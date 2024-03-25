@@ -1,12 +1,12 @@
 using UnityEngine;
 
 namespace UIFramework
-{    
+{
     public class UGUIWindowAnimator : IWindowAnimator
     {
         public WindowAnimation animation { get; private set; }
 
-        public IWindowAnimator.PlayMode playMode { get; private set; }
+        public PlayMode playMode { get; private set; }
 
         public float length { get; private set; }
 
@@ -20,9 +20,9 @@ namespace UIFramework
             {
                 switch (playMode)
                 {
-                    case IWindowAnimator.PlayMode.Forward:
+                    case PlayMode.Forward:
                         return length - currentTime;
-                    case IWindowAnimator.PlayMode.Reverse:
+                    case PlayMode.Reverse:
                         return currentTime;
                 }
                 return 0.0F;
@@ -31,11 +31,11 @@ namespace UIFramework
 
         public bool isPlaying { get; private set; }
 
-        public AnimatorEvent onAnimationComplete { get; private set; }
+        public WindowAnimatorEvent onAnimationComplete { get; private set; }
 
         public WindowAnimation.Type fallbackAnimationType { get { return WindowAnimation.Type.Fade; } }        
 
-        AnimatorEvent IWindowAnimator.onAnimationComplete { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        WindowAnimatorEvent IWindowAnimator.onAnimationComplete { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
         private RectTransform _rectTransform = null;
         private CanvasGroup _canvasGroup = null;
@@ -48,7 +48,7 @@ namespace UIFramework
             _canvasGroup = canvasGroup;
         }
 
-        public void Play(in WindowAnimation animation, float startTime = 0.0F, IWindowAnimator.PlayMode playMode = IWindowAnimator.PlayMode.Forward)
+        public void Play(in WindowAnimation animation)
         {
             WindowAnimation.Type animationType = animation.type;
             if (!IsSupportedAnimationType(animationType))
@@ -87,10 +87,10 @@ namespace UIFramework
 
         public void Update(float deltaTime)
         {
-            float animationDelta = playMode == IWindowAnimator.PlayMode.Forward ? deltaTime : -deltaTime;
+            float animationDelta = playMode == PlayMode.Forward ? deltaTime : -deltaTime;
             currentTime = Mathf.Clamp(currentTime + animationDelta, 0.0F, length);
 
-            float endTime = playMode == IWindowAnimator.PlayMode.Forward ? length : 0.0F;
+            float endTime = playMode == PlayMode.Forward ? length : 0.0F;
             bool isAtEnd = Mathf.Approximately(currentTime, endTime);
             if(isAtEnd)
             {
@@ -104,7 +104,7 @@ namespace UIFramework
 
         public void Rewind()
         {
-            playMode ^= (IWindowAnimator.PlayMode)1;
+            playMode ^= (PlayMode)1;
         }
     }
 }

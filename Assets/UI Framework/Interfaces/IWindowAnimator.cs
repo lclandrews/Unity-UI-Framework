@@ -1,15 +1,9 @@
 namespace UIFramework
 {
-    public delegate void AnimatorEvent(IWindowAnimator animator);
+    public delegate void WindowAnimatorEvent(IWindowAnimator animator);
 
     public interface IWindowAnimator
     {
-        public enum PlayMode
-        {
-            Forward,
-            Reverse
-        }
-
         WindowAnimation animation { get; }
         PlayMode playMode { get; }
         float currentTime { get; }
@@ -18,11 +12,11 @@ namespace UIFramework
 
         bool isPlaying { get; }        
 
-        AnimatorEvent onAnimationComplete { get; set; }
+        WindowAnimatorEvent onAnimationComplete { get; set; }
 
         WindowAnimation.Type fallbackAnimationType { get; }
 
-        void Play(in WindowAnimation animation, float startTime = 0.0F, PlayMode playMode = PlayMode.Forward);
+        void Play(in WindowAnimation animation);
 
         void Rewind();
 

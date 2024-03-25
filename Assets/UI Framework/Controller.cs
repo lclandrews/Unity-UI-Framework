@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Resources;
 
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace UIFramework
 {
@@ -16,9 +14,29 @@ namespace UIFramework
             Disabled
         }
 
-        public WindowState state { get; private set; } = WindowState.Closed;
-        public bool isEnabled { get; private set; } = true;
+        public WindowState state { get; private set; } = WindowState.Closed;        
         public bool isVisible { get { return state != WindowState.Closed; } }
+
+        public bool isEnabled 
+        {
+            get { return _isEnabled; } 
+            private set
+            {
+                if (_isEnabled != value) 
+                {
+                    _isEnabled = value;
+                    if(_isEnabled)
+                    {
+                        Enabled();
+                    }
+                    else
+                    {
+                        Disabled();
+                    }
+                }
+            }
+        }
+        private bool _isEnabled = false;
 
         protected abstract UpdateTimeMode updateTimeMode { get; set; }
 
@@ -142,30 +160,7 @@ namespace UIFramework
 
         protected abstract void SetBackButtonActive(bool active);
 
-        public bool Enable()
-        {
-            if (!isEnabled)
-            {
-                isEnabled = true;
-                Enabled();
-                return true;
-            }
-            return false;
-        }
-
         protected virtual void Enabled() { }
-
-        public bool Disable()
-        {
-            if (isEnabled)
-            {
-                isEnabled = false;
-                Disabled();
-                return true;
-            }
-            return false;
-        }
-
         protected virtual void Disabled() { }
 
         public abstract void SetWaiting(bool waiting);
@@ -197,12 +192,12 @@ namespace UIFramework
                     state = WindowState.Opening;
                     if (navigation.activeScreenType == targetScreenType)
                     {
-                        targetScreen.UpdateData(data);
+                        targetScreen.SetData(data);
                     }
                     else
                     {
-                        WindowAnimation windowAnimation = new WindowAnimation(WindowAnimation.Type.Fade, animator.remainingTime);
-                        navigation.Travel<ScreenType>(in windowAnimation, data, true);
+                        ScreenTransition windowTransition = new ScreenTransition(ScreenTransition.Type.Fade, animator.remainingTime);
+                        navigation.Travel<ScreenType>(in windowTransition, data, true);
                     }
                     OnOpen();
                 }                                
@@ -252,12 +247,12 @@ namespace UIFramework
                 {
                     if (navigation.activeScreenType == targetScreenType)
                     {
-                        targetScreen.UpdateData(data);
+                        targetScreen.SetData(data);
                     }
                     else
                     {
-                        WindowAnimation windowAnimation = new WindowAnimation(WindowAnimation.Type.Fade, animator.remainingTime);
-                        navigation.Travel<ScreenType>(in windowAnimation, data, true);
+                        ScreenTransition windowTransition = new ScreenTransition(ScreenTransition.Type.Fade, animator.remainingTime);
+                        navigation.Travel<ScreenType>(in windowTransition, data, true);
                     }                    
                 }                
                 

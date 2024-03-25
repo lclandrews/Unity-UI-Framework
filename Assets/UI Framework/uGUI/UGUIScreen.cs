@@ -11,6 +11,10 @@ namespace UIFramework
 
         public virtual bool supportsHistory { get; } = true;
 
+        public ScreenTransition defaultTransition => throw new System.NotImplementedException();
+
+        public int sortOrder { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+
         // IScreen
         public virtual void Init(Controller<ControllerType> controller)
         {

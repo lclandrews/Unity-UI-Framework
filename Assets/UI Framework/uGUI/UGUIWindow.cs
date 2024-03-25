@@ -45,7 +45,8 @@ namespace UIFramework
         private WindowState _state = WindowState.Closed;
 
         public bool isVisible { get { return state != WindowState.Closed; } }
-        public bool isEnabled { get { return _windowEnabled; } }
+        public bool isEnabled { get { return _windowEnabled; } set { _windowEnabled = value; } }
+        public bool isInteractable { get; set; }
 
         private bool _windowEnabled = true;
 
@@ -56,7 +57,6 @@ namespace UIFramework
         public abstract bool requiresData { get; }
         public object data { get; private set; } = null;
 
-        public abstract WindowAnimation defaultAnimation { get; }
         public IWindowAnimator animator { get; private set; }
 
         // Unity Messages
@@ -162,17 +162,17 @@ namespace UIFramework
             return false;
         }        
 
-        public bool Open(in WindowAnimation animation, object data)
+        public bool Open(in WindowAnimation animation)
         {
-            return Open(false, data);
+            return Open(false);
         }
 
-        public bool Open(object data)
+        public bool Open()
         {
-            return Open(true, data);
+            return Open(true);
         }        
 
-        public bool UpdateData(object data)
+        public bool SetData(object data)
         {
             if (requiresData)
             {
@@ -207,7 +207,7 @@ namespace UIFramework
 
         protected abstract bool OnUpdateData(object data);
 
-        private bool Open(bool force, object data)
+        private bool Open(bool force)
         {
             if (state == WindowState.Closed || state == WindowState.Closing)
             {
@@ -230,11 +230,11 @@ namespace UIFramework
                     _fadeTime = 0.0F;
                 }
                 //c.blocksRaycasts = true;
-                OnOpen(this.data);
-                if (force)
-                {
-                    OnOpened();
-                }
+                //OnOpen(this.data);
+                //if (force)
+                //{
+                //    OnOpened();
+                //}
                 return true;
             }
             return false;

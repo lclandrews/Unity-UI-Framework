@@ -11,32 +11,25 @@ namespace UIFramework
     /// <summary>
     /// Interface <c>IWindow</c> defines expected contract for all <c>UIFramework</c> windows.
     /// </summary>
-    public interface IWindow : IUIBehaviour
+    public interface IWindow : IWindowData, IUIBehaviour
     {
         WindowState state { get; }
-        bool isEnabled { get; }
         bool isVisible { get; }
+        bool isEnabled { get; set; }
+        bool isInteractable { get; set; }
 
-        bool requiresData { get; }
-        object data { get; }
-
-        WindowAnimation defaultAnimation { get; }
         IWindowAnimator animator { get; }
-
-        bool Enable();
-        bool Disable();
 
         bool SetWaiting(bool waiting);
 
         /// <summary>
-        /// Open the window with the provided animation and data
+        /// Open the window with the provided animation
         /// /// </summary>
-        bool Open(in WindowAnimation animation, object data);
-        // Open the window immediately with no animation and the provided data
-        bool Open(object data);
-
-        bool UpdateData(object data);
-        bool IsValidData(object data);
+        bool Open(in WindowAnimation animation);
+        /// <summary>
+        /// Open the window with immediately
+        /// /// </summary>
+        bool Open();
 
         /// <summary>
         /// Close the window with the provided animation

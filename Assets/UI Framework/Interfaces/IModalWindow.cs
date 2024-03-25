@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
-using TMPro;
-using UnityEngine.EventSystems;
 
 namespace UIFramework
 {

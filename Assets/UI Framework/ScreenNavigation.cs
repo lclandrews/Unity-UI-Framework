@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Generic;
 
 using UnityEngine;
 
 namespace UIFramework
-{    
+{
     public struct NavigationEvent
     {
         public enum Type
@@ -38,11 +37,12 @@ namespace UIFramework
 
         public Type activeScreenType { get; private set; } = null;
 
-        private List<Stack<Type>> _history = new List<Stack<Type>>();
-        private int activeHistoryGroup = 0;
         public int historyCount { get; private set; }
 
         public NavigationUpdate onNavigationUpdate = null;
+
+        private ScreenHistory<ControllerType> _history = null;
+        private ScreenTransitionManager<ControllerType> _transitionManager = null;
 
         private ScreenNavigation() { }
 
@@ -53,7 +53,8 @@ namespace UIFramework
                 throw new ArgumentNullException("screens");
             }
             _screens = screens;
-            _history.Add(new Stack<Type>(_screens.array.Length));
+            _history = new ScreenHistory<ControllerType>(_screens.array.Length);
+            _transitionManager = new ScreenTransitionManager<ControllerType>();
         }
 
         public void Init<ScreenType>(object targetScreenData) where ScreenType : IScreen<ControllerType>
@@ -70,7 +71,8 @@ namespace UIFramework
                 throw new Exception (string.Format("Attempted to initialize ScreenNavigation with a screen type of {0} that has not been found.", targetScreenType.ToString()));
             }
 
-            targetScreen.Open(targetScreenData);
+            targetScreen.SetData(targetScreenData);
+            targetScreen.Open();
             activeScreenType = targetScreenType;
 
             for (int i = 0; i < _screens.array.Length; i++)
@@ -83,7 +85,7 @@ namespace UIFramework
             }
         }
 
-        public NavigationEvent Travel<ScreenType>(in WindowAnimation transition, object data, bool excludeCurrentFromHistory = false)
+        public NavigationEvent Travel<ScreenType>(in ScreenTransition transition, object data, bool excludeCurrentFromHistory = false)
             where ScreenType : IScreen<ControllerType>
         {
             Type targetType = typeof(ScreenType);
@@ -107,7 +109,7 @@ namespace UIFramework
             return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Travel, false, targetType, historyCount));
         }
 
-        public NavigationEvent Travel(Type screenType, in WindowAnimation transition, object data, bool excludeCurrentFromHistory = false)
+        public NavigationEvent Travel(Type screenType, in ScreenTransition transition, object data, bool excludeCurrentFromHistory = false)
         {
             if (screenType.IsSubclassOf(typeof(IScreen<ControllerType>)))
             {
@@ -135,22 +137,25 @@ namespace UIFramework
 
         private NavigationEvent TravelInternal(Type screenType, IScreen<ControllerType> screen, object data, bool excludeCurrentFromHistory)
         {
-            return TravelInternal(screenType, screen, screen.defaultAnimation, data, excludeCurrentFromHistory);
+            return TravelInternal(screenType, screen, screen.defaultTransition, data, excludeCurrentFromHistory);
         }
 
-        private NavigationEvent TravelInternal(Type screenType, IScreen<ControllerType> screen, in WindowAnimation transition, object data, bool excludeCurrentFromHistory)
+        private NavigationEvent TravelInternal(Type screenType, IScreen<ControllerType> screen, in ScreenTransition transition, object data, bool excludeCurrentFromHistory)
         {
-            if (activeScreenType != null)
+            if(activeScreenType == null)
             {
-                WindowAnimation closeAnimation = transition.CreateInverseAnimation();
-                IScreen<ControllerType> activeScreen = _screens.dictionary[activeScreenType];
-                activeScreen.Close(in closeAnimation);
-                if (activeScreen.supportsHistory && !excludeCurrentFromHistory)
-                {
-                    PushToHistory(activeScreenType);
-                }
+                throw new InvalidOperationException("Unable to travel while there is no active screen");
             }
-            screen.Open(in transition, data);
+
+            IScreen<ControllerType> activeScreen = _screens.dictionary[activeScreenType];
+            if (activeScreen.supportsHistory && !excludeCurrentFromHistory)
+            {
+                _history.Push(activeScreenType, in transition);
+            }
+
+            screen.SetData(data);
+            _transitionManager.Transition(in transition, activeScreen, screen);
+
             activeScreenType = screenType;
             return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Travel, true, screenType, historyCount));
         }
@@ -184,15 +189,15 @@ namespace UIFramework
             {
                 if (historyCount > 0)
                 {                    
-                    WindowAnimation closeAnimation = activeScreen.animator.animation.CreateInverseAnimation();
-                    activeScreen.Close(in closeAnimation);
+                    Type previousScreenType;
+                    ScreenTransition transition; 
+                    _history.Pop(out previousScreenType, out transition);
+                    IScreen<ControllerType> previousScreen = _screens.dictionary[previousScreenType];
 
-                    Type targetScreenType = PopFromHistory();
-                    IScreen<ControllerType> targetScreen = _screens.dictionary[targetScreenType];
+                    previousScreen.SetData(previousScreen.data);
+                    _transitionManager.ReverseTransition(in transition, previousScreen, activeScreen);
 
-                    WindowAnimation openAnimation = targetScreen.animator.animation.CreateInverseAnimation();
-                    targetScreen.Open(in openAnimation, targetScreen.data);
-                    activeScreenType = targetScreenType;
+                    activeScreenType = previousScreenType;
 
                     return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Back, true, activeScreenType, historyCount));
                 }
@@ -217,61 +222,30 @@ namespace UIFramework
             }
         }        
 
-        private void PushToHistory(Type type)
-        {
-            _history[activeHistoryGroup].Push(type);
-            historyCount++;
-        }
-
-        private Type PopFromHistory()
-        {
-            if(_history[activeHistoryGroup].Count > 0)
-            {
-                historyCount--;
-                Type type = _history[activeHistoryGroup].Pop();
-                if(_history[activeHistoryGroup].Count == 0 && activeHistoryGroup > 0)
-                {
-                    activeHistoryGroup--;
-                }
-            }
-
-            throw new InvalidOperationException("The history stack is empty.");
-        }
-
         public void StartNewHistoryGroup()
         {
-            _history.Add(new Stack<Type>(_screens.array.Length));
-            activeHistoryGroup = _history.Count - 1;
+            _history.StartNewGroup();
         }
 
         public NavigationEvent ClearLatestHistoryGroup()
         {
-            if(_history.Count > 1)
+            if(_history.ClearLatestGroup())
             {
-                historyCount -= _history[activeHistoryGroup].Count;
-                _history.RemoveAt(activeHistoryGroup);
-                activeHistoryGroup--;
                 return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.History, true, null, historyCount));
             }
             return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.History, false, null, historyCount));
         }
 
-        public NavigationEvent InsertHistory<T>() where T : IScreen<ControllerType>
+        public NavigationEvent InsertHistory<T>(in ScreenTransition transition) where T : IScreen<ControllerType>
         {
-            PushToHistory(typeof(T));
+            _history.Push(typeof(T), in transition);
             return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.History, true, null, historyCount));
         }
 
         public NavigationEvent ClearHistory()
         {
-            if(historyCount > 0)
+            if(_history.Clear())
             {
-                if (activeHistoryGroup > 0)
-                {
-                    _history.RemoveRange(1, activeHistoryGroup);
-                }
-                _history[0].Clear();
-                historyCount = 0;
                 return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.History, true, null, historyCount));
             }
             return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.History, false, null, historyCount));
