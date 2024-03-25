@@ -28,6 +28,9 @@ namespace UIFramework
         public float length { get; private set; }
         public EasingMode easingMode { get; private set; }
         public float startTime { get; private set; }
+        // [TODO] Determine if this is the best place for this to live.
+        // Kept here to simplify opening windows with an animation but this duplicates data
+        // on the animator class and may confuse things.
         public PlayMode playMode { get; private set; }
 
         public WindowAnimation(Type type, float length)

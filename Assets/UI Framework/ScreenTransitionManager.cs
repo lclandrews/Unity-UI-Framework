@@ -10,6 +10,7 @@ namespace UIFramework
         {
             public ScreenTransition transition { get; private set; }
             public IScreen<ControllerType> sourceScreen { get; private set; }
+
             public IScreen<ControllerType> targetScreen { get; private set; }
 
             public ScreenTransitionParams(in ScreenTransition transition, IScreen<ControllerType> sourceScreen, IScreen<ControllerType> targetScreen)
@@ -251,6 +252,8 @@ namespace UIFramework
                 {
                     _primaryAnimator = _activeTransitionParams.targetScreen.animator;
                 }
+                _primaryAnimator.onAnimationComplete += OnAnimationComplete;
+
                 _activeTransitionParams.sourceScreen.isInteractable = false;
                 _activeTransitionParams.targetScreen.isInteractable = false;
                 float normalisedStartTime = _isActiveReverse ? 1.0F : 0.0F;
@@ -493,17 +496,18 @@ namespace UIFramework
 
         private void CompleteTransition()
         {
+            _activeTransitionParams.sourceScreen.isInteractable = true;
+            _activeTransitionParams.targetScreen.isInteractable = true;
+
             if (_isActiveReverse)
-            {
-                _activeTransitionParams.sourceScreen.isInteractable = true;
+            {                
                 if(_activeTransitionParams.transition.animationTargets != ScreenTransition.AnimationTargets.Both)
                 {
                     _activeTransitionParams.targetScreen.Close();
                 }                
             }
             else
-            {
-                _activeTransitionParams.targetScreen.isInteractable = true;
+            {                
                 if (_activeTransitionParams.transition.animationTargets != ScreenTransition.AnimationTargets.Both)
                 {
                     _activeTransitionParams.sourceScreen.Close();

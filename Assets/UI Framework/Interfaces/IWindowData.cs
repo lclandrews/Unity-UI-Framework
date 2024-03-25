@@ -5,7 +5,7 @@ namespace UIFramework
         bool requiresData { get; }
         object data { get; }
 
-        bool SetData(object data);
+        void SetData(object data);
         bool IsValidData(object data);
     }
 }

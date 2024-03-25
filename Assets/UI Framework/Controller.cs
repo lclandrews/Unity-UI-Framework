@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Unity.VisualScripting;
+
 using UnityEngine;
 
 namespace UIFramework
 {
-    public abstract class Controller<ControllerType> : MonoBehaviour where ControllerType : Controller<ControllerType>
+    public abstract class Controller<ControllerType> : MonoBehaviour, IWindowAnimatorFactory where ControllerType : Controller<ControllerType>
     {
         public enum UpdateTimeMode
         {
@@ -14,7 +16,9 @@ namespace UIFramework
             Disabled
         }
 
-        public WindowState state { get; private set; } = WindowState.Closed;        
+        [SerializeField] private Transform[] rootScreenTransforms = new Transform[0];
+
+        public WindowState state { get; private set; } = WindowState.Unitialized;        
         public bool isVisible { get { return state != WindowState.Closed; } }
 
         public bool isEnabled 
@@ -40,7 +44,18 @@ namespace UIFramework
 
         protected abstract UpdateTimeMode updateTimeMode { get; set; }
 
-        protected abstract IWindowAnimator animator { get; set; }
+        protected IWindowAnimator animator 
+        { 
+            get
+            {
+                if(_animator == null)
+                {
+                    _animator = CreateAnimator();
+                }
+                return _animator;
+            }
+        }
+        private IWindowAnimator _animator = null;
 
         public ScreenNavigation<ControllerType> navigation = null;
 
@@ -56,30 +71,7 @@ namespace UIFramework
 
         protected virtual void Awake()
         {
-            _screens.array = GetComponentsInChildren<IScreen<ControllerType>>(true);
-            _screens.dictionary = new Dictionary<Type, IScreen<ControllerType>>(_screens.array.Length);            
-
-            for (int i = 0; i < _screens.array.Length; i++)
-            {
-                Type screenType = _screens.array[i].GetType();
-                if (!_screens.dictionary.ContainsKey(screenType))
-                {
-                    _screens.dictionary.Add(screenType, _screens.array[i]);                    
-                }
-                else
-                {
-                    Debug.LogWarning("Multiple instances of the same IScreen<ControllerType> type have been found. " +
-                        "Please ensure all IScreen<ControllerType> instances are of a unqiue type.");
-                }
-            }
-
-            navigation = new ScreenNavigation<ControllerType>(_screens);  
-            navigation.onNavigationUpdate += OnNavigationUpdate;
             
-            if (animator != null)
-            {
-                animator.onAnimationComplete += OnAnimationComplete;
-            }
         }
 
         protected virtual void Start()
@@ -120,7 +112,66 @@ namespace UIFramework
 
         }
 
+        // IWindowAnimatorFactor
+        public abstract IWindowAnimator CreateAnimator();
+
         // ScreenController<ControllerType>
+        public void Init()
+        {
+            if (state != WindowState.Unitialized)
+            {
+                throw new InvalidOperationException("Controller already initialized.");
+            }
+
+            if (rootScreenTransforms == null || rootScreenTransforms.Length == 0)
+            {
+                throw new InvalidOperationException("Unable to init Controller with no rootScreenTransforms set.");
+            }
+
+            List<IScreen<ControllerType>> screenList = new List<IScreen<ControllerType>>();
+            for (int i = 0; i < rootScreenTransforms.Length; i++)
+            {
+                if (rootScreenTransforms[i] == null)
+                {
+                    throw new InvalidOperationException(string.Format("Attempting to init while rootScreenTransform[{0}] is null.", i));
+                }
+                screenList.AddRange(rootScreenTransforms[i].GetComponentsInChildren<IScreen<ControllerType>>(true));
+            }
+
+            _screens.array = screenList.ToArray();
+            _screens.dictionary = new Dictionary<Type, IScreen<ControllerType>>(_screens.array.Length);
+
+            for (int i = 0; i < _screens.array.Length; i++)
+            {
+                Type screenType = _screens.array[i].GetType();
+                if (!_screens.dictionary.ContainsKey(screenType))
+                {
+                    _screens.array[i].Init(this);
+                    _screens.array[i].Close();
+                    _screens.dictionary.Add(screenType, _screens.array[i]);
+                }
+                else
+                {
+                    Debug.LogWarning("Multiple instances of the same IScreen<ControllerType> type have been found. " +
+                        "Please ensure all IScreen<ControllerType> instances are of a unqiue type.");
+                }
+            }
+
+            navigation = new ScreenNavigation<ControllerType>(_screens);
+            navigation.onNavigationUpdate += OnNavigationUpdate;
+
+            if (animator != null)
+            {
+                animator.onAnimationComplete += OnAnimationComplete;
+            }
+
+            SetBackButtonActive(false);
+            state = WindowState.Closed;
+            OnInit();
+        }
+
+        protected virtual void OnInit() { }
+
         protected virtual void UpdateUI(float deltaTime)
         {
             if(animator != null)
@@ -340,8 +391,8 @@ namespace UIFramework
             }
             else
             {
-                Debug.LogWarning(string.Format("Controller animation complete while in unexpected state: {0}", state.ToString()));
+                throw new Exception(string.Format("Controller animation complete while in unexpected state: {0}", state.ToString()));
             }
-        }
+        }        
     }
 }

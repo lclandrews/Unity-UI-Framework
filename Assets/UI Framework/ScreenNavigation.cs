@@ -35,9 +35,17 @@ namespace UIFramework
     {
         private ScreenCollection<ControllerType> _screens = null;
 
+        public IScreen<ControllerType> activeScreen
+        {
+            get
+            {
+                return activeScreenType != null ? _screens.dictionary[activeScreenType] : null;
+            }
+        }
+
         public Type activeScreenType { get; private set; } = null;
 
-        public int historyCount { get; private set; }
+        public int historyCount { get { return _history.count; } }
 
         public NavigationUpdate onNavigationUpdate = null;
 
@@ -74,15 +82,6 @@ namespace UIFramework
             targetScreen.SetData(targetScreenData);
             targetScreen.Open();
             activeScreenType = targetScreenType;
-
-            for (int i = 0; i < _screens.array.Length; i++)
-            {
-                Type screenType = _screens.array[i].GetType();
-                if (screenType != targetScreenType)
-                {
-                    _screens.array[i].Close();
-                }
-            }
         }
 
         public NavigationEvent Travel<ScreenType>(in ScreenTransition transition, object data, bool excludeCurrentFromHistory = false)

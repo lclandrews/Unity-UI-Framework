@@ -2,6 +2,7 @@ namespace UIFramework
 {
     public enum WindowState
     {
+        Unitialized,
         Open,
         Opening,
         Closed,
@@ -19,6 +20,8 @@ namespace UIFramework
         bool isInteractable { get; set; }
 
         IWindowAnimator animator { get; }
+
+        void Init();
 
         bool SetWaiting(bool waiting);
 

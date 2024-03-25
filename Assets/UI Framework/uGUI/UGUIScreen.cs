@@ -1,9 +1,11 @@
-﻿using UnityEngine.UI;
+﻿using UnityEngine;
+using UnityEngine.UI;
 
 namespace UIFramework
-{
+{    
     public abstract class UGUIScreen<ControllerType> : UGUIWindow, IScreen<ControllerType> where ControllerType : Controller<ControllerType>
     {
+
         public ControllerType controller { get { return _controller; } }
         private ControllerType _controller = null;
 
@@ -11,9 +13,29 @@ namespace UIFramework
 
         public virtual bool supportsHistory { get; } = true;
 
-        public ScreenTransition defaultTransition => throw new System.NotImplementedException();
+        public ScreenTransition defaultTransition { get; private set; } = new ScreenTransition(ScreenTransition.Type.Fade, 0.25F);
 
-        public int sortOrder { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        private Canvas _canvas = null;
+
+        public int sortOrder
+        {
+            get
+            {
+                return _sortOrder;
+            }
+            set
+            {
+                _sortOrder = value;
+                // [TODO] Determine a better way of handling implemented sort order.
+                // This current approach is used to support transitioning between screens within the same Canvas and
+                // screens that utilise different Canvases, or a hybrid approach.
+                // This means that if screens share a Canvas when the sort order is set to transition between children, 
+                // both will set the sort order of the Canvas which is undesirable :(
+                rectTransform.SetSiblingIndex(_sortOrder);              
+                _canvas.sortingOrder = _sortOrder;
+            }
+        }
+        private int _sortOrder = 0;
 
         // IScreen
         public virtual void Init(Controller<ControllerType> controller)
@@ -21,11 +43,13 @@ namespace UIFramework
             if (controller != null)
             {
                 _controller = controller as ControllerType;
+                _canvas = GetComponentInParent<Canvas>(true);
                 if (backButton != null)
                 {
                     backButton.onClick.AddListener(controller.navigation.Back);
                 }
             }
+            Init();
         }
 
         public bool SetBackButtonActive(bool active)

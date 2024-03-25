@@ -18,14 +18,16 @@ namespace UIFramework
 
         void Play(in WindowAnimation animation);
 
-        void Rewind();
+        bool Rewind();
 
         bool Stop();
 
-        void SetCurrentTime(float time);
+        bool SetCurrentTime(float time);
 
         bool IsSupportedAnimationType(WindowAnimation.Type animationType);
 
-        void Update(float deltaTime);        
+        void Update(float deltaTime);
+
+        void ResetAnimatedComponents();
     }
 }

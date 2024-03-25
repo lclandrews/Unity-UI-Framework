@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace UIFramework
 {
-    [RequireComponent(typeof(CanvasGroup))]
+    [RequireComponent(typeof(CanvasGroup), typeof(RectTransform))]
     public abstract class UGUIWindow : UGUIBehaviour, IWindow, IWindowAnimatorFactory
     {
         public RectTransform rectTransform
@@ -26,177 +27,264 @@ namespace UIFramework
                 if (_canvasGroup == null)
                 {
                     _canvasGroup = GetComponent<CanvasGroup>();
-                    _canvasGroup.alpha = 0.0F;
-                    _canvasGroup.interactable = true;
-                    _canvasGroup.blocksRaycasts = false;
                 }
                 return _canvasGroup;
             }
         }
         private CanvasGroup _canvasGroup = null;
 
-        private float _fadeTimer = 0.25F;
-        private bool _fade = false;
-        private float _fadeTime = 0.0F;
-        private float _startAlpha = 0.0F;
-        private float _targetAlpha = 0.0F;
-
         public WindowState state { get { return _state; } protected set { _state = value; } }
-        private WindowState _state = WindowState.Closed;
+        private WindowState _state = WindowState.Unitialized;
 
         public bool isVisible { get { return state != WindowState.Closed; } }
-        public bool isEnabled { get { return _windowEnabled; } set { _windowEnabled = value; } }
-        public bool isInteractable { get; set; }
 
-        private bool _windowEnabled = true;
+        public virtual bool isEnabled
+        {
+            get { return _isEnabledCounter > 0; }
+            set
+            {
+                if (value)
+                {
+                    _isEnabledCounter = Mathf.Min(_isInteractableCounter + 1, 1);
+                }
+                else
+                {
+                    _isEnabledCounter--;
+                }
 
-        public float windowTransitionLength { get { return _fadeTimer; } }
-        public float windowTransitionTime { get { return _fadeTime; } }
-        public float windowTransitionAlpha { get { return _fadeTime / _fadeTimer; } }
+                if(_isEnabledCounter > 0)
+                {                    
+                    isInteractable = true;
+                    canvasGroup.interactable = true;
+                }
+                else
+                {                    
+                    isInteractable = false;
+                    canvasGroup.interactable = false;
+                }
+            }
+        }
+        private int _isEnabledCounter = 1;
+
+        public bool isInteractable
+        {
+            get { return _isInteractableCounter > 0; }
+            set
+            {
+                if (value)
+                {
+                    _isInteractableCounter = Mathf.Min(_isInteractableCounter + 1, 1);
+                }
+                else
+                {
+                    _isInteractableCounter--;
+                }
+
+                if (_isInteractableCounter > 0)
+                {
+                    canvasGroup.blocksRaycasts = true;
+                }
+                else
+                {
+                    canvasGroup.blocksRaycasts = false;
+                }
+            }
+        }
+        private int _isInteractableCounter = 1;
 
         public abstract bool requiresData { get; }
         public object data { get; private set; } = null;
 
-        public IWindowAnimator animator { get; private set; }
-
-        // Unity Messages
-        protected override void Awake()
+        public IWindowAnimator animator 
         {
-            base.Awake();
-            canvasGroup.alpha = 0.0F;
-            canvasGroup.blocksRaycasts = false;
-            animator = CreateAnimator();
+            get 
+            {
+                if(_animator == null)
+                {
+                    _animator = CreateAnimator();
+                    animator.onAnimationComplete += OnAnimationComplete;
+                }
+                return _animator;
+            } 
         }
+        private IWindowAnimator _animator = null;
+
+        private bool _isWaiting = false;
 
         // IWindowAnimatorFactory
         public virtual IWindowAnimator CreateAnimator()
         {
-            return new UGUIWindowAnimator(_rectTransform, _canvasGroup);
+            return new UGUIWindowAnimator(rectTransform, canvasGroup);
         }
 
         // UGUIBehaviour
         public override void UpdateUI(float deltaTime)
         {
             base.UpdateUI(deltaTime);
-            if (_fade)
+            if(animator != null)
             {
-                CanvasGroup c = canvasGroup;
-                _fadeTime += deltaTime;
-                float normalTime = _fadeTime / _fadeTimer;
-                if (normalTime < 1.0F)
-                {
-                    c.alpha = Mathf.Lerp(_startAlpha, _targetAlpha, normalTime);
-                }
-                else
-                {
-                    c.alpha = _targetAlpha;
-                    _fade = false;
-                    _fadeTime = 0.0F;
-                    if (state == WindowState.Opening)
-                    {
-                        state = WindowState.Open;
-                        //c.interactable = true;
-                        c.blocksRaycasts = true;
-                        OnOpened();
-                    }
-                    else if (state == WindowState.Closing)
-                    {
-                        state = WindowState.Closed;
-                        OnClosed();
-                    }
-                    else
-                    {
-                        Debug.LogError("Window - UpdateUI - Invalid window state when finalizing animation!");
-                    }
-                }
+                animator.Update(deltaTime);
             }
         }
 
         // IWindow
-        public bool Enable()
+        public void Init()
         {
-            if (!_windowEnabled)
+            if (state != WindowState.Unitialized)
             {
-                _windowEnabled = true;
-                if (isVisible)
-                {
-                    canvasGroup.interactable = true;
-                }
-                return true;
+                throw new InvalidOperationException("Window already initialized.");
             }
-            return false;
-        }
 
-        public bool Disable()
-        {
-            if (_windowEnabled)
-            {
-                _windowEnabled = false;
-                if (isVisible)
-                {
-                    canvasGroup.interactable = false;
-                }
-                return true;
-            }
-            return false;
+            state = WindowState.Closed;
+            gameObject.SetActive(false);
+            OnInit();
         }
 
         public bool SetWaiting(bool waiting)
         {
-            if (waiting)
+            if(ShowWaitingIndicator(waiting))
             {
-                if (Disable())
+                if (waiting != _isWaiting)
                 {
-                    ShowWaitingIndicator(waiting);
-                    return true;
-                }
-            }
-            else
-            {
-                if (Enable())
-                {
-                    ShowWaitingIndicator(waiting);
-                    return true;
-                }
+                    _isWaiting = waiting;
+                    isEnabled = !waiting;
+                }                    
+                return true;
             }
             return false;
-        }        
+        }
 
         public bool Open(in WindowAnimation animation)
         {
-            return Open(false);
+            if (animator == null)
+            {
+                throw new Exception("Attempted to open Window with animation while animator is null.");
+            }
+
+            if (state == WindowState.Closing || state == WindowState.Closed)
+            {
+                if (animator.isPlaying)
+                {
+                    if (animator.animation.type != animation.type)
+                    {
+                        Debug.Log(string.Format("Window is already playing a close animation of type {0}, " +
+                            "provided open animation is ignored and the current close animation is rewound.", animator.animation.type.ToString()));
+                    }
+                    animator.Rewind();
+                }
+                else
+                {
+                    animator.Play(in animation);
+                }
+                state = WindowState.Opening;
+                gameObject.SetActive(true);
+                OnOpen();
+                return true;
+            }
+            return false;
         }
 
         public bool Open()
         {
-            return Open(true);
-        }        
-
-        public bool SetData(object data)
-        {
-            if (requiresData)
+            if (state == WindowState.Closing || state == WindowState.Closed)
             {
-                if (OnUpdateData(data))
+                if (state == WindowState.Closed)
+                {
+                    state = WindowState.Open;
+                    gameObject.SetActive(true);
+                    animator.ResetAnimatedComponents();
+                    OnOpen();
+                    OnOpened();
+                }
+                else
+                {
+                    Debug.Log("Open was called on Window without an animation while already playing a close animation, " +
+                        "the current animation will be rewound.");
+                    animator.Rewind();
+
+                    state = WindowState.Opening;
+                    OnOpen();
+                }
+                return true;
+            }
+            return false;
+        }
+
+        public void SetData(object data)
+        {
+            if(requiresData)
+            {                
+                if (IsValidData(data))
                 {
                     this.data = data;
-                    return true;
+                    OnDataSet();
                 }
-                Debug.LogWarning(GetType().ToString() + " - UpdateData - data can only bet set via Window.Open(object data)");
+                else
+                {
+                    throw new InvalidOperationException("Attempted to set data on Window of the wrong type.");
+                }
+            }            
+            else if(data != null)
+            {
+                throw new InvalidOperationException("Cannot set data on Window as it requires none.");
             }
-            Debug.LogWarning(GetType().ToString() + " - UpdateData - Window does not require any data");
-            return false;
         }
 
         public abstract bool IsValidData(object data);
 
         public bool Close(in WindowAnimation animation)
         {
-            return Close(false);
+            if (animator == null)
+            {
+                throw new Exception("Attempted to close Controller with animation while animator is null.");
+            }
+
+            if (state == WindowState.Opening || state == WindowState.Open)
+            {
+                if (animator.isPlaying)
+                {
+                    if (animator.animation.type != animation.type)
+                    {
+                        Debug.Log(string.Format("Controller is already playing a open animation of type {0}, " +
+                            "provided close animation is ignored and the current open animation is rewound.", animator.animation.type.ToString()));
+                    }
+                    animator.Rewind();
+                }
+                else
+                {
+                    animator.Play(in animation);
+                }
+
+                state = WindowState.Closing;
+                OnClose();
+                return true;
+            }
+            return false;
         }
 
         public bool Close()
         {
-            return Close(true);
+            if (state == WindowState.Opening || state == WindowState.Open)
+            {
+                if (state == WindowState.Open)
+                {
+                    state = WindowState.Closed;                    
+                    OnClose();
+                    gameObject.SetActive(false);
+                    OnClosed();                    
+                }
+                else
+                {
+                    Debug.Log("Close was called on Window without an animation while already playing a open animation, " +
+                        "the current animation will be rewound.");
+                    animator.Rewind();
+
+                    state = WindowState.Closing;
+                    OnClose();
+                }
+                return true;
+            }
+            return false;
         }
 
         // UGUIWindow
@@ -205,86 +293,35 @@ namespace UIFramework
             return false;
         }
 
-        protected abstract bool OnUpdateData(object data);
+        protected virtual void OnDataSet() { }
 
-        private bool Open(bool force)
+        protected virtual void OnInit() { }
+
+        protected virtual void OnOpen() { }
+
+        protected virtual void OnOpened() { }
+
+        protected virtual void OnClose() { }
+
+        protected virtual void OnClosed() { }
+
+        private void OnAnimationComplete(IWindowAnimator animator)
         {
-            if (state == WindowState.Closed || state == WindowState.Closing)
+            if(state == WindowState.Opening)
             {
-                this.data = data;
-                gameObject.SetActive(true);
-                CanvasGroup c = canvasGroup;
-                if (force)
-                {
-                    state = WindowState.Open;
-                    c.alpha = 1.0F;
-                    //c.interactable = true;
-                    c.blocksRaycasts = true;
-                }
-                else
-                {
-                    state = WindowState.Opening;
-                    _fade = true;
-                    _startAlpha = canvasGroup.alpha;
-                    _targetAlpha = 1.0F;
-                    _fadeTime = 0.0F;
-                }
-                //c.blocksRaycasts = true;
-                //OnOpen(this.data);
-                //if (force)
-                //{
-                //    OnOpened();
-                //}
-                return true;
+                state = WindowState.Open;
+                OnOpened();
             }
-            return false;
-        }
-
-        protected abstract void OnOpen(object data);
-
-        protected virtual void OnOpened()
-        {
-            return;
-        }
-
-        private bool Close(bool force)
-        {
-            if (state == WindowState.Open || state == WindowState.Opening ||
-                (force && (canvasGroup.alpha > 0.0F || gameObject.activeSelf)))
+            else if(state == WindowState.Closing)
             {
-                if (force)
-                {
-                    state = WindowState.Closed;
-                    canvasGroup.alpha = 0.0F;
-                }
-                else
-                {
-                    state = WindowState.Closing;
-                    _fade = true;
-                    _startAlpha = canvasGroup.alpha;
-                    _targetAlpha = 0.0F;
-                    _fadeTime = 0.0F;
-                }
-                //canvasGroup.interactable = false;
-                canvasGroup.blocksRaycasts = false;
-                OnClose();
-                if (force)
-                {
-                    OnClosed();
-                }
-                return true;
+                state = WindowState.Closed;
+                gameObject.SetActive(false);
+                OnClosed();
             }
-            return false;
-        }
-
-        protected virtual void OnClose()
-        {
-            return;
-        }
-
-        protected virtual void OnClosed()
-        {
-            gameObject.SetActive(false);
+            else
+            {
+                throw new Exception(string.Format("Window animation complete while in unexpected state: {0}", state.ToString()));
+            }
         }
 
         protected void RebuildLayout(RectTransform target = null)

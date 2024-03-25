@@ -29,13 +29,11 @@ namespace UIFramework
             }
         }
 
-        public bool isPlaying { get; private set; }
+        public bool isPlaying { get; private set; } = false;
 
-        public WindowAnimatorEvent onAnimationComplete { get; private set; }
+        public WindowAnimation.Type fallbackAnimationType { get { return WindowAnimation.Type.Fade; } }
 
-        public WindowAnimation.Type fallbackAnimationType { get { return WindowAnimation.Type.Fade; } }        
-
-        WindowAnimatorEvent IWindowAnimator.onAnimationComplete { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        public WindowAnimatorEvent onAnimationComplete { get; set; } = default;
 
         private RectTransform _rectTransform = null;
         private CanvasGroup _canvasGroup = null;
@@ -57,54 +55,167 @@ namespace UIFramework
                 Debug.LogWarning(string.Format("No UGUI animation implemented for: {0}, falling back to: {1}", animationType, fallbackAnimationType.ToString()));
             }
 
+            isPlaying = true;
+            this.animation = animation;
+            playMode = animation.playMode;
+            length = animation.length;
+            currentTime = Mathf.Clamp(animation.startTime, 0.0F, length);
+
             switch (animation.type)
             {
                 case WindowAnimation.Type.Fade:
+                    Fade(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
+                    break;
+                case WindowAnimation.Type.Dissolve:
+                    Dissolve(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
+                    break;
+                case WindowAnimation.Type.SlideFromLeft:
+                    SlideFromLeft(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
+                    break;
+                case WindowAnimation.Type.SlideFromRight:
+                    SlideFromRight(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
+                    break;
+                case WindowAnimation.Type.SlideFromBottom:
+                    SlideFromBottom(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
+                    break;
+                case WindowAnimation.Type.SlideFromTop:
+                    SlideFromTop(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
+                    break;
+                case WindowAnimation.Type.Flip:
+                    Flip(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
                     break;
             }
         }
 
-        public void SetCurrentTime(float time)
+        public bool Rewind()
         {
-            throw new System.NotImplementedException();
+            if (isPlaying)
+            {
+                playMode ^= (PlayMode)1;
+                return true;
+            }
+            return false;
         }
 
         public bool Stop()
         {
-            throw new System.NotImplementedException();
+            if (isPlaying)
+            {
+                isPlaying = false;
+                return true;
+            }
+            return false;
         }
 
-        public bool IsSupportedAnimationType(WindowAnimation.Type animationType)
+        public bool SetCurrentTime(float time)
+        {
+            if(isPlaying)
+            {
+                currentTime = Mathf.Clamp(time, 0.0F, length);
+                return true;
+            }
+            return false;
+        }        
+
+        public virtual bool IsSupportedAnimationType(WindowAnimation.Type animationType)
         {
             switch (animationType)
             {
                 default:
                     return false;
                 case WindowAnimation.Type.Fade:
+                case WindowAnimation.Type.SlideFromLeft:
+                case WindowAnimation.Type.SlideFromRight:
+                case WindowAnimation.Type.SlideFromBottom:
+                case WindowAnimation.Type.SlideFromTop:
+                case WindowAnimation.Type.Flip:
                     return true;
             }
         }
 
         public void Update(float deltaTime)
         {
-            float animationDelta = playMode == PlayMode.Forward ? deltaTime : -deltaTime;
-            currentTime = Mathf.Clamp(currentTime + animationDelta, 0.0F, length);
-
-            float endTime = playMode == PlayMode.Forward ? length : 0.0F;
-            bool isAtEnd = Mathf.Approximately(currentTime, endTime);
-            if(isAtEnd)
+            if(isPlaying)
             {
+                float animationDelta = playMode == PlayMode.Forward ? deltaTime : -deltaTime;
+                currentTime = Mathf.Clamp(currentTime + animationDelta, 0.0F, length);
 
-            }
-            else
-            {
+                float endTime = playMode == PlayMode.Forward ? length : 0.0F;
+                bool isAtEnd = Mathf.Approximately(currentTime, endTime);
+                currentTime = isAtEnd ? endTime : currentTime;
 
-            }
+                switch (animation.type)
+                {
+                    case WindowAnimation.Type.Fade:
+                        Fade(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
+                        break;
+                    case WindowAnimation.Type.Dissolve:
+                        Dissolve(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
+                        break;
+                    case WindowAnimation.Type.SlideFromLeft:
+                        SlideFromLeft(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
+                        break;
+                    case WindowAnimation.Type.SlideFromRight:
+                        SlideFromRight(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
+                        break;
+                    case WindowAnimation.Type.SlideFromBottom:
+                        SlideFromBottom(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
+                        break;
+                    case WindowAnimation.Type.SlideFromTop:
+                        SlideFromTop(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
+                        break;
+                    case WindowAnimation.Type.Flip:
+                        Flip(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
+                        break;
+                }
+
+                if (isAtEnd)
+                {
+                    isPlaying = false;
+                    onAnimationComplete.Invoke(this);
+                }
+            }            
         }
 
-        public void Rewind()
+        public virtual void ResetAnimatedComponents()
         {
-            playMode ^= (PlayMode)1;
+            _rectTransform.anchoredPosition = Vector2.zero;
+            _canvasGroup.alpha = 1.0F;
         }
+
+        public virtual void Fade(float normalisedTime)
+        {
+            _canvasGroup.alpha = normalisedTime;
+        }
+
+        public virtual void Dissolve(float normalisedTime)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public virtual void SlideFromLeft(float normalisedTime)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public virtual void SlideFromRight(float normalisedTime)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public virtual void SlideFromBottom(float normalisedTime)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public virtual void SlideFromTop(float normalisedTime)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public virtual void Flip(float normalisedTime)
+        {
+            throw new System.NotImplementedException();
+        }        
     }
 }

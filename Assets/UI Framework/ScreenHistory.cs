@@ -50,8 +50,10 @@ namespace UIFramework
                 screenType = entry.screenType;
                 transition = entry.transition;
             }
-
-            throw new InvalidOperationException("The history stack is empty.");
+            else
+            {
+                throw new InvalidOperationException("The history stack is empty.");
+            }            
         }
 
         public void StartNewGroup()
