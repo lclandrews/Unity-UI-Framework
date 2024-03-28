@@ -15,11 +15,19 @@ namespace UIFramework
             Both
         }
 
+        public enum SortPriority
+        {
+            Auto,
+            Source,
+            Target
+        }
+
         public float length { get; private set; }
         public int lengthMs { get; private set; }
         public EasingMode easingMode { get; private set; }
         public WindowAnimation.Type? exitAnimation { get; private set; }
         public WindowAnimation.Type? entryAnimation { get; private set; }
+        public SortPriority sortPriority { get; private set; }
 
         public AnimationTargets animationTargets
         {
@@ -44,13 +52,14 @@ namespace UIFramework
             }
         }
 
-        private ScreenTransition(float length, EasingMode easingMode, WindowAnimation.Type? exitAnimation, WindowAnimation.Type? entryAnimation)
+        private ScreenTransition(float length, EasingMode easingMode, WindowAnimation.Type? exitAnimation, WindowAnimation.Type? entryAnimation, SortPriority sortPriority)
         {
             this.length = length;
             lengthMs = SecondsToMilliseconds(length);
             this.easingMode = easingMode;
             this.exitAnimation = exitAnimation;
             this.entryAnimation = entryAnimation;
+            this.sortPriority = sortPriority;
         }
 
         private static int SecondsToMilliseconds(float seconds)
@@ -60,72 +69,72 @@ namespace UIFramework
 
         public static ScreenTransition None()
         {
-            return new ScreenTransition(0.0F, EasingMode.Linear, null, null);
+            return new ScreenTransition(0.0F, EasingMode.Linear, null, null, SortPriority.Auto);
         }
 
         public static ScreenTransition Fade(float length, EasingMode easingMode)
         {
-            return new ScreenTransition(length, easingMode, null, WindowAnimation.Type.Fade);
+            return new ScreenTransition(length, easingMode, null, WindowAnimation.Type.Fade, SortPriority.Auto);
         }
 
         public static ScreenTransition Dissolve(float length, EasingMode easingMode)
         {
-            return new ScreenTransition(length, easingMode, WindowAnimation.Type.Dissolve, null);
+            return new ScreenTransition(length, easingMode, WindowAnimation.Type.Dissolve, null, SortPriority.Auto);
         }
 
         public static ScreenTransition SlideFromLeft(float length, EasingMode easingMode)
         {
-            return new ScreenTransition(length, easingMode, WindowAnimation.Type.SlideFromRight, WindowAnimation.Type.SlideFromLeft);
+            return new ScreenTransition(length, easingMode, WindowAnimation.Type.SlideFromRight, WindowAnimation.Type.SlideFromLeft, SortPriority.Auto);
         }
 
         public static ScreenTransition SlideFromRight(float length, EasingMode easingMode)
         {
-            return new ScreenTransition(length, easingMode, WindowAnimation.Type.SlideFromLeft, WindowAnimation.Type.SlideFromRight);
+            return new ScreenTransition(length, easingMode, WindowAnimation.Type.SlideFromLeft, WindowAnimation.Type.SlideFromRight, SortPriority.Auto);
         }
 
         public static ScreenTransition SlideFromBottom(float length, EasingMode easingMode)
         {
-            return new ScreenTransition(length, easingMode, WindowAnimation.Type.SlideFromTop, WindowAnimation.Type.SlideFromBottom);
+            return new ScreenTransition(length, easingMode, WindowAnimation.Type.SlideFromTop, WindowAnimation.Type.SlideFromBottom, SortPriority.Auto);
         }
 
         public static ScreenTransition SlideFromTop(float length, EasingMode easingMode)
         {
-            return new ScreenTransition(length, easingMode, WindowAnimation.Type.SlideFromBottom, WindowAnimation.Type.SlideFromTop);
+            return new ScreenTransition(length, easingMode, WindowAnimation.Type.SlideFromBottom, WindowAnimation.Type.SlideFromTop, SortPriority.Auto);
         }
 
         public static ScreenTransition SlideOverFromLeft(float length, EasingMode easingMode)
         {
-            return new ScreenTransition(length, easingMode, null, WindowAnimation.Type.SlideFromLeft);
+            return new ScreenTransition(length, easingMode, null, WindowAnimation.Type.SlideFromLeft, SortPriority.Auto);
         }
 
         public static ScreenTransition SlideOverFromRight(float length, EasingMode easingMode)
         {
-            return new ScreenTransition(length, easingMode, null, WindowAnimation.Type.SlideFromRight);
+            return new ScreenTransition(length, easingMode, null, WindowAnimation.Type.SlideFromRight, SortPriority.Auto);
         }
 
         public static ScreenTransition SlideOverFromBottom(float length, EasingMode easingMode)
         {
-            return new ScreenTransition(length, easingMode, null, WindowAnimation.Type.SlideFromBottom);
+            return new ScreenTransition(length, easingMode, null, WindowAnimation.Type.SlideFromBottom, SortPriority.Auto);
         }
 
         public static ScreenTransition SlideOverFromTop(float length, EasingMode easingMode)
         {
-            return new ScreenTransition(length, easingMode, null, WindowAnimation.Type.SlideFromTop);
+            return new ScreenTransition(length, easingMode, null, WindowAnimation.Type.SlideFromTop, SortPriority.Auto);
         }
 
         public static ScreenTransition Flip(float length, EasingMode easingMode)
         {
-            return new ScreenTransition(length, easingMode, WindowAnimation.Type.Flip, null);
+            return new ScreenTransition(length, easingMode, WindowAnimation.Type.Flip, null, SortPriority.Auto);
         }
 
         public static ScreenTransition Expand(float length, EasingMode easingMode)
         {
-            return new ScreenTransition(length, easingMode, null, WindowAnimation.Type.Expand);
+            return new ScreenTransition(length, easingMode, null, WindowAnimation.Type.Expand, SortPriority.Auto);
         }
 
-        public static ScreenTransition Custom(float length, EasingMode easingMode, WindowAnimation.Type? exitAnimation, WindowAnimation.Type? entryAnimation)
+        public static ScreenTransition Custom(float length, EasingMode easingMode, WindowAnimation.Type? exitAnimation, WindowAnimation.Type? entryAnimation, SortPriority sortPriority = SortPriority.Auto)
         {
-            return new ScreenTransition(length, easingMode, exitAnimation, entryAnimation);
+            return new ScreenTransition(length, easingMode, exitAnimation, entryAnimation, sortPriority);
         }
 
         public override bool Equals(object obj)

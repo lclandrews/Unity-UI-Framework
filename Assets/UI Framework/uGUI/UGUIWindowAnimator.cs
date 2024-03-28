@@ -225,7 +225,7 @@ namespace UIFramework
         public virtual void Flip(float normalisedTime)
         {
             Vector3 euler = _rectTransform.eulerAngles;
-            euler.y = normalisedTime * 90.0F;
+            euler.y = (1.0F - normalisedTime) * 90.0F;
             _rectTransform.rotation = Quaternion.Euler(euler);
         } 
         

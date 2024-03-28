@@ -219,21 +219,38 @@ namespace UIFramework
                     _activeTransitionParams.transition.exitAnimation, _activeTransitionParams.transition.entryAnimation));
             }
 
-            switch (_activeTransitionParams.transition.animationTargets)
+            if(_activeTransitionParams.transition.sortPriority == ScreenTransition.SortPriority.Auto)
             {
-                default:
-                case ScreenTransition.AnimationTargets.Both:
-                    _activeTransitionParams.sourceScreen.sortOrder = 0;
-                    _activeTransitionParams.targetScreen.sortOrder = 0;
-                    break;
-                case ScreenTransition.AnimationTargets.Target:
-                    _activeTransitionParams.sourceScreen.sortOrder = 0;
-                    _activeTransitionParams.targetScreen.sortOrder = 1;
-                    break;
-                case ScreenTransition.AnimationTargets.Source:
-                    _activeTransitionParams.sourceScreen.sortOrder = 1;
-                    _activeTransitionParams.targetScreen.sortOrder = 0;
-                    break;
+                switch (_activeTransitionParams.transition.animationTargets)
+                {
+                    default:
+                    case ScreenTransition.AnimationTargets.Both:
+                        _activeTransitionParams.sourceScreen.sortOrder = 0;
+                        _activeTransitionParams.targetScreen.sortOrder = 0;
+                        break;
+                    case ScreenTransition.AnimationTargets.Target:
+                        _activeTransitionParams.sourceScreen.sortOrder = 0;
+                        _activeTransitionParams.targetScreen.sortOrder = 1;
+                        break;
+                    case ScreenTransition.AnimationTargets.Source:
+                        _activeTransitionParams.sourceScreen.sortOrder = 1;
+                        _activeTransitionParams.targetScreen.sortOrder = 0;
+                        break;
+                }
+            }
+            else
+            {
+                switch (_activeTransitionParams.transition.sortPriority)
+                {
+                    case ScreenTransition.SortPriority.Source:
+                        _activeTransitionParams.sourceScreen.sortOrder = 1;
+                        _activeTransitionParams.targetScreen.sortOrder = 0;
+                        break;
+                    case ScreenTransition.SortPriority.Target:
+                        _activeTransitionParams.sourceScreen.sortOrder = 0;
+                        _activeTransitionParams.targetScreen.sortOrder = 1;
+                        break;
+                }
             }
 
             if (_activeTransitionParams.transition.animationTargets == ScreenTransition.AnimationTargets.None)
@@ -323,10 +340,11 @@ namespace UIFramework
 
         private void ExecuteOnSource(in ScreenTransitionParams transitionParams, bool reverse, float startTime)
         {
+            startTime = transitionParams.transition.length - startTime;
             if (reverse)
             {
                 WindowAnimation sourceScreenAnimation = new WindowAnimation(transitionParams.transition.exitAnimation.Value, transitionParams.transition.length, 
-                    Easing.GetInverseEasingMode(transitionParams.transition.easingMode), startTime, PlayMode.Reverse);
+                    Easing.GetInverseEasingMode(transitionParams.transition.easingMode), startTime, PlayMode.Forward);
                 transitionParams.sourceScreen.Open(sourceScreenAnimation);
             }
             else
@@ -334,7 +352,7 @@ namespace UIFramework
                 transitionParams.targetScreen.Open();
 
                 WindowAnimation sourceScreenAnimation = new WindowAnimation(transitionParams.transition.exitAnimation.Value, transitionParams.transition.length, 
-                    transitionParams.transition.easingMode, startTime, PlayMode.Forward);
+                    transitionParams.transition.easingMode, startTime, PlayMode.Reverse);
                 transitionParams.sourceScreen.Close(sourceScreenAnimation);
             }
         }
