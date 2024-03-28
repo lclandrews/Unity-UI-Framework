@@ -33,7 +33,7 @@ namespace UIFramework
 
         public bool isPlaying { get; private set; } = false;
 
-        public WindowAnimation.Type fallbackType { get { return WindowAnimation.Type.Fade; } }
+        public virtual WindowAnimation.Type fallbackType { get { return WindowAnimation.Type.Fade; } }
 
         public WindowAnimatorEvent onComplete { get; set; } = default;
 
@@ -184,6 +184,7 @@ namespace UIFramework
         {
             _rectTransform.anchoredPosition = Vector2.zero;
             _rectTransform.localScale = Vector2.one;
+            _rectTransform.rotation = Quaternion.identity;
             _canvasGroup.alpha = 1.0F;
         }
 

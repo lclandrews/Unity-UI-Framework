@@ -5,7 +5,6 @@ namespace UIFramework
 {    
     public abstract class UGUIScreen<ControllerType> : UGUIWindow, IScreen<ControllerType> where ControllerType : Controller<ControllerType>
     {
-
         public ControllerType controller { get { return _controller; } }
         private ControllerType _controller = null;
 
@@ -13,7 +12,7 @@ namespace UIFramework
 
         public virtual bool supportsHistory { get; } = true;
 
-        public virtual ScreenTransition defaultTransition { get; protected set; } = new ScreenTransition(ScreenTransition.Type.Fade, 0.25F);
+        public virtual ScreenTransition defaultTransition { get; protected set; } = ScreenTransition.Fade(0.25F, EasingMode.EaseInOut);
 
         private Canvas _canvas = null;
 

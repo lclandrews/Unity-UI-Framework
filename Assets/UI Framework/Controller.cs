@@ -156,9 +156,7 @@ namespace UIFramework
             {
                 Type screenType = _screens.array[i].GetType();
                 if (!_screens.dictionary.ContainsKey(screenType))
-                {
-                    _screens.array[i].Init(this);
-                    _screens.array[i].Close();
+                {                    
                     _screens.dictionary.Add(screenType, _screens.array[i]);
                 }
                 else
@@ -169,7 +167,7 @@ namespace UIFramework
             }
 
             navigation = new ScreenNavigation<ControllerType>(_screens);
-            navigation.onNavigationUpdate += OnNavigationUpdate;
+            navigation.onNavigationUpdate += OnNavigationUpdate;            
 
             if (animator != null)
             {
@@ -178,6 +176,11 @@ namespace UIFramework
 
             SetBackButtonActive(false);
             state = WindowState.Closed;
+            for (int i = 0; i < _screens.array.Length; i++)
+            {
+                _screens.array[i].Init(this);
+                _screens.array[i].Close();
+            }
             OnInit();
         }
 
