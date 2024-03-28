@@ -4,15 +4,17 @@ namespace UIFramework
 {
     public class UGUIWindowAnimator : IWindowAnimator
     {
-        public WindowAnimation animation { get; private set; }
+        public WindowAnimation.Type type { get; private set; }
 
         public PlayMode playMode { get; private set; }
+
+        public EasingMode easingMode { get; private set; }
 
         public float length { get; private set; }
 
         public float currentTime { get; private set; }
 
-        public float currentNormalisedTime { get { return currentTime / animation.length; } }
+        public float currentNormalisedTime { get { return currentTime / length; } }
 
         public float remainingTime
         {
@@ -31,14 +33,14 @@ namespace UIFramework
 
         public bool isPlaying { get; private set; } = false;
 
-        public WindowAnimation.Type fallbackAnimationType { get { return WindowAnimation.Type.Fade; } }
+        public WindowAnimation.Type fallbackType { get { return WindowAnimation.Type.Fade; } }
 
-        public WindowAnimatorEvent onAnimationComplete { get; set; } = default;
+        public WindowAnimatorEvent onComplete { get; set; } = default;
 
         private RectTransform _rectTransform = null;
         private CanvasGroup _canvasGroup = null;
 
-        private UGUIWindowAnimator() { }
+        protected UGUIWindowAnimator() { }
 
         public UGUIWindowAnimator(RectTransform rectTransform, CanvasGroup canvasGroup)
         {
@@ -48,43 +50,21 @@ namespace UIFramework
 
         public void Play(in WindowAnimation animation)
         {
-            WindowAnimation.Type animationType = animation.type;
-            if (!IsSupportedAnimationType(animationType))
+            type = animation.type;
+            if (!IsSupportedType(type))
             {
-                animationType = fallbackAnimationType;
-                Debug.LogWarning(string.Format("No UGUI animation implemented for: {0}, falling back to: {1}", animationType, fallbackAnimationType.ToString()));
+                type = fallbackType;
+                Debug.LogWarning(string.Format("No UGUI animation implemented for: {0}, falling back to: {1}", animation.type, fallbackType.ToString()));
             }
 
             isPlaying = true;
-            this.animation = animation;
+            easingMode = animation.easingMode;
             playMode = animation.playMode;
             length = animation.length;
             currentTime = Mathf.Clamp(animation.startTime, 0.0F, length);
 
-            switch (animation.type)
-            {
-                case WindowAnimation.Type.Fade:
-                    Fade(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
-                    break;
-                case WindowAnimation.Type.Dissolve:
-                    Dissolve(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
-                    break;
-                case WindowAnimation.Type.SlideFromLeft:
-                    SlideFromLeft(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
-                    break;
-                case WindowAnimation.Type.SlideFromRight:
-                    SlideFromRight(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
-                    break;
-                case WindowAnimation.Type.SlideFromBottom:
-                    SlideFromBottom(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
-                    break;
-                case WindowAnimation.Type.SlideFromTop:
-                    SlideFromTop(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
-                    break;
-                case WindowAnimation.Type.Flip:
-                    Flip(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
-                    break;
-            }
+            ResetAnimatedComponents();
+            InterpolateAnimation(type, currentNormalisedTime, easingMode);
         }
 
         public bool Rewind()
@@ -107,6 +87,20 @@ namespace UIFramework
             return false;
         }
 
+        public bool Complete()
+        {
+            if (isPlaying)
+            {
+                isPlaying = false;
+                float endTime = playMode == PlayMode.Forward ? length : 0.0F;
+                currentTime = endTime;
+                InterpolateAnimation(type, currentNormalisedTime, easingMode);
+                onComplete.Invoke(this);
+                return true;
+            }
+            return false;
+        }
+
         public bool SetCurrentTime(float time)
         {
             if(isPlaying)
@@ -117,9 +111,9 @@ namespace UIFramework
             return false;
         }        
 
-        public virtual bool IsSupportedAnimationType(WindowAnimation.Type animationType)
+        public virtual bool IsSupportedType(WindowAnimation.Type type)
         {
-            switch (animationType)
+            switch (type)
             {
                 default:
                     return false;
@@ -129,6 +123,7 @@ namespace UIFramework
                 case WindowAnimation.Type.SlideFromBottom:
                 case WindowAnimation.Type.SlideFromTop:
                 case WindowAnimation.Type.Flip:
+                case WindowAnimation.Type.Expand:
                     return true;
             }
         }
@@ -144,42 +139,51 @@ namespace UIFramework
                 bool isAtEnd = Mathf.Approximately(currentTime, endTime);
                 currentTime = isAtEnd ? endTime : currentTime;
 
-                switch (animation.type)
-                {
-                    case WindowAnimation.Type.Fade:
-                        Fade(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
-                        break;
-                    case WindowAnimation.Type.Dissolve:
-                        Dissolve(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
-                        break;
-                    case WindowAnimation.Type.SlideFromLeft:
-                        SlideFromLeft(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
-                        break;
-                    case WindowAnimation.Type.SlideFromRight:
-                        SlideFromRight(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
-                        break;
-                    case WindowAnimation.Type.SlideFromBottom:
-                        SlideFromBottom(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
-                        break;
-                    case WindowAnimation.Type.SlideFromTop:
-                        SlideFromTop(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
-                        break;
-                    case WindowAnimation.Type.Flip:
-                        Flip(Easing.PerformEase(currentNormalisedTime, animation.easingMode));
-                        break;
-                }
+                InterpolateAnimation(type, currentNormalisedTime, easingMode);
 
                 if (isAtEnd)
                 {
                     isPlaying = false;
-                    onAnimationComplete.Invoke(this);
+                    onComplete.Invoke(this);
                 }
             }            
+        }
+
+        public void InterpolateAnimation(WindowAnimation.Type type, float normalisedTime, EasingMode easingMode)
+        {
+            switch (type)
+            {
+                case WindowAnimation.Type.Fade:
+                    Fade(Easing.PerformEase(normalisedTime, easingMode));
+                    break;
+                case WindowAnimation.Type.Dissolve:
+                    Dissolve(Easing.PerformEase(normalisedTime, easingMode));
+                    break;
+                case WindowAnimation.Type.SlideFromLeft:
+                    SlideFromLeft(Easing.PerformEase(normalisedTime, easingMode));
+                    break;
+                case WindowAnimation.Type.SlideFromRight:
+                    SlideFromRight(Easing.PerformEase(normalisedTime, easingMode));
+                    break;
+                case WindowAnimation.Type.SlideFromBottom:
+                    SlideFromBottom(Easing.PerformEase(normalisedTime, easingMode));
+                    break;
+                case WindowAnimation.Type.SlideFromTop:
+                    SlideFromTop(Easing.PerformEase(normalisedTime, easingMode));
+                    break;
+                case WindowAnimation.Type.Flip:
+                    Flip(Easing.PerformEase(normalisedTime, easingMode));
+                    break;
+                case WindowAnimation.Type.Expand:
+                    Expand(Easing.PerformEase(normalisedTime, easingMode));
+                    break;
+            }
         }
 
         public virtual void ResetAnimatedComponents()
         {
             _rectTransform.anchoredPosition = Vector2.zero;
+            _rectTransform.localScale = Vector2.one;
             _canvasGroup.alpha = 1.0F;
         }
 
@@ -195,27 +199,39 @@ namespace UIFramework
 
         public virtual void SlideFromLeft(float normalisedTime)
         {
-            throw new System.NotImplementedException();
+            Vector2 start = new Vector2(-_rectTransform.rect.width, 0.0F);
+            _rectTransform.anchoredPosition = Vector2.LerpUnclamped(start, Vector2.zero, normalisedTime);
         }
 
         public virtual void SlideFromRight(float normalisedTime)
         {
-            throw new System.NotImplementedException();
+            Vector2 start = new Vector2(_rectTransform.rect.width, 0.0F);
+            _rectTransform.anchoredPosition = Vector2.LerpUnclamped(start, Vector2.zero, normalisedTime);
         }
 
         public virtual void SlideFromBottom(float normalisedTime)
         {
-            throw new System.NotImplementedException();
+            Vector2 start = new Vector2(0.0F, -_rectTransform.rect.height);
+            _rectTransform.anchoredPosition = Vector2.LerpUnclamped(start, Vector2.zero, normalisedTime);
         }
 
         public virtual void SlideFromTop(float normalisedTime)
         {
-            throw new System.NotImplementedException();
+            Vector2 start = new Vector2(0.0F, _rectTransform.rect.height);
+            _rectTransform.anchoredPosition = Vector2.LerpUnclamped(start, Vector2.zero, normalisedTime);
         }
 
         public virtual void Flip(float normalisedTime)
         {
-            throw new System.NotImplementedException();
-        }        
+            Vector3 euler = _rectTransform.eulerAngles;
+            euler.y = normalisedTime * 90.0F;
+            _rectTransform.rotation = Quaternion.Euler(euler);
+        } 
+        
+        public virtual void Expand(float normalisedTime)
+        {
+            Vector2 scale = Vector2.one * normalisedTime;
+            _rectTransform.localScale = scale;
+        }
     }
 }

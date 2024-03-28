@@ -10,27 +10,38 @@ namespace UIFramework
         {
             Travel,
             Back,
-            History
+            History,
+            Lock
         }
 
         public Type type { get; private set; }
         public bool success { get; private set; }
         public System.Type target { get; private set; }
         public int historyCount { get; private set; }
+        public bool isLocked { get; private set; }
 
         public bool exit { get { return type == Type.Back && target == null && success; } }
 
-        public NavigationEvent(Type type, bool success, System.Type target, int historyCount)
+        public NavigationEvent(Type type, bool success, System.Type target, int historyCount, bool isLocked)
         {
             this.type = type;
             this.success = success;
             this.target = target;
             this.historyCount = historyCount;
+            this.isLocked = isLocked;
         }
     }
 
     public delegate void NavigationUpdate(NavigationEvent navigationEvent);
 
+    // [TODO] Should consider if this aligns with single responsibility (probably not).
+    // ScreenTransitionManager could be factored out from the ScreenNavigation class.
+    // Instead of the navigation component being responsible for transitions, the controller
+    // reads the responses of returned navigation events to invoke a given transition.
+    // The side effect of this would be creating wrapper functions for all travel functions on the 
+    // controller class, also there is a issue where in this current implementation the history stack of navigation is
+    // coupled with a transition. This moves toward a model where the controller is the single point of responsibility for
+    // controlling all dependant components instead of chaining dependency in this way.
     public class ScreenNavigation<ControllerType> where ControllerType : Controller<ControllerType>
     {
         private ScreenCollection<ControllerType> _screens = null;
@@ -45,9 +56,28 @@ namespace UIFramework
 
         public Type activeScreenType { get; private set; } = null;
 
+        public bool isTransitioning { get { return _transitionManager.isTransitionActive; } }
+
         public int historyCount { get { return _history.count; } }
 
         public NavigationUpdate onNavigationUpdate = null;
+
+        public bool isLocked
+        {
+            get { return _isLockedCounter > 0; }
+            private set
+            {
+                if (value)
+                {
+                    _isLockedCounter++;
+                }
+                else
+                {
+                    _isLockedCounter = Mathf.Max(_isLockedCounter - 1, 0);
+                }
+            }
+        }
+        private int _isLockedCounter = 0;
 
         private ScreenHistory<ControllerType> _history = null;
         private ScreenTransitionManager<ControllerType> _transitionManager = null;
@@ -66,22 +96,130 @@ namespace UIFramework
         }
 
         public void Init<ScreenType>(object targetScreenData) where ScreenType : IScreen<ControllerType>
-        {            
+        {
+            Type targetScreenType = typeof(ScreenType);
+            IScreen<ControllerType> targetScreen;
+            if (!ValidateInit(targetScreenType, out targetScreen))
+            {
+                throw new Exception(string.Format("Attempted to initialize ScreenNavigation with a screen type of {0} that has not been found.", targetScreenType.ToString()));
+            }
+
+            InitInternal(targetScreenType, targetScreen, targetScreenData);
+            targetScreen.Open();
+        }
+
+        public void Init<ScreenType>(in WindowAnimation animation, object targetScreenData) where ScreenType : IScreen<ControllerType>
+        {
+            Type targetScreenType = typeof(ScreenType);
+            IScreen<ControllerType> targetScreen;
+            if (!ValidateInit(targetScreenType, out targetScreen))
+            {
+                throw new Exception(string.Format("Attempted to initialize ScreenNavigation with a screen type of {0} that has not been found.", targetScreenType.ToString()));
+            }
+
+            InitInternal(targetScreenType, targetScreen, targetScreenData);
+            targetScreen.Open(in animation);
+        }
+
+        public void Init(IScreen<ControllerType> targetScreen, object targetScreenData)
+        {
+            Type targetScreenType = targetScreen.GetType();
+            if (!ValidateInit(targetScreenType, targetScreen))
+            {
+                throw new Exception(string.Format("Attempted to initialize ScreenNavigation with a screen type of {0} that has not been found.", targetScreenType.ToString()));
+            }
+
+            InitInternal(targetScreenType, targetScreen, targetScreenData);
+            targetScreen.Open();
+        }
+
+        public void Init(IScreen<ControllerType> targetScreen, in WindowAnimation animation, object targetScreenData)
+        {
+            Type targetScreenType = targetScreen.GetType();
+            if (!ValidateInit(targetScreenType, targetScreen))
+            {
+                throw new Exception(string.Format("Attempted to initialize ScreenNavigation with a screen type of {0} that has not been found.", targetScreenType.ToString()));
+            }
+
+            InitInternal(targetScreenType, targetScreen, targetScreenData);
+            targetScreen.Open(in animation);
+        }
+
+        public void Init(Type targetScreenType, object targetScreenData)
+        {
+            if (!targetScreenType.IsSubclassOf(typeof(IScreen<ControllerType>)))
+            {
+                throw new Exception("Attempted to initialize ScreenNavigation with unrecognised type.");
+            }
+
+            IScreen<ControllerType> targetScreen;
+            if (!ValidateInit(targetScreenType, out targetScreen))
+            {
+                throw new Exception(string.Format("Attempted to initialize ScreenNavigation with a screen type of {0} that has not been found.", targetScreenType.ToString()));
+            }
+
+            InitInternal(targetScreenType, targetScreen, targetScreenData);
+            targetScreen.Open();
+        }
+
+        public void Init(Type targetScreenType, in WindowAnimation animation, object targetScreenData)
+        {
+            if (!targetScreenType.IsSubclassOf(typeof(IScreen<ControllerType>)))
+            {
+                throw new Exception("Attempted to initialize ScreenNavigation with unrecognised type.");
+            }
+
+            IScreen<ControllerType> targetScreen;
+            if (!ValidateInit(targetScreenType, out targetScreen))
+            {
+                throw new Exception(string.Format("Attempted to initialize ScreenNavigation with a screen type of {0} that has not been found.", targetScreenType.ToString()));
+            }
+
+            InitInternal(targetScreenType, targetScreen, targetScreenData);
+            targetScreen.Open(in animation);
+        }
+
+        private void InitInternal(Type screenType, IScreen<ControllerType> screen, object data)
+        {
+            screen.SetData(data);
+            activeScreenType = screenType;
+        }
+
+        private bool ValidateInit(Type screenType, IScreen<ControllerType> screen)
+        {
+            IScreen<ControllerType> cachedScreen;
+            if(!ValidateInit(screenType, out cachedScreen))
+            {
+                return false;
+            }
+
+            if(cachedScreen != screen)
+            {
+                Debug.LogWarning(string.Format("Unable to init with: {0}, the screen type exists in navigation but the instance of the screen provided does not.", screenType.ToString()));
+                return false;
+            }
+            return true;
+        }
+
+        private bool ValidateInit(Type screenType, out IScreen<ControllerType> screen)
+        {
             if (_screens == null)
             {
                 throw new Exception("Attempted to initialize ScreenNavigation with no screens set.");
             }
 
-            Type targetScreenType = typeof(ScreenType);
-            IScreen<ControllerType> targetScreen;
-            if(!ValidateTravelTarget(targetScreenType, out targetScreen))
+            if (activeScreenType != null)
             {
-                throw new Exception (string.Format("Attempted to initialize ScreenNavigation with a screen type of {0} that has not been found.", targetScreenType.ToString()));
+                throw new Exception("Attempted to initialize ScreenNavigation that has already been initialized.");
             }
 
-            targetScreen.SetData(targetScreenData);
-            targetScreen.Open();
-            activeScreenType = targetScreenType;
+            screen = null;
+
+            if (!_screens.dictionary.TryGetValue(screenType, out screen))
+            {
+                return false;
+            }
+            return true;
         }
 
         public NavigationEvent Travel<ScreenType>(in ScreenTransition transition, object data, bool excludeCurrentFromHistory = false)
@@ -93,7 +231,7 @@ namespace UIFramework
             {
                 return InvokeNavigationUpdate(TravelInternal(targetType, targetScreen, in transition, data, excludeCurrentFromHistory));
             }
-            return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Travel, false, targetType, historyCount));
+            return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Travel, false, targetType, historyCount, isLocked));
         }
 
         public NavigationEvent Travel<ScreenType>(object data, bool excludeCurrentFromHistory = false)
@@ -105,7 +243,27 @@ namespace UIFramework
             {
                 return InvokeNavigationUpdate(TravelInternal(targetType, targetScreen, data, excludeCurrentFromHistory));
             }
-            return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Travel, false, targetType, historyCount));
+            return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Travel, false, targetType, historyCount, isLocked));
+        }
+
+        public NavigationEvent Travel(IScreen<ControllerType> targetScreen, in ScreenTransition transition, object data, bool excludeCurrentFromHistory = false)
+        {
+            Type targetScreenType = targetScreen.GetType();
+            if (ValidateTravelTarget(targetScreenType, targetScreen))
+            {
+                return TravelInternal(targetScreenType, targetScreen, in transition, data, excludeCurrentFromHistory);
+            }
+            return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Travel, false, targetScreenType, historyCount, isLocked));
+        }
+
+        public NavigationEvent Travel(IScreen<ControllerType> targetScreen, object data, bool excludeCurrentFromHistory = false)
+        {
+            Type targetScreenType = targetScreen.GetType();
+            if (ValidateTravelTarget(targetScreenType, targetScreen))
+            {
+                return TravelInternal(targetScreenType, targetScreen, data, excludeCurrentFromHistory);
+            }
+            return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Travel, false, targetScreenType, historyCount, isLocked));
         }
 
         public NavigationEvent Travel(Type screenType, in ScreenTransition transition, object data, bool excludeCurrentFromHistory = false)
@@ -118,7 +276,7 @@ namespace UIFramework
                     return TravelInternal(screenType, targetScreen, in transition, data, excludeCurrentFromHistory);
                 }
             }
-            return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Travel, false, screenType, historyCount));
+            return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Travel, false, screenType, historyCount, isLocked));
         }
 
         public NavigationEvent Travel(Type screenType, object data, bool excludeCurrentFromHistory = false)
@@ -131,7 +289,7 @@ namespace UIFramework
                     return TravelInternal(screenType, targetScreen, data, excludeCurrentFromHistory);
                 }
             }
-            return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Travel, false, screenType, historyCount));
+            return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Travel, false, screenType, historyCount, isLocked));
         }
 
         private NavigationEvent TravelInternal(Type screenType, IScreen<ControllerType> screen, object data, bool excludeCurrentFromHistory)
@@ -141,6 +299,11 @@ namespace UIFramework
 
         private NavigationEvent TravelInternal(Type screenType, IScreen<ControllerType> screen, in ScreenTransition transition, object data, bool excludeCurrentFromHistory)
         {
+            if(isLocked)
+            {
+                InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Travel, false, screenType, historyCount, isLocked));
+            }
+
             if(activeScreenType == null)
             {
                 throw new InvalidOperationException("Unable to travel while there is no active screen");
@@ -156,10 +319,26 @@ namespace UIFramework
             _transitionManager.Transition(in transition, activeScreen, screen);
 
             activeScreenType = screenType;
-            return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Travel, true, screenType, historyCount));
+            return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Travel, true, screenType, historyCount, isLocked));
         }
 
-        bool ValidateTravelTarget(Type screenType, out IScreen<ControllerType> screen)
+        private bool ValidateTravelTarget(Type screenType, IScreen<ControllerType> screen)
+        {            
+            IScreen<ControllerType> cachedScreen = null;
+            if(!ValidateTravelTarget(screenType, out cachedScreen))
+            {
+                return false;
+            }
+
+            if(cachedScreen != screen)
+            {
+                Debug.LogWarning(string.Format("Unable to travel to: {0}, the screen type exists in navigation but the instance of the screen provided does not.", screenType.ToString()));
+                return false;
+            }
+            return true;
+        }
+
+        private bool ValidateTravelTarget(Type screenType, out IScreen<ControllerType> screen)
         {
             screen = null;
             if(activeScreenType == screenType)
@@ -183,6 +362,11 @@ namespace UIFramework
 
         public NavigationEvent Back(bool allowExit)
         {
+            if (isLocked)
+            {
+                InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Back, false, null, historyCount, isLocked));
+            }
+
             IScreen<ControllerType> activeScreen;
             if (_screens.dictionary.TryGetValue(activeScreenType, out activeScreen))
             {
@@ -198,28 +382,61 @@ namespace UIFramework
 
                     activeScreenType = previousScreenType;
 
-                    return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Back, true, activeScreenType, historyCount));
+                    return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Back, true, activeScreenType, historyCount, isLocked));
                 }
                 else if (allowExit)
                 {
-                    return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Back, true, null, historyCount));
+                    return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Back, true, null, historyCount, isLocked));
                 }
             }
-            return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Back, false, null, historyCount));
+            return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Back, false, null, historyCount, isLocked));
+        }
+
+        public NavigationEvent Lock()
+        {
+            isLocked = true;
+            return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Lock, isLocked == true, null, historyCount, isLocked));
+        }
+
+        public NavigationEvent Unlock()
+        {
+            isLocked = false;
+            return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Lock, isLocked == false, null, historyCount, isLocked));
         }
 
         public void Terminate()
         {
-            if (_screens != null)
+            IScreen<ControllerType> activeScreen = this.activeScreen;
+            TerminateInternal();
+            _transitionManager.Terminate(true);
+            activeScreen.Close();
+        }
+
+        public void Terminate(in WindowAnimation animation)
+        {
+            IScreen<ControllerType> activeScreen = this.activeScreen;
+            TerminateInternal();
+            _transitionManager.Terminate(false);
+            activeScreen.Close(in animation);
+        }
+
+        private void TerminateInternal()
+        {
+            if (_screens == null)
             {
-                ClearHistory();
-                if (activeScreenType != null)
-                {
-                    _screens.dictionary[activeScreenType].Close();
-                    activeScreenType = null;
-                }
+                throw new Exception("Attempted to terminate ScreenNavigation with no screens set.");
             }
-        }        
+
+            if (activeScreenType == null)
+            {
+                throw new Exception("Attempted to terminate ScreenNavigation that has not been intialized.");
+            }
+
+            isLocked = false;
+
+            ClearHistory();            
+            activeScreenType = null;
+        }
 
         public void StartNewHistoryGroup()
         {
@@ -230,24 +447,24 @@ namespace UIFramework
         {
             if(_history.ClearLatestGroup())
             {
-                return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.History, true, null, historyCount));
+                return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.History, true, null, historyCount, isLocked));
             }
-            return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.History, false, null, historyCount));
+            return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.History, false, null, historyCount, isLocked));
         }
 
         public NavigationEvent InsertHistory<T>(in ScreenTransition transition) where T : IScreen<ControllerType>
         {
             _history.Push(typeof(T), in transition);
-            return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.History, true, null, historyCount));
+            return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.History, true, null, historyCount, isLocked));
         }
 
         public NavigationEvent ClearHistory()
         {
             if(_history.Clear())
             {
-                return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.History, true, null, historyCount));
+                return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.History, true, null, historyCount, isLocked));
             }
-            return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.History, false, null, historyCount));
+            return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.History, false, null, historyCount, isLocked));
         }
 
         private NavigationEvent InvokeNavigationUpdate(NavigationEvent navigationEvent)

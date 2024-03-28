@@ -13,7 +13,7 @@ namespace UIFramework
 
         public virtual bool supportsHistory { get; } = true;
 
-        public ScreenTransition defaultTransition { get; private set; } = new ScreenTransition(ScreenTransition.Type.Fade, 0.25F);
+        public virtual ScreenTransition defaultTransition { get; protected set; } = new ScreenTransition(ScreenTransition.Type.Fade, 0.25F);
 
         private Canvas _canvas = null;
 

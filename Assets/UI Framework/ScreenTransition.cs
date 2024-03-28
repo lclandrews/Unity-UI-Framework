@@ -19,7 +19,8 @@ namespace UIFramework
             SlideOverFromRight,
             SlideOverFromBottom,
             SlideOverFromTop,
-            Flip
+            Flip,
+            Expand
         }
 
         public enum AnimationTargets
@@ -49,6 +50,7 @@ namespace UIFramework
                     case Type.SlideOverFromRight:
                     case Type.SlideOverFromTop:
                     case Type.SlideOverFromBottom:
+                    case Type.Expand:
                         return AnimationTargets.Target;
                     case Type.SlideFromLeft:
                     case Type.SlideFromRight:

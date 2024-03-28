@@ -10,7 +10,7 @@ namespace UIFramework
     {
         /// <summary>
         /// Type of animation. Some assumptions are made.
-        /// Fade, Dissolve, Flip: These are assumed to be from a inactive state to an active state.
+        /// Fade, Dissolve, Flip, Expand: These are assumed to be from a inactive state to an active state.
         /// E.g, animating from an alpha of 0 to 1 for Fade.
         /// </summary>
         public enum Type
@@ -21,16 +21,14 @@ namespace UIFramework
             SlideFromRight,
             SlideFromBottom,
             SlideFromTop,
-            Flip
+            Flip,
+            Expand
         }
 
         public Type type { get; private set; }
         public float length { get; private set; }
         public EasingMode easingMode { get; private set; }
         public float startTime { get; private set; }
-        // [TODO] Determine if this is the best place for this to live.
-        // Kept here to simplify opening windows with an animation but this duplicates data
-        // on the animator class and may confuse things.
         public PlayMode playMode { get; private set; }
 
         public WindowAnimation(Type type, float length)

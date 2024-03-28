@@ -102,7 +102,7 @@ namespace UIFramework
                 if(_animator == null)
                 {
                     _animator = CreateAnimator();
-                    animator.onAnimationComplete += OnAnimationComplete;
+                    animator.onComplete += OnAnimationComplete;
                 }
                 return _animator;
             } 
@@ -165,15 +165,16 @@ namespace UIFramework
             {
                 if (animator.isPlaying)
                 {
-                    if (animator.animation.type != animation.type)
+                    if (animator.type != animation.type)
                     {
                         Debug.Log(string.Format("Window is already playing a close animation of type {0}, " +
-                            "provided open animation is ignored and the current close animation is rewound.", animator.animation.type.ToString()));
+                            "provided open animation is ignored and the current close animation is rewound.", animator.type.ToString()));
                     }
                     animator.Rewind();
                 }
                 else
                 {
+                    isInteractable = false;
                     animator.Play(in animation);
                 }
                 state = WindowState.Opening;
@@ -188,23 +189,22 @@ namespace UIFramework
         {
             if (state == WindowState.Closing || state == WindowState.Closed)
             {
-                if (state == WindowState.Closed)
+                if(state == WindowState.Closing)
                 {
-                    state = WindowState.Open;
-                    gameObject.SetActive(true);
-                    animator.ResetAnimatedComponents();
-                    OnOpen();
-                    OnOpened();
+                    Debug.Log("Open was called on a Window without an animation while already playing a state animation, " +
+                        "this may cause unexpected behviour of the UI.");
+                    isInteractable = true;
+                    animator.Stop();
                 }
-                else
-                {
-                    Debug.Log("Open was called on Window without an animation while already playing a close animation, " +
-                        "the current animation will be rewound.");
-                    animator.Rewind();
 
-                    state = WindowState.Opening;
-                    OnOpen();
-                }
+                state = WindowState.Open;
+                gameObject.SetActive(true);
+                if(animator != null)
+                {
+                    animator.ResetAnimatedComponents();
+                }                
+                OnOpen();
+                OnOpened();
                 return true;
             }
             return false;
@@ -243,15 +243,16 @@ namespace UIFramework
             {
                 if (animator.isPlaying)
                 {
-                    if (animator.animation.type != animation.type)
+                    if (animator.type != animation.type)
                     {
                         Debug.Log(string.Format("Controller is already playing a open animation of type {0}, " +
-                            "provided close animation is ignored and the current open animation is rewound.", animator.animation.type.ToString()));
+                            "provided close animation is ignored and the current open animation is rewound.", animator.type.ToString()));
                     }
                     animator.Rewind();
                 }
                 else
                 {
+                    isInteractable = false;
                     animator.Play(in animation);
                 }
 
@@ -266,22 +267,18 @@ namespace UIFramework
         {
             if (state == WindowState.Opening || state == WindowState.Open)
             {
-                if (state == WindowState.Open)
+                if(state == WindowState.Opening)
                 {
-                    state = WindowState.Closed;                    
-                    OnClose();
-                    gameObject.SetActive(false);
-                    OnClosed();                    
+                    Debug.Log("Close was called on a Window without an animation while already playing a state animation, " +
+                        "this may cause unexpected behviour of the UI.");
+                    isInteractable = true;
+                    animator.Stop();
                 }
-                else
-                {
-                    Debug.Log("Close was called on Window without an animation while already playing a open animation, " +
-                        "the current animation will be rewound.");
-                    animator.Rewind();
 
-                    state = WindowState.Closing;
-                    OnClose();
-                }
+                state = WindowState.Closed;
+                OnClose();
+                gameObject.SetActive(false);
+                OnClosed();
                 return true;
             }
             return false;
@@ -307,6 +304,7 @@ namespace UIFramework
 
         private void OnAnimationComplete(IWindowAnimator animator)
         {
+            isInteractable = true;
             if(state == WindowState.Opening)
             {
                 state = WindowState.Open;

@@ -4,17 +4,18 @@ namespace UIFramework
 
     public interface IWindowAnimator
     {
-        WindowAnimation animation { get; }
+        WindowAnimation.Type type { get; }
         PlayMode playMode { get; }
+        EasingMode easingMode { get; }
         float currentTime { get; }
         float currentNormalisedTime { get; }        
         float remainingTime { get; }
 
         bool isPlaying { get; }        
 
-        WindowAnimatorEvent onAnimationComplete { get; set; }
+        WindowAnimatorEvent onComplete { get; set; }
 
-        WindowAnimation.Type fallbackAnimationType { get; }
+        WindowAnimation.Type fallbackType { get; }
 
         void Play(in WindowAnimation animation);
 
@@ -22,9 +23,11 @@ namespace UIFramework
 
         bool Stop();
 
+        bool Complete();
+
         bool SetCurrentTime(float time);
 
-        bool IsSupportedAnimationType(WindowAnimation.Type animationType);
+        bool IsSupportedType(WindowAnimation.Type type);
 
         void Update(float deltaTime);
 
