@@ -114,7 +114,7 @@ namespace UIFramework
         // IWindowAnimatorFactory
         public virtual IWindowAnimator CreateAnimator()
         {
-            return new UGUIWindowAnimator(rectTransform, canvasGroup);
+            return new UGUIWindowAnimator(rectTransform.root as RectTransform,rectTransform, canvasGroup);
         }
 
         // UGUIBehaviour
@@ -168,7 +168,7 @@ namespace UIFramework
                     if (animator.type != animation.type)
                     {
                         Debug.Log(string.Format("Window is already playing a close animation of type {0}, " +
-                            "provided open animation is ignored and the current close animation is rewound.", animator.type.ToString()));
+                            "provided open animation of type {1} is ignored and the current close animation is rewound.", animator.type, animation.type));
                     }
                     animator.Rewind();
                 }
@@ -246,7 +246,7 @@ namespace UIFramework
                     if (animator.type != animation.type)
                     {
                         Debug.Log(string.Format("Controller is already playing a open animation of type {0}, " +
-                            "provided close animation is ignored and the current open animation is rewound.", animator.type.ToString()));
+                            "provided close animation of type {1} is ignored and the current open animation is rewound.", animator.type, animation.type));
                     }
                     animator.Rewind();
                 }

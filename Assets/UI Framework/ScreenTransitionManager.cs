@@ -57,7 +57,7 @@ namespace UIFramework
 
         private class QueuedTransition
         {
-            public ScreenTransitionParams transitionParams { get; }
+            public ScreenTransitionParams transitionParams { get { return _transitionParams; } }
             private ScreenTransitionParams _transitionParams = new ScreenTransitionParams();
             public bool reverse { get; private set; } = false;
 
@@ -92,7 +92,24 @@ namespace UIFramework
         private int _queuedTransitionsCount { get { return _queuedTransitions.Count; } }
         private List<QueuedTransition> _queuedTransitions = new List<QueuedTransition>();
 
-        private IWindowAnimator _primaryAnimator = null;
+        private IWindowAnimator _sourceScreenAnimator = null;
+        private IWindowAnimator _targetScreenAnimator = null;
+
+        private IWindowAnimator _primaryScreenAnimator
+        {
+            get
+            {
+                switch (_activeTransitionParams.transition.animationTargets)
+                {
+                    case ScreenTransition.AnimationTargets.Both:
+                    case ScreenTransition.AnimationTargets.Target:
+                        return _targetScreenAnimator;
+                    case ScreenTransition.AnimationTargets.Source:
+                        return _sourceScreenAnimator;
+                }
+                return null;
+            }
+        }
 
         public void Transition(IScreen<ControllerType> sourceScreen, IScreen<ControllerType> targetScreen)
         {
@@ -112,6 +129,7 @@ namespace UIFramework
             HandleNewTransition(in transitionParams, true);
         }
 
+        // Reverse transitons need to be queued for spamming back key??
         public void ReverseTransition(in ScreenTransition transition, IScreen<ControllerType> sourceScreen, IScreen<ControllerType> targetScreen)
         {
             ScreenTransitionParams transitionParams = new ScreenTransitionParams(transition, sourceScreen, targetScreen);
@@ -143,10 +161,11 @@ namespace UIFramework
                 ScreenTransitionParams leadingTransitionParams;
                 if (_queuedTransitionsCount > 0)
                 {
-                    if (QueueContainsTransition(in transitionParams, reverse))
-                    {
-                        throw new InvalidOperationException("Attempting to perform a transition that is already queued.");
-                    }
+                    // Don't actually need to check this as we ensure that with queued transitions the leading transition should match any that are queued.
+                    //if (QueueContainsTransition(in transitionParams, reverse))
+                    //{
+                    //    throw new InvalidOperationException("Attempting to perform a transition that is already queued.");
+                    //}
 
                     QueuedTransition leadingQueuedTransition = PeekQueuedTransition();
                     leadingTransitionParams = leadingQueuedTransition.transitionParams;
@@ -181,10 +200,14 @@ namespace UIFramework
                 {
                     if (reverse)
                     {
-                        // If newTransitionOpposesLeading == false and reverse is true we know we are unable to perform the operation while transitions
-                        // are active or queued as we require the leading transition to be the forward playing equivalent of the transition to reverse.
-                        throw new InvalidOperationException(
-                            "Attempting to reverse a transition while the leading transition differs from the transition to reverse.");
+                        // Ensure that the enqueueing transition is viable given the current leading transition.
+                        if (leadingTransitionParams.sourceScreen != transitionParams.targetScreen)
+                        {
+                            throw new InvalidOperationException(
+                                "Attempting to reverse a transition to a previous screen while the leading transitions source differs from the reverse transitions target.");
+                        }
+
+                        EnqueueTransition(in transitionParams, reverse);
                     }
                     else
                     {
@@ -260,15 +283,23 @@ namespace UIFramework
             }
             else
             {
-                if (_activeTransitionParams.transition.animationTargets == ScreenTransition.AnimationTargets.Source)
+                switch (_activeTransitionParams.transition.animationTargets)
                 {
-                    _primaryAnimator = _activeTransitionParams.sourceScreen.animator;
-                }
-                else
-                {
-                    _primaryAnimator = _activeTransitionParams.targetScreen.animator;
-                }
-                _primaryAnimator.onComplete += OnAnimationComplete;
+                    case ScreenTransition.AnimationTargets.Both:
+                        _sourceScreenAnimator = _activeTransitionParams.sourceScreen.animator;
+                        _sourceScreenAnimator.onComplete += OnAnimationComplete;
+                        _targetScreenAnimator = _activeTransitionParams.targetScreen.animator;
+                        _targetScreenAnimator.onComplete += OnAnimationComplete;
+                        break;
+                    case ScreenTransition.AnimationTargets.Source:
+                        _sourceScreenAnimator = _activeTransitionParams.sourceScreen.animator;
+                        _sourceScreenAnimator.onComplete += OnAnimationComplete;
+                        break;
+                    case ScreenTransition.AnimationTargets.Target:
+                        _targetScreenAnimator = _activeTransitionParams.targetScreen.animator;
+                        _targetScreenAnimator.onComplete += OnAnimationComplete;
+                        break;
+                }                
 
                 // Removed as this is now expected to be handled by the screen / window itself.
                 //_activeTransitionParams.sourceScreen.isInteractable = false;
@@ -287,7 +318,8 @@ namespace UIFramework
 
             _isActiveReverse = !_isActiveReverse;
 
-            float normalisedStartTime = _primaryAnimator.currentNormalisedTime;
+
+            float normalisedStartTime = _primaryScreenAnimator.currentNormalisedTime;
             ExecuteTransition(in _activeTransitionParams, _isActiveReverse, normalisedStartTime);
         }
 
@@ -423,7 +455,7 @@ namespace UIFramework
 
         private bool QueueContainsTransition(in ScreenTransitionParams transitionParams, bool reverse)
         {
-            for (int i = _queuedTransitionsCount; i >= 0; i--)
+            for (int i = _queuedTransitionsCount - 1; i >= 0; i--)
             {
                 if (_queuedTransitions[i].transitionParams == transitionParams && _queuedTransitions[i].reverse == reverse)
                 {
@@ -472,9 +504,22 @@ namespace UIFramework
 
         private void OnAnimationComplete(IWindowAnimator animator)
         {
-            _primaryAnimator.onComplete -= OnAnimationComplete;
-            _primaryAnimator = null;
-            CompleteTransition();
+            if (animator == _sourceScreenAnimator)
+            {
+                _sourceScreenAnimator.onComplete -= OnAnimationComplete;
+                _sourceScreenAnimator = null;
+            }
+
+            if (animator == _targetScreenAnimator)
+            {
+                _targetScreenAnimator.onComplete -= OnAnimationComplete;
+                _targetScreenAnimator = null;
+            }
+
+            if (_sourceScreenAnimator == null && _targetScreenAnimator == null)
+            {
+                CompleteTransition();
+            }            
         }
 
         private bool AreOpposingTransitions(in ScreenTransitionParams lhsTransitionParams, bool lhsReverse, in ScreenTransitionParams rhsTransitionParams, bool rhsReverse)
@@ -529,10 +574,16 @@ namespace UIFramework
         {
             if (isTransitionActive)
             {
-                if (_primaryAnimator != null)
+                if (_sourceScreenAnimator != null)
                 {
-                    _primaryAnimator.onComplete -= OnAnimationComplete;
-                    _primaryAnimator = null;
+                    _sourceScreenAnimator.onComplete -= OnAnimationComplete;
+                    _sourceScreenAnimator = null;
+                }
+
+                if(_targetScreenAnimator != null)
+                {
+                    _targetScreenAnimator.onComplete -= OnAnimationComplete;
+                    _targetScreenAnimator = null;
                 }
 
                 if (endActiveAnimations)

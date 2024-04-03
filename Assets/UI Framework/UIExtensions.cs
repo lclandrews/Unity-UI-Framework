@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -37,6 +38,70 @@ namespace UIFramework
                 unityObject = Object.Instantiate(template, parent);
             }
             return unityObject;
+        }
+
+        public static Vector3 GetWorldBottomLeftCorner(this RectTransform rectTransform)
+        {
+            Rect tmpRect = rectTransform.rect;
+            Vector3 bottomLeft = new Vector3(tmpRect.x, tmpRect.y, 0.0F);
+
+            Matrix4x4 mat = rectTransform.localToWorldMatrix;
+            bottomLeft = mat.MultiplyPoint(bottomLeft);
+            return bottomLeft;
+        }
+
+        public static Vector3 GetWorldTopLeftCorner(this RectTransform rectTransform)
+        {
+            Rect tmpRect = rectTransform.rect;
+            Vector3 topLeft = new Vector3(tmpRect.x, tmpRect.yMax, 0.0F);
+
+            Matrix4x4 mat = rectTransform.localToWorldMatrix;
+            topLeft = mat.MultiplyPoint(topLeft);
+            return topLeft;
+        }
+
+        public static Vector3 GetWorldTopRightCorner(this RectTransform rectTransform)
+        {
+            Rect tmpRect = rectTransform.rect;
+            Vector3 topRight = new Vector3(tmpRect.xMax, tmpRect.yMax, 0.0F);
+
+            Matrix4x4 mat = rectTransform.localToWorldMatrix;
+            topRight = mat.MultiplyPoint(topRight);
+            return topRight;
+        }
+
+        public static Vector3 GetWorldBottomRightCorner(this RectTransform rectTransform)
+        {
+            Rect tmpRect = rectTransform.rect;
+            Vector3 bottomRight = new Vector3(tmpRect.xMax, tmpRect.y, 0.0F);
+
+            Matrix4x4 mat = rectTransform.localToWorldMatrix;
+            bottomRight = mat.MultiplyPoint(bottomRight);
+            return bottomRight;
+        }
+
+        public static Vector3 GetLocalBottomLeftCorner(this RectTransform rectTransform)
+        {
+            Rect tmpRect = rectTransform.rect;
+            return new Vector3(tmpRect.x, tmpRect.y, 0.0F);
+        }
+
+        public static Vector3 GetLocalTopLeftCorner(this RectTransform rectTransform)
+        {
+            Rect tmpRect = rectTransform.rect;
+            return new Vector3(tmpRect.x, tmpRect.yMax, 0.0F);
+        }
+
+        public static Vector3 GetLocalTopRightCorner(this RectTransform rectTransform)
+        {
+            Rect tmpRect = rectTransform.rect;
+            return new Vector3(tmpRect.xMax, tmpRect.yMax, 0.0F);
+        }
+
+        public static Vector3 GetLocalBottomRightCorner(this RectTransform rectTransform)
+        {
+            Rect tmpRect = rectTransform.rect;
+            return new Vector3(tmpRect.xMax, tmpRect.y, 0.0F);
         }
     }
 }
