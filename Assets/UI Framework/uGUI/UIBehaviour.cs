@@ -2,18 +2,18 @@
 
 using UnityEngine;
 
-namespace UIFramework
+namespace UIFramework.UGUI
 {
-    public abstract class UGUIBehaviour : MonoBehaviour, IUIBehaviour
+    public abstract class UIBehaviour : MonoBehaviour, IUIBehaviour
     {
-        public UGUIBehaviour parent { get; private set; } = null;
-        private HashSet<UGUIBehaviour> _children { get; set; } = new HashSet<UGUIBehaviour>();
+        public UIBehaviour parent { get; private set; } = null;
+        private HashSet<UIBehaviour> _children { get; set; } = new HashSet<UIBehaviour>();
 
 
         // IUIBehaviour
         public virtual void UpdateUI(float deltaTime)
         {
-            foreach (UGUIBehaviour child in _children)
+            foreach (UIBehaviour child in _children)
             {
                 if (child.gameObject.activeInHierarchy)
                 {
@@ -34,7 +34,7 @@ namespace UIFramework
         {
             if (transform.parent != null)
             {
-                parent = transform.parent.GetComponentInParent<UGUIBehaviour>();
+                parent = transform.parent.GetComponentInParent<UIBehaviour>();
                 if (parent != null)
                 {
                     parent.AddChild(this);
@@ -61,7 +61,7 @@ namespace UIFramework
         }
 
         // UGUIBehaviour
-        protected virtual void AddChild(UGUIBehaviour child)
+        protected virtual void AddChild(UIBehaviour child)
         {
             if (!_children.Contains(child))
             {
@@ -69,7 +69,7 @@ namespace UIFramework
             }
         }
 
-        protected virtual void RemoveChild(UGUIBehaviour child)
+        protected virtual void RemoveChild(UIBehaviour child)
         {
             if (_children.Contains(child))
             {

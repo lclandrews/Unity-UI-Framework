@@ -29,6 +29,11 @@ namespace UIFramework
 
     public static class Easing
     {
+        public static UnityEngine.UIElements.EasingMode ToUnityEasingMode(this EasingMode mode)
+        {
+            return (UnityEngine.UIElements.EasingMode)mode;
+        }
+
         public static EasingMode GetInverseEasingMode(EasingMode mode)
         {
             switch (mode)

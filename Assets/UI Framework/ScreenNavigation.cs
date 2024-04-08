@@ -301,7 +301,7 @@ namespace UIFramework
         {
             if(isLocked)
             {
-                InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Travel, false, screenType, historyCount, isLocked));
+                return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Travel, false, screenType, historyCount, isLocked));
             }
 
             if(activeScreenType == null)
@@ -364,7 +364,7 @@ namespace UIFramework
         {
             if (isLocked)
             {
-                InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Back, false, null, historyCount, isLocked));
+                return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Back, false, null, historyCount, isLocked));
             }
 
             IScreen<ControllerType> activeScreen;

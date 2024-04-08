@@ -1,19 +1,18 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace UIFramework
+namespace UIFramework.UGUI
 {    
-    public abstract class UGUIScreen<ControllerType> : UGUIWindow, IScreen<ControllerType> where ControllerType : Controller<ControllerType>
+    public abstract class Screen<ControllerType> : Window, IScreen<ControllerType> where ControllerType : Controller<ControllerType>
     {
         public ControllerType controller { get { return _controller; } }
-        private ControllerType _controller = null;
-
-        public virtual Button backButton { get; } = null;
+        private ControllerType _controller = null;        
 
         public virtual bool supportsHistory { get; } = true;
 
         public virtual ScreenTransition defaultTransition { get; protected set; } = ScreenTransition.Fade(0.25F, EasingMode.EaseInOut);
 
+        protected virtual Button backButton { get; } = null;
         private Canvas _canvas = null;
 
         public int sortOrder
@@ -56,6 +55,7 @@ namespace UIFramework
             if (backButton != null)
             {
                 backButton.gameObject.SetActive(active);
+                return true;
             }
             return false;
         }

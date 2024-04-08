@@ -22,8 +22,6 @@ namespace UIFramework
             Screen = 2
         }
 
-        [SerializeField] private Transform[] rootScreenTransforms = new Transform[0];
-
         public WindowState state { get; private set; } = WindowState.Unitialized;
         public bool isVisible { get { return state != WindowState.Closed; } }
 
@@ -67,6 +65,7 @@ namespace UIFramework
 
         public ScreenNavigation<ControllerType> navigation = null;
 
+        protected abstract IScreenCollector<ControllerType>[] screenCollectors { get; }
         private ScreenCollection<ControllerType> _screens = new ScreenCollection<ControllerType>(null, null);
 
         private bool stateAnimatesSelf { get { return stateAnimationMode.HasFlag(StateAnimationMode.Self); } }
@@ -134,19 +133,10 @@ namespace UIFramework
                 throw new InvalidOperationException("Controller already initialized.");
             }
 
-            if (rootScreenTransforms == null || rootScreenTransforms.Length == 0)
-            {
-                throw new InvalidOperationException("Unable to init Controller with no rootScreenTransforms set.");
-            }
-
             List<IScreen<ControllerType>> screenList = new List<IScreen<ControllerType>>();
-            for (int i = 0; i < rootScreenTransforms.Length; i++)
+            for (int i = 0; i < screenCollectors.Length; i++)
             {
-                if (rootScreenTransforms[i] == null)
-                {
-                    throw new InvalidOperationException(string.Format("Attempting to init while rootScreenTransform[{0}] is null.", i));
-                }
-                screenList.AddRange(rootScreenTransforms[i].GetComponentsInChildren<IScreen<ControllerType>>(true));
+                screenList.AddRange(screenCollectors[i].Collect());
             }
 
             _screens.array = screenList.ToArray();

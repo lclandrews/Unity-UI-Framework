@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 namespace UIFramework
 {
@@ -12,6 +14,24 @@ namespace UIFramework
         {
             float luminance = color.r * 0.299F + color.g * 0.587F + color.b * 0.114F;
             return luminance > 0.729F ? Color.black : Color.white;
+        }
+
+        // UI Toolkit
+        public static void IterateHierarchy(this VisualElement visualElement, Action<VisualElement> action)
+        {
+            Stack<VisualElement> stack = new Stack<VisualElement>();
+            stack.Push(visualElement);
+
+            while (stack.Count > 0)
+            {
+                VisualElement currentElement = stack.Pop();                
+                for (int i = 0; i < currentElement.hierarchy.childCount; i++)
+                {
+                    VisualElement child = currentElement.hierarchy.ElementAt(i);
+                    stack.Push(child);
+                    action.Invoke(child);
+                }
+            }
         }
 
         // UGUI
@@ -35,7 +55,7 @@ namespace UIFramework
             }
             else
             {
-                unityObject = Object.Instantiate(template, parent);
+                unityObject = UnityEngine.Object.Instantiate(template, parent);
             }
             return unityObject;
         }

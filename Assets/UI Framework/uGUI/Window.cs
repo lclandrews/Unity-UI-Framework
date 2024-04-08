@@ -2,10 +2,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace UIFramework
+namespace UIFramework.UGUI
 {
     [RequireComponent(typeof(CanvasGroup), typeof(RectTransform))]
-    public abstract class UGUIWindow : UGUIBehaviour, IWindow, IWindowAnimatorFactory
+    public abstract class Window : UIBehaviour, IWindow, IWindowAnimatorFactory
     {
         public RectTransform rectTransform
         {
@@ -114,7 +114,7 @@ namespace UIFramework
         // IWindowAnimatorFactory
         public virtual IWindowAnimator CreateAnimator()
         {
-            return new UGUIWindowAnimator(rectTransform.root as RectTransform,rectTransform, canvasGroup);
+            return new WindowAnimator(rectTransform.root as RectTransform,rectTransform, canvasGroup);
         }
 
         // UGUIBehaviour

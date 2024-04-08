@@ -2,9 +2,9 @@ using System;
 
 using UnityEngine;
 
-namespace UIFramework
+namespace UIFramework.UGUI
 {
-    public class UGUIWindowAnimator : IWindowAnimator
+    public class WindowAnimator : IWindowAnimator
     {
         public WindowAnimation.Type type { get; private set; }
 
@@ -50,9 +50,9 @@ namespace UIFramework
         private Vector3 _offDisplayBottom = Vector3.zero;
         private Vector3 _offDisplayTop = Vector3.zero;
 
-        protected UGUIWindowAnimator() { }
+        protected WindowAnimator() { }
 
-        public UGUIWindowAnimator(RectTransform displayRectTransform, RectTransform rectTransform, CanvasGroup canvasGroup)
+        public WindowAnimator(RectTransform displayRectTransform, RectTransform rectTransform, CanvasGroup canvasGroup)
         {
             if (displayRectTransform == null)
             {
