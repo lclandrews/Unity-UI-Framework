@@ -1,4 +1,5 @@
 ﻿using System;
+
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -32,13 +33,13 @@ namespace UIFramework.UIToolkit
                     _isEnabledCounter--;
                 }
 
-                if(_isEnabledCounter > 0)
-                {                    
+                if (_isEnabledCounter > 0)
+                {
                     isInteractable = true;
                     visualElement.SetEnabled(true);
                 }
                 else
-                {                    
+                {
                     isInteractable = false;
                     visualElement.SetEnabled(false);
                 }
@@ -75,17 +76,17 @@ namespace UIFramework.UIToolkit
         public abstract bool requiresData { get; }
         public object data { get; private set; } = null;
 
-        public IWindowAnimator animator 
+        public IWindowAnimator animator
         {
-            get 
+            get
             {
-                if(_animator == null)
+                if (_animator == null)
                 {
                     _animator = CreateAnimator();
                     animator.onComplete += OnAnimationComplete;
                 }
                 return _animator;
-            } 
+            }
         }
         private IWindowAnimator _animator = null;
 
@@ -109,7 +110,7 @@ namespace UIFramework.UIToolkit
         public override void UpdateUI(float deltaTime)
         {
             base.UpdateUI(deltaTime);
-            if(animator != null)
+            if (animator != null)
             {
                 animator.Update(deltaTime);
             }
@@ -130,13 +131,13 @@ namespace UIFramework.UIToolkit
 
         public bool SetWaiting(bool waiting)
         {
-            if(ShowWaitingIndicator(waiting))
+            if (ShowWaitingIndicator(waiting))
             {
                 if (waiting != _isWaiting)
                 {
                     _isWaiting = waiting;
                     isEnabled = !waiting;
-                }                    
+                }
                 return true;
             }
             return false;
@@ -177,7 +178,7 @@ namespace UIFramework.UIToolkit
         {
             if (state == WindowState.Closing || state == WindowState.Closed)
             {
-                if(state == WindowState.Closing)
+                if (state == WindowState.Closing)
                 {
                     Debug.Log("Open was called on a Window without an animation while already playing a state animation, " +
                         "this may cause unexpected behviour of the UI.");
@@ -187,10 +188,10 @@ namespace UIFramework.UIToolkit
 
                 state = WindowState.Open;
                 SetActive(true);
-                if(animator != null)
+                if (animator != null)
                 {
                     animator.ResetAnimatedComponents();
-                }                
+                }
                 OnOpen();
                 OnOpened();
                 return true;
@@ -200,8 +201,8 @@ namespace UIFramework.UIToolkit
 
         public void SetData(object data)
         {
-            if(requiresData)
-            {                
+            if (requiresData)
+            {
                 if (IsValidData(data))
                 {
                     this.data = data;
@@ -211,8 +212,8 @@ namespace UIFramework.UIToolkit
                 {
                     throw new InvalidOperationException("Attempted to set data on Window of the wrong type.");
                 }
-            }            
-            else if(data != null)
+            }
+            else if (data != null)
             {
                 throw new InvalidOperationException("Cannot set data on Window as it requires none.");
             }
@@ -255,7 +256,7 @@ namespace UIFramework.UIToolkit
         {
             if (state == WindowState.Opening || state == WindowState.Open)
             {
-                if(state == WindowState.Opening)
+                if (state == WindowState.Opening)
                 {
                     Debug.Log("Close was called on a Window without an animation while already playing a state animation, " +
                         "this may cause unexpected behviour of the UI.");
@@ -293,12 +294,12 @@ namespace UIFramework.UIToolkit
         private void OnAnimationComplete(IWindowAnimator animator)
         {
             isInteractable = true;
-            if(state == WindowState.Opening)
+            if (state == WindowState.Opening)
             {
                 state = WindowState.Open;
                 OnOpened();
             }
-            else if(state == WindowState.Closing)
+            else if (state == WindowState.Closing)
             {
                 state = WindowState.Closed;
                 SetActive(false);
@@ -317,6 +318,7 @@ namespace UIFramework.UIToolkit
 
         protected void SetInteractable(VisualElement visualElement, bool interactable)
         {
+            visualElement.pickingMode = interactable ? PickingMode.Position : PickingMode.Ignore;
             visualElement.IterateHierarchy(delegate (VisualElement v)
             {
                 v.pickingMode = interactable ? PickingMode.Position : PickingMode.Ignore;

@@ -42,6 +42,11 @@ namespace UIFramework.UIToolkit
 
         private VisualElement _visualElement = null;
 
+        private Vector3 _activeLeftPercent = Vector3.zero;
+        private Vector3 _activeRightPercent = Vector3.zero;
+        private Vector3 _activeBottomPercent = Vector3.zero;
+        private Vector3 _activeTopPercent = Vector3.zero;
+
         protected WindowAnimator() { }
 
         public WindowAnimator(VisualElement visualElement)
@@ -190,6 +195,7 @@ namespace UIFramework.UIToolkit
             _visualElement.style.opacity = 1;
             _visualElement.style.translate = new Translate(Length.Percent(0.0F), Length.Percent(0.0F));
             _visualElement.style.scale = new Scale(Vector2.one);
+            _visualElement.style.rotate = new Rotate(0.0F);
         }
 
         public virtual void Fade(float normalisedTime)
@@ -204,32 +210,38 @@ namespace UIFramework.UIToolkit
 
         public virtual void SlideFromLeft(float normalisedTime)
         {
-            throw new System.NotImplementedException();
+            float percent = (-1.0F + normalisedTime) * 100.0F;
+            _visualElement.style.translate = new Translate(Length.Percent(percent), Length.Percent(0.0F));
         }
 
         public virtual void SlideFromRight(float normalisedTime)
         {
-            throw new System.NotImplementedException();
+            float percent = (1.0F - normalisedTime) * 100.0F;
+            _visualElement.style.translate = new Translate(Length.Percent(percent), Length.Percent(0.0F));
         }
 
         public virtual void SlideFromBottom(float normalisedTime)
         {
-            throw new System.NotImplementedException();
+            float percent = (1.0F - normalisedTime) * 100.0F;
+            _visualElement.style.translate = new Translate(Length.Percent(0.0F), Length.Percent(percent));
         }
 
         public virtual void SlideFromTop(float normalisedTime)
         {
-            throw new System.NotImplementedException();
+            float percent = (-1.0F + normalisedTime) * 100.0F;
+            _visualElement.style.translate = new Translate(Length.Percent(0.0F), Length.Percent(percent));
         }
 
         public virtual void Flip(float normalisedTime)
         {
-            throw new System.NotImplementedException();
+            Fade(normalisedTime);
+            float degrees = (1.0F - normalisedTime) * 180.0F;
+            _visualElement.style.rotate = new Rotate(degrees);
         } 
         
         public virtual void Expand(float normalisedTime)
         {
-            throw new System.NotImplementedException();
+            _visualElement.style.scale = new Scale(new Vector2(normalisedTime, normalisedTime));
         }
     }
 }
