@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Example/UI/UI%20Toolkit/UITKExampleStyleSheet.uss?fileID=7433441132597879392&amp;guid=41f14b9d16a09624b87d0036798840bd&amp;type=3#UITKExampleStyleSheet" />
+    <ui:VisualElement name="root" picking-mode="Ignore" style="flex-grow: 1; padding-top: 25px; padding-right: 25px; padding-bottom: 25px; padding-left: 25px; align-items: stretch; justify-content: center; color: rgb(255, 255, 255); background-color: rgb(255, 106, 0); rotate: 0; margin-top: 25px; margin-right: 25px; margin-bottom: 25px; margin-left: 25px;">
+        <ui:Label tabindex="-1" text="UITK Example Screen" parse-escape-sequences="true" display-tooltip-when-elided="true" style="align-items: stretch; -unity-text-align: upper-center;" />
+        <ui:Button text="Return" parse-escape-sequences="true" display-tooltip-when-elided="true" name="returnButton" class="example-button" />
+        <ui:Button text="UGUI Transition Screen" parse-escape-sequences="true" display-tooltip-when-elided="true" name="uguiTransitionButton" class="example-button" />
+        <ui:Button text="UITK Transition Screen" parse-escape-sequences="true" display-tooltip-when-elided="true" name="uitkTransitionButton" class="example-button" />
+        <ui:Button text="UGUI Shared Canvas Screen" parse-escape-sequences="true" display-tooltip-when-elided="true" name="uguiSharedCanvasButton" class="example-button" />
+        <ui:Button text="UGUI Alt Canvas Screen" parse-escape-sequences="true" display-tooltip-when-elided="true" name="uguiAltCanvasButton" class="example-button" />
+    </ui:VisualElement>
+</ui:UXML>

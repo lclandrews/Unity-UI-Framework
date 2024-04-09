@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Example/UI/UI%20Toolkit/UITKExampleStyleSheet.uss?fileID=7433441132597879392&amp;guid=41f14b9d16a09624b87d0036798840bd&amp;type=3#UITKExampleStyleSheet" />
+    <ui:VisualElement name="root" picking-mode="Ignore" style="flex-grow: 1; background-color: rgb(129, 0, 255); justify-content: center; padding-top: 25px; padding-right: 25px; padding-bottom: 25px; padding-left: 25px; margin-top: 25px; margin-right: 25px; margin-bottom: 25px; margin-left: 25px;">
+        <ui:Label tabindex="-1" text="Transitions" parse-escape-sequences="true" display-tooltip-when-elided="true" style="align-items: stretch; -unity-text-align: upper-center; color: rgb(255, 255, 255);" />
+        <ui:Button text="Fade" parse-escape-sequences="true" display-tooltip-when-elided="true" name="fadeButton" picking-mode="Ignore" class="example-button" />
+        <ui:Button text="Dissolve" parse-escape-sequences="true" display-tooltip-when-elided="true" name="dissolveButton" class="example-button" />
+        <ui:Button text="Slide From Left" parse-escape-sequences="true" display-tooltip-when-elided="true" name="slideFromLeftButton" class="example-button" />
+        <ui:Button text="Slide From Right" parse-escape-sequences="true" display-tooltip-when-elided="true" name="slideFromRightButton" class="example-button" />
+        <ui:Button text="Slide From Top" parse-escape-sequences="true" display-tooltip-when-elided="true" name="slideFromTopButton" class="example-button" />
+        <ui:Button text="Slide From Bottom" parse-escape-sequences="true" display-tooltip-when-elided="true" name="slideFromBottomButton" class="example-button" />
+        <ui:Button text="Slide Over Left" parse-escape-sequences="true" display-tooltip-when-elided="true" name="slideOverLeftButton" class="example-button" />
+        <ui:Button text="Slide Over Right" parse-escape-sequences="true" display-tooltip-when-elided="true" name="slideOverRightButton" class="example-button" />
+        <ui:Button text="Slide Over Right" parse-escape-sequences="true" display-tooltip-when-elided="true" name="slideOverTopButton" class="example-button" />
+        <ui:Button text="Slide Over Bottom" parse-escape-sequences="true" display-tooltip-when-elided="true" name="slideOverBottomButton" class="example-button" />
+        <ui:Button text="Flip" parse-escape-sequences="true" display-tooltip-when-elided="true" name="flipButton" class="example-button" style="translate: 0 0;" />
+        <ui:Button text="Expand" parse-escape-sequences="true" display-tooltip-when-elided="true" name="expandButton" class="example-button" />
+    </ui:VisualElement>
+</ui:UXML>

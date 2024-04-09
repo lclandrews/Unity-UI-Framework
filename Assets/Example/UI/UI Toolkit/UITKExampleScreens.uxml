@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="UITKExampleScreen" src="project://database/Assets/Example/UI/UI%20Toolkit/UITKExampleScreen.uxml?fileID=9197481963319205126&amp;guid=0f01d75566b86674fb1f4466ac29c836&amp;type=3#UITKExampleScreen" />
+    <ui:Template name="ExampleUXMLScreen" src="project://database/Assets/Example/UI/UI%20Toolkit/UITKExampleTransitionScreen.uxml?fileID=9197481963319205126&amp;guid=791878ab729540d42bc337bf38d00946&amp;type=3#UITKExampleTransitionScreen" />
+    <ui:Instance template="UITKExampleScreen" name="exampleScreen" style="position: absolute; width: 100%; height: 100%; display: none;" />
+    <ui:Instance template="ExampleUXMLScreen" name="exampleTransitionScreen" style="position: absolute; width: 100%; height: 100%; display: none;" />
+</ui:UXML>
