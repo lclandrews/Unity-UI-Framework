@@ -28,7 +28,7 @@ namespace UIFramework
         public bool isEnabled
         {
             get { return _isEnabled; }
-            private set
+            set
             {
                 if (_isEnabled != value)
                 {

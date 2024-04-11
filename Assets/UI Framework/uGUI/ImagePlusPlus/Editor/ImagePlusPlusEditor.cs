@@ -97,7 +97,7 @@ namespace UIFramework.UGUI
             _cornerWProp = _independantCornerRadiiProp.FindPropertyRelative("w");
 
             _borderProp = serializedObject.FindProperty("_border");
-            _borderColorProp = serializedObject.FindProperty("borderColor");
+            _borderColorProp = serializedObject.FindProperty("_borderColor");
 
             _gradientFillProp = serializedObject.FindProperty("_gradientFill");
             _gradientColorProp = serializedObject.FindProperty("_gradientColor");

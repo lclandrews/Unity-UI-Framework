@@ -226,7 +226,7 @@ namespace UIFramework.UGUI
         public virtual void ResetAnimatedComponents()
         {
             _rectTransform.anchoredPosition = _activeAnchoredPosition;
-            _rectTransform.localScale = Vector2.one;
+            _rectTransform.localScale = Vector3.one;
             _rectTransform.localRotation = Quaternion.identity;
             _canvasGroup.alpha = 1.0F;
         }
@@ -271,7 +271,7 @@ namespace UIFramework.UGUI
         
         public virtual void Expand(float normalisedTime)
         {
-            Vector2 scale = Vector2.one * normalisedTime;
+            Vector3 scale = Vector3.one * normalisedTime;
             _rectTransform.localScale = scale;
         }
 

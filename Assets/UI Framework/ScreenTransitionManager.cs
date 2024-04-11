@@ -242,7 +242,7 @@ namespace UIFramework
                     _activeTransitionParams.transition.exitAnimation, _activeTransitionParams.transition.entryAnimation));
             }
 
-            if(_activeTransitionParams.transition.sortPriority == ScreenTransition.SortPriority.Auto)
+            if (_activeTransitionParams.transition.sortPriority == ScreenTransition.SortPriority.Auto)
             {
                 switch (_activeTransitionParams.transition.animationTargets)
                 {

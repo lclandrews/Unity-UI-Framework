@@ -7,6 +7,7 @@ namespace UIFramework
         WindowAnimation.Type type { get; }
         PlayMode playMode { get; }
         EasingMode easingMode { get; }
+        float length { get; }
         float currentTime { get; }
         float currentNormalisedTime { get; }        
         float remainingTime { get; }
