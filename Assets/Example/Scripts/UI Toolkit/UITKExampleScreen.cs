@@ -43,25 +43,25 @@ public class UITKExampleScreen : Screen<ExampleController>
 
     private void TravelToUGUITransitionScreen()
     {
-        ScreenTransition transition = ScreenTransition.Custom(0.5F, UIFramework.EasingMode.EaseInOut, WindowAnimation.Type.Flip, WindowAnimation.Type.Fade, ScreenTransition.SortPriority.Source);
+        WindowTransition transition = WindowTransition.Custom(0.5F, UIFramework.EasingMode.EaseInOut, WindowAnimation.Type.Flip, WindowAnimation.Type.Fade, WindowTransition.SortPriority.Source);
         controller.navigation.Travel<UGUIExampleTransitionScreen>(in transition, null);
     }    
 
     private void TravelToUITKTransitionScreen()
     {
-        ScreenTransition transition = ScreenTransition.Custom(0.5F, UIFramework.EasingMode.EaseInOut, WindowAnimation.Type.Fade, WindowAnimation.Type.Fade);
+        WindowTransition transition = WindowTransition.Custom(0.5F, UIFramework.EasingMode.EaseInOut, WindowAnimation.Type.Fade, WindowAnimation.Type.Fade);
         controller.navigation.Travel<UITKExampleTransitionScreen>(in transition, null);
     }
 
     private void TravelToUGUISharedCanvasScreen()
     {
-        ScreenTransition transition = ScreenTransition.Custom(0.5F, UIFramework.EasingMode.EaseInOut, WindowAnimation.Type.Fade, WindowAnimation.Type.Fade, ScreenTransition.SortPriority.Target);
+        WindowTransition transition = WindowTransition.Custom(0.5F, UIFramework.EasingMode.EaseInOut, WindowAnimation.Type.Fade, WindowAnimation.Type.Fade, WindowTransition.SortPriority.Target);
         controller.navigation.Travel<UGUIExampleSharedCanvasScreen>(in transition, null);
     }
 
     private void TravelToUGUIAltCanvasScreen()
     {
-        ScreenTransition transition = ScreenTransition.Custom(0.5F, UIFramework.EasingMode.EaseInOut, WindowAnimation.Type.Fade, WindowAnimation.Type.Expand, ScreenTransition.SortPriority.Target);
+        WindowTransition transition = WindowTransition.Custom(0.5F, UIFramework.EasingMode.EaseInOut, WindowAnimation.Type.Fade, WindowAnimation.Type.Expand, WindowTransition.SortPriority.Target);
         controller.navigation.Travel<UGUIExampleAlternateCanvasScreen>(in transition, null);
     }    
 }

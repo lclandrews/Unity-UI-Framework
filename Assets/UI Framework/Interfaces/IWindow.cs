@@ -12,12 +12,13 @@ namespace UIFramework
     /// <summary>
     /// Interface <c>IWindow</c> defines expected contract for all <c>UIFramework</c> windows.
     /// </summary>
-    public interface IWindow : IWindowData, IUIBehaviour
+    public interface IWindow : IDataRecipient, IUIBehaviour
     {
         WindowState state { get; }
         bool isVisible { get; }
         bool isEnabled { get; set; }
         bool isInteractable { get; set; }
+        int sortOrder { get; set; }
 
         IWindowAnimator animator { get; }
 

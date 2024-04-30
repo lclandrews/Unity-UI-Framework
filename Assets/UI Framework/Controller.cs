@@ -63,13 +63,16 @@ namespace UIFramework
         }
         private IWindowAnimator _animator = null;
 
-        public ScreenNavigation<ControllerType> navigation = null;
+        public Navigation<IScreen<ControllerType>> navigation = null;
+
+        public Action onOpenAction { get; set; } = null;
+        public Action onCloseAction { get; set; } = null;
 
         protected abstract IScreenCollector<ControllerType>[] screenCollectors { get; }
-        private ScreenCollection<ControllerType> _screens = new ScreenCollection<ControllerType>(null, null);
+        private ArrayDictionary<IScreen<ControllerType>> _screens = null;
 
         private bool stateAnimatesSelf { get { return stateAnimationMode.HasFlag(StateAnimationMode.Self); } }
-        private bool stateAnimatesScreen { get { return stateAnimationMode.HasFlag(StateAnimationMode.Self); } }
+        private bool stateAnimatesScreen { get { return stateAnimationMode.HasFlag(StateAnimationMode.Screen); } }
 
         // Unity Messages
 #if UNITY_EDITOR
@@ -139,24 +142,9 @@ namespace UIFramework
                 screenList.AddRange(screenCollectors[i].Collect());
             }
 
-            _screens.array = screenList.ToArray();
-            _screens.dictionary = new Dictionary<Type, IScreen<ControllerType>>(_screens.array.Length);
+            _screens = new ArrayDictionary<IScreen<ControllerType>>(screenList.ToArray());
 
-            for (int i = 0; i < _screens.array.Length; i++)
-            {
-                Type screenType = _screens.array[i].GetType();
-                if (!_screens.dictionary.ContainsKey(screenType))
-                {                    
-                    _screens.dictionary.Add(screenType, _screens.array[i]);
-                }
-                else
-                {
-                    Debug.LogWarning("Multiple instances of the same IScreen<ControllerType> type have been found. " +
-                        "Please ensure all IScreen<ControllerType> instances are of a unqiue type.");
-                }
-            }
-
-            navigation = new ScreenNavigation<ControllerType>(_screens);
+            navigation = new Navigation<IScreen<ControllerType>>(_screens);
             navigation.onNavigationUpdate += OnNavigationUpdate;            
 
             if (animator != null)
@@ -183,13 +171,16 @@ namespace UIFramework
                 animator.Update(deltaTime);
             }
 
-            for (int i = 0; i < _screens.array.Length; i++)
+            if(_screens.array != null)
             {
-                if (_screens.array[i].isVisible)
+                for (int i = 0; i < _screens.array.Length; i++)
                 {
-                    _screens.array[i].UpdateUI(deltaTime);
+                    if (_screens.array[i].isVisible)
+                    {
+                        _screens.array[i].UpdateUI(deltaTime);
+                    }
                 }
-            }
+            }            
         }
 
         public ScreenType GetScreen<ScreenType>() where ScreenType : class, IScreen<ControllerType>
@@ -244,6 +235,7 @@ namespace UIFramework
                 state = WindowState.Open;
                 navigation.Init<ScreenType>(data);
                 OnOpen();
+                onOpenAction?.Invoke();
                 OnOpened();
                 return true;
             }
@@ -297,8 +289,8 @@ namespace UIFramework
                 {
                     navigation.Init<ScreenType>(data);
                 }                
-
                 OnOpen();
+                onOpenAction?.Invoke();
                 return true;
             }
             return false;
@@ -319,6 +311,7 @@ namespace UIFramework
             state = WindowState.Open;
             navigation.Init(targetScreenType, data);
             OnOpen();
+            onOpenAction?.Invoke();
             OnOpened();
         }
 
@@ -362,6 +355,7 @@ namespace UIFramework
             }
 
             OnOpen();
+            onOpenAction?.Invoke();
         }
 
         private bool ValidateOpen(Type screenType, IScreen<ControllerType> screen)
@@ -414,6 +408,7 @@ namespace UIFramework
                 state = WindowState.Closed;
                 navigation.Terminate();
                 OnClose();
+                onCloseAction?.Invoke();
                 OnClosed();
                 return true;
             }
@@ -467,6 +462,7 @@ namespace UIFramework
                     navigation.Terminate();
                 }
                 OnClose();
+                onCloseAction?.Invoke();
                 return true;
             }
             return false;

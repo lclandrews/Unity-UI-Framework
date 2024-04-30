@@ -10,30 +10,23 @@ namespace UIFramework.UGUI
 
         public virtual bool supportsHistory { get; } = true;
 
-        public virtual ScreenTransition defaultTransition { get; protected set; } = ScreenTransition.Fade(0.25F, EasingMode.EaseInOut);
+        public virtual WindowTransition defaultTransition { get; protected set; } = WindowTransition.Fade(0.25F, EasingMode.EaseInOut);
 
         protected virtual Button backButton { get; } = null;
         private Canvas _canvas = null;
 
-        public int sortOrder
+        public override int sortOrder
         {
             get
             {
-                return _sortOrder;
+                return base.sortOrder;
             }
             set
             {
-                _sortOrder = value;
-                // [TODO] Determine a better way of handling implemented sort order.
-                // This current approach is used to support transitioning between screens within the same Canvas and
-                // screens that utilise different Canvases, or a hybrid approach.
-                // This means that if screens share a Canvas when the sort order is set to transition between children, 
-                // both will set the sort order of the Canvas which is undesirable :(
-                rectTransform.SetSiblingIndex(_sortOrder);              
-                _canvas.sortingOrder = _sortOrder;
+                base.sortOrder = value;
+                _canvas.sortingOrder = value;
             }
         }
-        private int _sortOrder = 0;
 
         // IScreen
         public virtual void Init(Controller<ControllerType> controller)
@@ -58,6 +51,11 @@ namespace UIFramework.UGUI
                 return true;
             }
             return false;
+        }
+
+        public bool Equals(INavigatable other)
+        {
+            return other as Screen<ControllerType> == this;
         }
     }
 }

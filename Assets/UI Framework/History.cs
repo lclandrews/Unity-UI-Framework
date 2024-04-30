@@ -3,16 +3,16 @@ using System.Collections.Generic;
 
 namespace UIFramework
 {
-    public class ScreenHistory<ControllerType> where ControllerType : Controller<ControllerType>
+    public class History
     {
         private struct Entry
         {
-            public Type screenType { get; private set; }
-            public ScreenTransition transition { get; private set; }
+            public Type windowType { get; private set; }
+            public WindowTransition transition { get; private set; }
 
-            public Entry(Type screenType, in ScreenTransition transition)
+            public Entry(Type windowType, in WindowTransition transition)
             {
-                this.screenType = screenType;
+                this.windowType = windowType;
                 this.transition = transition;
             }
         }
@@ -24,19 +24,19 @@ namespace UIFramework
         private int _activeGroup = 0;
         private int _groupCapacity = 0;
 
-        public ScreenHistory(int capacity)
+        public History(int capacity)
         {
             _history.Add(new Stack<Entry>(capacity));
         }
 
-        public void Push(Type screenType, in ScreenTransition transition)
+        public void Push(Type windowType, in WindowTransition transition)
         {
-            Entry entry = new Entry(screenType, transition);
+            Entry entry = new Entry(windowType, transition);
             _history[_activeGroup].Push(entry);
             count++;
         }
 
-        public void Pop(out Type screenType, out ScreenTransition transition)
+        public void Pop(out Type windowType, out WindowTransition transition)
         {
             if (_history[_activeGroup].Count > 0)
             {
@@ -47,7 +47,7 @@ namespace UIFramework
                     _activeGroup--;
                 }
 
-                screenType = entry.screenType;
+                windowType = entry.windowType;
                 transition = entry.transition;
             }
             else

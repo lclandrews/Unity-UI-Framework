@@ -68,73 +68,73 @@ public class UITKExampleTransitionScreen : Screen<ExampleController>
 
     private void FadeTransition()
     {
-        ScreenTransition transition = ScreenTransition.Fade(_transitionLength, UIFramework.EasingMode.EaseInOut);
+        WindowTransition transition = WindowTransition.Fade(_transitionLength, UIFramework.EasingMode.EaseInOut);
         controller.navigation.Travel<UITKExampleScreen>(in transition, null);
     }
 
     private void DissolveTransition()
     {
-        ScreenTransition transition = ScreenTransition.Dissolve(_transitionLength, UIFramework.EasingMode.EaseInOut);
+        WindowTransition transition = WindowTransition.Dissolve(_transitionLength, UIFramework.EasingMode.EaseInOut);
         controller.navigation.Travel<UITKExampleScreen>(in transition, null);
     }
 
     private void SlideFromLeftTransition()
     {
-        ScreenTransition transition = ScreenTransition.SlideFromLeft(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
+        WindowTransition transition = WindowTransition.SlideFromLeft(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
         controller.navigation.Travel<UITKExampleScreen>(in transition, null);
     }
 
     private void SlideFromRightTransition()
     {
-        ScreenTransition transition = ScreenTransition.SlideFromRight(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
+        WindowTransition transition = WindowTransition.SlideFromRight(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
         controller.navigation.Travel<UITKExampleScreen>(in transition, null);
     }
 
     private void SlideFromBottomTransition()
     {
-        ScreenTransition transition = ScreenTransition.SlideFromBottom(_transitionLength, UIFramework.EasingMode.EaseInOut);
+        WindowTransition transition = WindowTransition.SlideFromBottom(_transitionLength, UIFramework.EasingMode.EaseInOut);
         controller.navigation.Travel<UITKExampleScreen>(in transition, null);
     }
 
     private void SlideFromTopTransition()
     {
-        ScreenTransition transition = ScreenTransition.SlideFromTop(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
+        WindowTransition transition = WindowTransition.SlideFromTop(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
         controller.navigation.Travel<UITKExampleScreen>(in transition, null);
     }
 
     private void SlideOverLeftTransition()
     {
-        ScreenTransition transition = ScreenTransition.SlideOverFromLeft(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
+        WindowTransition transition = WindowTransition.SlideOverFromLeft(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
         controller.navigation.Travel<UITKExampleScreen>(in transition, null);
     }
 
     private void SlideOverRightTransition()
     {
-        ScreenTransition transition = ScreenTransition.SlideOverFromRight(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
+        WindowTransition transition = WindowTransition.SlideOverFromRight(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
         controller.navigation.Travel<UITKExampleScreen>(in transition, null);
     }
 
     private void SlideOverBottomTransition()
     {
-        ScreenTransition transition = ScreenTransition.SlideOverFromBottom(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
+        WindowTransition transition = WindowTransition.SlideOverFromBottom(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
         controller.navigation.Travel<UITKExampleScreen>(in transition, null);
     }
 
     private void SlideOverTopTransition()
     {
-        ScreenTransition transition = ScreenTransition.SlideOverFromTop(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
+        WindowTransition transition = WindowTransition.SlideOverFromTop(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
         controller.navigation.Travel<UITKExampleScreen>(in transition, null);
     }
 
     private void FlipTransition()
     {
-        ScreenTransition transition = ScreenTransition.Flip(_transitionLength, UIFramework.EasingMode.EaseInBounce);
+        WindowTransition transition = WindowTransition.Flip(_transitionLength, UIFramework.EasingMode.EaseInBounce);
         controller.navigation.Travel<UITKExampleScreen>(in transition, null);
     }
 
     private void ExpandTransition()
     {
-        ScreenTransition transition = ScreenTransition.Expand(_transitionLength, UIFramework.EasingMode.EaseInOutBack);
+        WindowTransition transition = WindowTransition.Expand(_transitionLength, UIFramework.EasingMode.EaseInOutBack);
         controller.navigation.Travel<UITKExampleScreen>(in transition, null);
     }
 }

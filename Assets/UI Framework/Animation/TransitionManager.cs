@@ -5,65 +5,62 @@ using UnityEngine;
 
 namespace UIFramework
 {
-    public class ScreenTransitionManager<ControllerType> where ControllerType : Controller<ControllerType>
+    public class TransitionManager
     {
-        // [TODO] Consider a more appropriate name for this wrapper
-        private struct ScreenTransitionParams
+        private struct TransitionParams
         {
-            public ScreenTransition transition { get; private set; }
-            public IScreen<ControllerType> sourceScreen { get; private set; }
+            public WindowTransition transition { get; private set; }
+            public IWindow sourceWidow { get; private set; }
+            public IWindow targetWindow { get; private set; }
 
-
-            public IScreen<ControllerType> targetScreen { get; private set; }
-
-            public ScreenTransitionParams(in ScreenTransition transition, IScreen<ControllerType> sourceScreen, IScreen<ControllerType> targetScreen)
+            public TransitionParams(in WindowTransition transition, IWindow sourceWindow, IWindow targetWindow)
             {
                 this.transition = transition;
-                this.sourceScreen = sourceScreen;
-                this.targetScreen = targetScreen;
+                this.sourceWidow = sourceWindow;
+                this.targetWindow = targetWindow;
             }
 
             public override bool Equals(object obj)
             {
-                return obj is ScreenTransitionParams other && Equals(other);
+                return obj is TransitionParams other && Equals(other);
             }
 
-            public bool Equals(ScreenTransitionParams other)
+            public bool Equals(TransitionParams other)
             {
-                return transition == other.transition && sourceScreen == other.sourceScreen && targetScreen == other.targetScreen;
+                return transition == other.transition && sourceWidow == other.sourceWidow && targetWindow == other.targetWindow;
             }
 
             public override int GetHashCode()
             {
-                return HashCode.Combine(transition, sourceScreen, targetScreen);
+                return HashCode.Combine(transition, sourceWidow, targetWindow);
             }
 
-            public static bool operator ==(ScreenTransitionParams lhs, ScreenTransitionParams rhs)
+            public static bool operator ==(TransitionParams lhs, TransitionParams rhs)
             {
                 return lhs.Equals(rhs);
             }
 
-            public static bool operator !=(ScreenTransitionParams lhs, ScreenTransitionParams rhs)
+            public static bool operator !=(TransitionParams lhs, TransitionParams rhs)
             {
                 return !(lhs == rhs);
             }
 
             public void ReleaseReferences()
             {
-                sourceScreen = null;
-                targetScreen = null;
+                sourceWidow = null;
+                targetWindow = null;
             }
         }
 
         private class QueuedTransition
         {
-            public ScreenTransitionParams transitionParams { get { return _transitionParams; } }
-            private ScreenTransitionParams _transitionParams = new ScreenTransitionParams();
+            public TransitionParams transitionParams { get { return _transitionParams; } }
+            private TransitionParams _transitionParams = new TransitionParams();
             public bool reverse { get; private set; } = false;
 
             private QueuedTransition() { }
 
-            public QueuedTransition(in ScreenTransitionParams transitionParams, bool reverse)
+            public QueuedTransition(in TransitionParams transitionParams, bool reverse)
             {
                 _transitionParams = transitionParams;
                 this.reverse = reverse;
@@ -74,78 +71,65 @@ namespace UIFramework
                 return _transitionParams == other._transitionParams && reverse == other.reverse;
             }
 
-            public bool ValuesAreEqualTo(in ScreenTransitionParams otherParams, bool otherReverse)
+            public bool ValuesAreEqualTo(in TransitionParams otherParams, bool otherReverse)
             {
                 return _transitionParams == otherParams && reverse == otherReverse;
             }
 
-            public ref ScreenTransitionParams GetTransitionParamsRef()
+            public ref TransitionParams GetTransitionParamsRef()
             {
                 return ref _transitionParams;
             }
         }
 
         public bool isTransitionActive { get; private set; } = false;
-        private ScreenTransitionParams _activeTransitionParams = new ScreenTransitionParams();
+        private TransitionParams _activeTransitionParams = new TransitionParams();
         private bool _isActiveReverse = false;
 
         private int _queuedTransitionsCount { get { return _queuedTransitions.Count; } }
         private List<QueuedTransition> _queuedTransitions = new List<QueuedTransition>();
 
-        private IWindowAnimator _sourceScreenAnimator = null;
-        private IWindowAnimator _targetScreenAnimator = null;
+        private IWindowAnimator _sourceWindowAnimator = null;
+        private IWindowAnimator _targetWindowAnimator = null;
 
-        private IWindowAnimator _primaryScreenAnimator
+        private IWindowAnimator _primaryWindowAnimator
         {
             get
             {
                 switch (_activeTransitionParams.transition.animationTargets)
                 {
-                    case ScreenTransition.AnimationTargets.Both:
-                    case ScreenTransition.AnimationTargets.Target:
-                        return _targetScreenAnimator;
-                    case ScreenTransition.AnimationTargets.Source:
-                        return _sourceScreenAnimator;
+                    case WindowTransition.AnimationTargets.Both:
+                    case WindowTransition.AnimationTargets.Target:
+                        return _targetWindowAnimator;
+                    case WindowTransition.AnimationTargets.Source:
+                        return _sourceWindowAnimator;
                 }
                 return null;
             }
         }
 
-        public void Transition(IScreen<ControllerType> sourceScreen, IScreen<ControllerType> targetScreen)
+        public void Transition(in WindowTransition transition, IWindow sourceWindow, IWindow targetWindow)
         {
-            ScreenTransitionParams transitionParams = new ScreenTransitionParams(targetScreen.defaultTransition, sourceScreen, targetScreen);
+            TransitionParams transitionParams = new TransitionParams(transition, sourceWindow, targetWindow);
             HandleNewTransition(in transitionParams, false);
         }
 
-        public void Transition(in ScreenTransition transition, IScreen<ControllerType> sourceScreen, IScreen<ControllerType> targetScreen)
+        public void ReverseTransition(in WindowTransition transition, IWindow sourceWindow, IWindow targetWindow)
         {
-            ScreenTransitionParams transitionParams = new ScreenTransitionParams(transition, sourceScreen, targetScreen);
-            HandleNewTransition(in transitionParams, false);
-        }
-
-        public void ReverseTransition(IScreen<ControllerType> sourceScreen, IScreen<ControllerType> targetScreen)
-        {
-            ScreenTransitionParams transitionParams = new ScreenTransitionParams(targetScreen.defaultTransition, sourceScreen, targetScreen);
+            TransitionParams transitionParams = new TransitionParams(transition, sourceWindow, targetWindow);
             HandleNewTransition(in transitionParams, true);
         }
 
-        // Reverse transitons need to be queued for spamming back key??
-        public void ReverseTransition(in ScreenTransition transition, IScreen<ControllerType> sourceScreen, IScreen<ControllerType> targetScreen)
+        private void HandleNewTransition(in TransitionParams transitionParams, bool reverse)
         {
-            ScreenTransitionParams transitionParams = new ScreenTransitionParams(transition, sourceScreen, targetScreen);
-            HandleNewTransition(in transitionParams, true);
-        }
-
-        private void HandleNewTransition(in ScreenTransitionParams transitionParams, bool reverse)
-        {
-            if (transitionParams.sourceScreen == null)
+            if (transitionParams.sourceWidow == null)
             {
-                throw new ArgumentNullException(nameof(transitionParams.sourceScreen));
+                throw new ArgumentNullException(nameof(transitionParams.sourceWidow));
             }
 
-            if (transitionParams.targetScreen == null)
+            if (transitionParams.targetWindow == null)
             {
-                throw new ArgumentNullException(nameof(transitionParams.targetScreen));
+                throw new ArgumentNullException(nameof(transitionParams.targetWindow));
             }
 
             if (!isTransitionActive)
@@ -158,7 +142,7 @@ namespace UIFramework
                 // this is true is we attempt to reverse a transition that is running forward or
                 // we attempt to run a forward transition while a matching transition is currently running reversed                
                 bool newTransitionOpposesLeading;
-                ScreenTransitionParams leadingTransitionParams;
+                TransitionParams leadingTransitionParams;
                 if (_queuedTransitionsCount > 0)
                 {
                     // Don't actually need to check this as we ensure that with queued transitions the leading transition should match any that are queued.
@@ -201,7 +185,7 @@ namespace UIFramework
                     if (reverse)
                     {
                         // Ensure that the enqueueing transition is viable given the current leading transition.
-                        if (leadingTransitionParams.sourceScreen != transitionParams.targetScreen)
+                        if (leadingTransitionParams.sourceWidow != transitionParams.targetWindow)
                         {
                             throw new InvalidOperationException(
                                 "Attempting to reverse a transition to a previous screen while the leading transitions source differs from the reverse transitions target.");
@@ -212,7 +196,7 @@ namespace UIFramework
                     else
                     {
                         // Ensure that the enqueueing transition is viable given the current leading transition.
-                        if (leadingTransitionParams.targetScreen != transitionParams.sourceScreen)
+                        if (leadingTransitionParams.targetWindow != transitionParams.sourceWidow)
                         {
                             throw new InvalidOperationException(
                                 "Attempting to transition to a new screen while the leading transitions target differs from the new transitions source.");
@@ -224,12 +208,12 @@ namespace UIFramework
             }
         }
 
-        private void ExecuteTransition(in ScreenTransitionParams transitionParams, bool reverse)
+        private void ExecuteTransition(in TransitionParams transitionParams, bool reverse)
         {
             isTransitionActive = true;
             _isActiveReverse = reverse;
 
-            ScreenTransitionParams? fallbackTransitionParams;
+            TransitionParams? fallbackTransitionParams;
             if (IsSupportedTransition(in transitionParams, out fallbackTransitionParams))
             {
                 _activeTransitionParams = transitionParams;
@@ -242,22 +226,22 @@ namespace UIFramework
                     _activeTransitionParams.transition.exitAnimation, _activeTransitionParams.transition.entryAnimation));
             }
 
-            if (_activeTransitionParams.transition.sortPriority == ScreenTransition.SortPriority.Auto)
+            if(_activeTransitionParams.transition.sortPriority == WindowTransition.SortPriority.Auto)
             {
                 switch (_activeTransitionParams.transition.animationTargets)
                 {
                     default:
-                    case ScreenTransition.AnimationTargets.Both:
-                        _activeTransitionParams.sourceScreen.sortOrder = 0;
-                        _activeTransitionParams.targetScreen.sortOrder = 0;
+                    case WindowTransition.AnimationTargets.Both:
+                        _activeTransitionParams.sourceWidow.sortOrder = 0;
+                        _activeTransitionParams.targetWindow.sortOrder = 0;
                         break;
-                    case ScreenTransition.AnimationTargets.Target:
-                        _activeTransitionParams.sourceScreen.sortOrder = 0;
-                        _activeTransitionParams.targetScreen.sortOrder = 1;
+                    case WindowTransition.AnimationTargets.Target:
+                        _activeTransitionParams.sourceWidow.sortOrder = 0;
+                        _activeTransitionParams.targetWindow.sortOrder = 1;
                         break;
-                    case ScreenTransition.AnimationTargets.Source:
-                        _activeTransitionParams.sourceScreen.sortOrder = 1;
-                        _activeTransitionParams.targetScreen.sortOrder = 0;
+                    case WindowTransition.AnimationTargets.Source:
+                        _activeTransitionParams.sourceWidow.sortOrder = 1;
+                        _activeTransitionParams.targetWindow.sortOrder = 0;
                         break;
                 }
             }
@@ -265,18 +249,18 @@ namespace UIFramework
             {
                 switch (_activeTransitionParams.transition.sortPriority)
                 {
-                    case ScreenTransition.SortPriority.Source:
-                        _activeTransitionParams.sourceScreen.sortOrder = 1;
-                        _activeTransitionParams.targetScreen.sortOrder = 0;
+                    case WindowTransition.SortPriority.Source:
+                        _activeTransitionParams.sourceWidow.sortOrder = 1;
+                        _activeTransitionParams.targetWindow.sortOrder = 0;
                         break;
-                    case ScreenTransition.SortPriority.Target:
-                        _activeTransitionParams.sourceScreen.sortOrder = 0;
-                        _activeTransitionParams.targetScreen.sortOrder = 1;
+                    case WindowTransition.SortPriority.Target:
+                        _activeTransitionParams.sourceWidow.sortOrder = 0;
+                        _activeTransitionParams.targetWindow.sortOrder = 1;
                         break;
                 }
             }
 
-            if (_activeTransitionParams.transition.animationTargets == ScreenTransition.AnimationTargets.None)
+            if (_activeTransitionParams.transition.animationTargets == WindowTransition.AnimationTargets.None)
             {
                 ExecuteNone(in _activeTransitionParams, reverse);
                 CompleteTransition();
@@ -285,25 +269,25 @@ namespace UIFramework
             {
                 switch (_activeTransitionParams.transition.animationTargets)
                 {
-                    case ScreenTransition.AnimationTargets.Both:
-                        _sourceScreenAnimator = _activeTransitionParams.sourceScreen.animator;
-                        _sourceScreenAnimator.onComplete += OnAnimationComplete;
-                        _targetScreenAnimator = _activeTransitionParams.targetScreen.animator;
-                        _targetScreenAnimator.onComplete += OnAnimationComplete;
+                    case WindowTransition.AnimationTargets.Both:
+                        _sourceWindowAnimator = _activeTransitionParams.sourceWidow.animator;
+                        _sourceWindowAnimator.onComplete += OnAnimationComplete;
+                        _targetWindowAnimator = _activeTransitionParams.targetWindow.animator;
+                        _targetWindowAnimator.onComplete += OnAnimationComplete;
                         break;
-                    case ScreenTransition.AnimationTargets.Source:
-                        _sourceScreenAnimator = _activeTransitionParams.sourceScreen.animator;
-                        _sourceScreenAnimator.onComplete += OnAnimationComplete;
+                    case WindowTransition.AnimationTargets.Source:
+                        _sourceWindowAnimator = _activeTransitionParams.sourceWidow.animator;
+                        _sourceWindowAnimator.onComplete += OnAnimationComplete;
                         break;
-                    case ScreenTransition.AnimationTargets.Target:
-                        _targetScreenAnimator = _activeTransitionParams.targetScreen.animator;
-                        _targetScreenAnimator.onComplete += OnAnimationComplete;
+                    case WindowTransition.AnimationTargets.Target:
+                        _targetWindowAnimator = _activeTransitionParams.targetWindow.animator;
+                        _targetWindowAnimator.onComplete += OnAnimationComplete;
                         break;
                 }                
 
                 // Removed as this is now expected to be handled by the screen / window itself.
-                //_activeTransitionParams.sourceScreen.isInteractable = false;
-                //_activeTransitionParams.targetScreen.isInteractable = false;
+                //_activeTransitionParams.sourceWindow.isInteractable = false;
+                //_activeTransitionParams.targetWindow.isInteractable = false;
                 float normalisedStartTime = _isActiveReverse ? 1.0F : 0.0F;
                 ExecuteTransition(in _activeTransitionParams, _isActiveReverse, normalisedStartTime);
             }
@@ -311,7 +295,7 @@ namespace UIFramework
 
         private void InvertActiveTransition()
         {
-            if (_activeTransitionParams.transition.animationTargets == ScreenTransition.AnimationTargets.None)
+            if (_activeTransitionParams.transition.animationTargets == WindowTransition.AnimationTargets.None)
             {
                 throw new InvalidOperationException("Cannot invert transition with no animation targets.");
             }
@@ -319,103 +303,103 @@ namespace UIFramework
             _isActiveReverse = !_isActiveReverse;
 
 
-            float normalisedStartTime = _primaryScreenAnimator.currentNormalisedTime;
+            float normalisedStartTime = _primaryWindowAnimator.currentNormalisedTime;
             ExecuteTransition(in _activeTransitionParams, _isActiveReverse, normalisedStartTime);
         }
 
-        private void ExecuteTransition(in ScreenTransitionParams transitionParams, bool reverse, float normalisedStartTime)
+        private void ExecuteTransition(in TransitionParams transitionParams, bool reverse, float normalisedStartTime)
         {
             float startTime = transitionParams.transition.length * normalisedStartTime;
             switch (_activeTransitionParams.transition.animationTargets)
             {
-                case ScreenTransition.AnimationTargets.Both:
+                case WindowTransition.AnimationTargets.Both:
                     ExecuteOnBoth(in transitionParams, reverse, startTime);
                     break;
-                case ScreenTransition.AnimationTargets.Target:
+                case WindowTransition.AnimationTargets.Target:
                     ExecuteOnTarget(in transitionParams, reverse, startTime);
                     break;
-                case ScreenTransition.AnimationTargets.Source:
+                case WindowTransition.AnimationTargets.Source:
                     ExecuteOnSource(in transitionParams, reverse, startTime);
                     break;
             }
         }
 
-        private void ExecuteNone(in ScreenTransitionParams transitionParams, bool reverse)
+        private void ExecuteNone(in TransitionParams transitionParams, bool reverse)
         {
             if (reverse)
             {
-                transitionParams.sourceScreen.Open();
+                transitionParams.sourceWidow.Open();
             }
             else
             {
-                transitionParams.targetScreen.Open();
+                transitionParams.targetWindow.Open();
             }
         }
 
-        private void ExecuteOnTarget(in ScreenTransitionParams transitionParams, bool reverse, float startTime)
+        private void ExecuteOnTarget(in TransitionParams transitionParams, bool reverse, float startTime)
         {
             if (reverse)
             {
-                transitionParams.sourceScreen.Open();
+                transitionParams.sourceWidow.Open();
 
-                WindowAnimation targetScreenAnimation = new WindowAnimation(transitionParams.transition.entryAnimation.Value, transitionParams.transition.length, 
+                WindowAnimation targetWindowAnimation = new WindowAnimation(transitionParams.transition.entryAnimation.Value, transitionParams.transition.length, 
                     Easing.GetInverseEasingMode(transitionParams.transition.easingMode), startTime, PlayMode.Reverse);
-                transitionParams.targetScreen.Close(targetScreenAnimation);
+                transitionParams.targetWindow.Close(targetWindowAnimation);
             }
             else
             {
-                WindowAnimation targetScreenAnimation = new WindowAnimation(transitionParams.transition.entryAnimation.Value, transitionParams.transition.length, 
+                WindowAnimation targetWindowAnimation = new WindowAnimation(transitionParams.transition.entryAnimation.Value, transitionParams.transition.length, 
                     transitionParams.transition.easingMode, startTime, PlayMode.Forward);
-                transitionParams.targetScreen.Open(targetScreenAnimation);
+                transitionParams.targetWindow.Open(targetWindowAnimation);
             }
         }
 
-        private void ExecuteOnSource(in ScreenTransitionParams transitionParams, bool reverse, float startTime)
+        private void ExecuteOnSource(in TransitionParams transitionParams, bool reverse, float startTime)
         {
             startTime = transitionParams.transition.length - startTime;
             if (reverse)
             {
-                WindowAnimation sourceScreenAnimation = new WindowAnimation(transitionParams.transition.exitAnimation.Value, transitionParams.transition.length, 
+                WindowAnimation sourceWindowAnimation = new WindowAnimation(transitionParams.transition.exitAnimation.Value, transitionParams.transition.length, 
                     Easing.GetInverseEasingMode(transitionParams.transition.easingMode), startTime, PlayMode.Forward);
-                transitionParams.sourceScreen.Open(sourceScreenAnimation);
+                transitionParams.sourceWidow.Open(sourceWindowAnimation);
             }
             else
             {
-                transitionParams.targetScreen.Open();
+                transitionParams.targetWindow.Open();
 
-                WindowAnimation sourceScreenAnimation = new WindowAnimation(transitionParams.transition.exitAnimation.Value, transitionParams.transition.length, 
+                WindowAnimation sourceWindowAnimation = new WindowAnimation(transitionParams.transition.exitAnimation.Value, transitionParams.transition.length, 
                     transitionParams.transition.easingMode, startTime, PlayMode.Reverse);
-                transitionParams.sourceScreen.Close(sourceScreenAnimation);
+                transitionParams.sourceWidow.Close(sourceWindowAnimation);
             }
         }
 
-        private void ExecuteOnBoth(in ScreenTransitionParams transitionParams, bool reverse, float startTime)
+        private void ExecuteOnBoth(in TransitionParams transitionParams, bool reverse, float startTime)
         {
             float targetStartTime = startTime;
             float sourceStartTime = transitionParams.transition.length - startTime;
             if (reverse)
             {
-                WindowAnimation sourceScreenAnimation = new WindowAnimation(transitionParams.transition.exitAnimation.Value, transitionParams.transition.length, 
+                WindowAnimation sourceWindowAnimation = new WindowAnimation(transitionParams.transition.exitAnimation.Value, transitionParams.transition.length, 
                     transitionParams.transition.easingMode, sourceStartTime, PlayMode.Forward);
-                transitionParams.sourceScreen.Open(sourceScreenAnimation);
+                transitionParams.sourceWidow.Open(sourceWindowAnimation);
 
-                WindowAnimation targetScreenAnimation = new WindowAnimation(transitionParams.transition.entryAnimation.Value, transitionParams.transition.length, 
+                WindowAnimation targetWindowAnimation = new WindowAnimation(transitionParams.transition.entryAnimation.Value, transitionParams.transition.length, 
                     Easing.GetInverseEasingMode(transitionParams.transition.easingMode), targetStartTime, PlayMode.Reverse);
-                transitionParams.targetScreen.Close(targetScreenAnimation);
+                transitionParams.targetWindow.Close(targetWindowAnimation);
             }
             else
             {
-                WindowAnimation sourceScreenAnimation = new WindowAnimation(transitionParams.transition.exitAnimation.Value, transitionParams.transition.length, 
+                WindowAnimation sourceWindowAnimation = new WindowAnimation(transitionParams.transition.exitAnimation.Value, transitionParams.transition.length, 
                     Easing.GetInverseEasingMode(transitionParams.transition.easingMode), sourceStartTime, PlayMode.Reverse);
-                transitionParams.sourceScreen.Close(sourceScreenAnimation);
+                transitionParams.sourceWidow.Close(sourceWindowAnimation);
 
-                WindowAnimation targetScreenAnimation = new WindowAnimation(transitionParams.transition.entryAnimation.Value, transitionParams.transition.length, 
+                WindowAnimation targetWindowAnimation = new WindowAnimation(transitionParams.transition.entryAnimation.Value, transitionParams.transition.length, 
                     transitionParams.transition.easingMode, targetStartTime, PlayMode.Forward);
-                transitionParams.targetScreen.Open(targetScreenAnimation);
+                transitionParams.targetWindow.Open(targetWindowAnimation);
             }
         }
 
-        private void EnqueueTransition(in ScreenTransitionParams transitionParams, bool reverse)
+        private void EnqueueTransition(in TransitionParams transitionParams, bool reverse)
         {
             QueuedTransition queuedTransition = new QueuedTransition(in transitionParams, reverse);
             _queuedTransitions.Add(queuedTransition);
@@ -453,7 +437,7 @@ namespace UIFramework
             return _queuedTransitions[_queuedTransitionsCount - 1];
         }
 
-        private bool QueueContainsTransition(in ScreenTransitionParams transitionParams, bool reverse)
+        private bool QueueContainsTransition(in TransitionParams transitionParams, bool reverse)
         {
             for (int i = _queuedTransitionsCount - 1; i >= 0; i--)
             {
@@ -468,23 +452,23 @@ namespace UIFramework
         private void CompleteTransition()
         {
             // Removed as this is now expected to be handled by the screen / window itself.
-            //_activeTransitionParams.sourceScreen.isInteractable = true;
-            //_activeTransitionParams.targetScreen.isInteractable = true;
+            //_activeTransitionParams.sourceWindow.isInteractable = true;
+            //_activeTransitionParams.targetWindow.isInteractable = true;
 
-            if (_activeTransitionParams.transition.animationTargets != ScreenTransition.AnimationTargets.Both)
+            if (_activeTransitionParams.transition.animationTargets != WindowTransition.AnimationTargets.Both)
             {
                 if (_isActiveReverse)
                 {
-                    if (_activeTransitionParams.transition.animationTargets == ScreenTransition.AnimationTargets.Source)
+                    if (_activeTransitionParams.transition.animationTargets == WindowTransition.AnimationTargets.Source)
                     {
-                        _activeTransitionParams.targetScreen.Close();
+                        _activeTransitionParams.targetWindow.Close();
                     }
                 }
                 else
                 {
-                    if (_activeTransitionParams.transition.animationTargets == ScreenTransition.AnimationTargets.Target)
+                    if (_activeTransitionParams.transition.animationTargets == WindowTransition.AnimationTargets.Target)
                     {
-                        _activeTransitionParams.sourceScreen.Close();
+                        _activeTransitionParams.sourceWidow.Close();
                     }
                 }
             }            
@@ -504,66 +488,66 @@ namespace UIFramework
 
         private void OnAnimationComplete(IWindowAnimator animator)
         {
-            if (animator == _sourceScreenAnimator)
+            if (animator == _sourceWindowAnimator)
             {
-                _sourceScreenAnimator.onComplete -= OnAnimationComplete;
-                _sourceScreenAnimator = null;
+                _sourceWindowAnimator.onComplete -= OnAnimationComplete;
+                _sourceWindowAnimator = null;
             }
 
-            if (animator == _targetScreenAnimator)
+            if (animator == _targetWindowAnimator)
             {
-                _targetScreenAnimator.onComplete -= OnAnimationComplete;
-                _targetScreenAnimator = null;
+                _targetWindowAnimator.onComplete -= OnAnimationComplete;
+                _targetWindowAnimator = null;
             }
 
-            if (_sourceScreenAnimator == null && _targetScreenAnimator == null)
+            if (_sourceWindowAnimator == null && _targetWindowAnimator == null)
             {
                 CompleteTransition();
             }            
         }
 
-        private bool AreOpposingTransitions(in ScreenTransitionParams lhsTransitionParams, bool lhsReverse, in ScreenTransitionParams rhsTransitionParams, bool rhsReverse)
+        private bool AreOpposingTransitions(in TransitionParams lhsTransitionParams, bool lhsReverse, in TransitionParams rhsTransitionParams, bool rhsReverse)
         {
-            return lhsTransitionParams.targetScreen == rhsTransitionParams.targetScreen && lhsTransitionParams.sourceScreen == rhsTransitionParams.sourceScreen &&
+            return lhsTransitionParams.targetWindow == rhsTransitionParams.targetWindow && lhsTransitionParams.sourceWidow == rhsTransitionParams.sourceWidow &&
                 lhsReverse != rhsReverse;
         }
 
-        private bool IsSupportedTransition(in ScreenTransitionParams transitionParams, out ScreenTransitionParams? fallbackTransitionParams)
+        private bool IsSupportedTransition(in TransitionParams transitionParams, out TransitionParams? fallbackTransitionParams)
         {
             fallbackTransitionParams = null;
             bool isSupported = false;
             switch (transitionParams.transition.animationTargets)
             {
-                case ScreenTransition.AnimationTargets.None:
+                case WindowTransition.AnimationTargets.None:
                     isSupported = true;
                     break;
-                case ScreenTransition.AnimationTargets.Source:
-                    isSupported = transitionParams.sourceScreen.animator.IsSupportedType(transitionParams.transition.exitAnimation.Value);
+                case WindowTransition.AnimationTargets.Source:
+                    isSupported = transitionParams.sourceWidow.animator.IsSupportedType(transitionParams.transition.exitAnimation.Value);
                     if(!isSupported)
                     {
-                        fallbackTransitionParams = new ScreenTransitionParams(
-                            ScreenTransition.Custom(transitionParams.transition.length, transitionParams.transition.easingMode, transitionParams.sourceScreen.animator.fallbackType, null),
-                            transitionParams.sourceScreen, transitionParams.targetScreen);
+                        fallbackTransitionParams = new TransitionParams(
+                            WindowTransition.Custom(transitionParams.transition.length, transitionParams.transition.easingMode, transitionParams.sourceWidow.animator.fallbackType, null),
+                            transitionParams.sourceWidow, transitionParams.targetWindow);
                     }                    
                     break;
-                case ScreenTransition.AnimationTargets.Target:
-                    isSupported = transitionParams.targetScreen.animator.IsSupportedType(transitionParams.transition.entryAnimation.Value);
+                case WindowTransition.AnimationTargets.Target:
+                    isSupported = transitionParams.targetWindow.animator.IsSupportedType(transitionParams.transition.entryAnimation.Value);
                     if(!isSupported)
                     {
-                        fallbackTransitionParams = new ScreenTransitionParams(
-                            ScreenTransition.Custom(transitionParams.transition.length, transitionParams.transition.easingMode, null, transitionParams.targetScreen.animator.fallbackType),
-                            transitionParams.sourceScreen, transitionParams.targetScreen);
+                        fallbackTransitionParams = new TransitionParams(
+                            WindowTransition.Custom(transitionParams.transition.length, transitionParams.transition.easingMode, null, transitionParams.targetWindow.animator.fallbackType),
+                            transitionParams.sourceWidow, transitionParams.targetWindow);
                     }                    
                     break;
-                case ScreenTransition.AnimationTargets.Both:
-                    isSupported = transitionParams.sourceScreen.animator.IsSupportedType(transitionParams.transition.exitAnimation.Value) &&
-                        transitionParams.targetScreen.animator.IsSupportedType(transitionParams.transition.entryAnimation.Value);
+                case WindowTransition.AnimationTargets.Both:
+                    isSupported = transitionParams.sourceWidow.animator.IsSupportedType(transitionParams.transition.exitAnimation.Value) &&
+                        transitionParams.targetWindow.animator.IsSupportedType(transitionParams.transition.entryAnimation.Value);
                     if (!isSupported)
                     {
-                        fallbackTransitionParams = new ScreenTransitionParams(
-                            ScreenTransition.Custom(transitionParams.transition.length, transitionParams.transition.easingMode, 
-                                transitionParams.sourceScreen.animator.fallbackType, transitionParams.targetScreen.animator.fallbackType),
-                            transitionParams.sourceScreen, transitionParams.targetScreen);
+                        fallbackTransitionParams = new TransitionParams(
+                            WindowTransition.Custom(transitionParams.transition.length, transitionParams.transition.easingMode, 
+                                transitionParams.sourceWidow.animator.fallbackType, transitionParams.targetWindow.animator.fallbackType),
+                            transitionParams.sourceWidow, transitionParams.targetWindow);
                     }
                     break;
             }
@@ -574,39 +558,39 @@ namespace UIFramework
         {
             if (isTransitionActive)
             {
-                if (_sourceScreenAnimator != null)
+                if (_sourceWindowAnimator != null)
                 {
-                    _sourceScreenAnimator.onComplete -= OnAnimationComplete;
-                    _sourceScreenAnimator = null;
+                    _sourceWindowAnimator.onComplete -= OnAnimationComplete;
+                    _sourceWindowAnimator = null;
                 }
 
-                if(_targetScreenAnimator != null)
+                if(_targetWindowAnimator != null)
                 {
-                    _targetScreenAnimator.onComplete -= OnAnimationComplete;
-                    _targetScreenAnimator = null;
+                    _targetWindowAnimator.onComplete -= OnAnimationComplete;
+                    _targetWindowAnimator = null;
                 }
 
                 if (endActiveAnimations)
                 {
                     switch (_activeTransitionParams.transition.animationTargets)
                     {
-                        case ScreenTransition.AnimationTargets.Source:
-                            _activeTransitionParams.sourceScreen.animator.Complete();
+                        case WindowTransition.AnimationTargets.Source:
+                            _activeTransitionParams.sourceWidow.animator.Complete();
                             if (_isActiveReverse)
                             {
-                                _activeTransitionParams.targetScreen.Close();
+                                _activeTransitionParams.targetWindow.Close();
                             }
                             break;
-                        case ScreenTransition.AnimationTargets.Target:
-                            _activeTransitionParams.targetScreen.animator.Complete();
+                        case WindowTransition.AnimationTargets.Target:
+                            _activeTransitionParams.targetWindow.animator.Complete();
                             if(!_isActiveReverse)
                             {
-                                _activeTransitionParams.sourceScreen.Close();
+                                _activeTransitionParams.sourceWidow.Close();
                             }
                             break;
-                        case ScreenTransition.AnimationTargets.Both:
-                            _activeTransitionParams.sourceScreen.animator.Complete();
-                            _activeTransitionParams.targetScreen.animator.Complete();
+                        case WindowTransition.AnimationTargets.Both:
+                            _activeTransitionParams.sourceWidow.animator.Complete();
+                            _activeTransitionParams.targetWindow.animator.Complete();
                             break;
                     }
                 }

@@ -92,6 +92,20 @@ namespace UIFramework.UGUI
         }
         private int _isInteractableCounter = 1;
 
+        public virtual int sortOrder
+        {
+            get
+            {
+                return _sortOrder;
+            }
+            set
+            {
+                _sortOrder = value;
+                rectTransform.SetSiblingIndex(_sortOrder);
+            }
+        }
+        private int _sortOrder = 0;
+
         public abstract bool requiresData { get; }
         public object data { get; private set; } = null;
 
@@ -114,7 +128,8 @@ namespace UIFramework.UGUI
         // IWindowAnimatorFactory
         public virtual IWindowAnimator CreateAnimator()
         {
-            return new WindowAnimator(rectTransform.root as RectTransform,rectTransform, canvasGroup);
+            Canvas canvas = GetComponentInParent<Canvas>();
+            return new WindowAnimator(canvas.transform as RectTransform,rectTransform, canvasGroup);
         }
 
         // UGUIBehaviour

@@ -1,6 +1,6 @@
 namespace UIFramework
 {
-    public interface IWindowData
+    public interface IDataRecipient
     {
         bool requiresData { get; }
         object data { get; }

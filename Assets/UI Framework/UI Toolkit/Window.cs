@@ -73,6 +73,29 @@ namespace UIFramework.UIToolkit
         }
         private int _isInteractableCounter = 1;
 
+        public virtual int sortOrder
+        {
+            get
+            {
+                return _sortOrder;
+            }
+            set
+            {
+                _sortOrder = value;
+
+                VisualElement.Hierarchy parentHierarchy = visualElement.parent.hierarchy;
+                int newIndexInHierarchy = Mathf.Clamp(_sortOrder, 0, parentHierarchy.childCount - 1);
+                int existingIndexInHierarchy = parentHierarchy.IndexOf(visualElement);
+                if (newIndexInHierarchy != existingIndexInHierarchy)
+                {
+                    visualElement.PlaceInFront(parentHierarchy.ElementAt(newIndexInHierarchy));
+                }
+
+                uiDocument.sortingOrder = _sortOrder;
+            }
+        }
+        private int _sortOrder = 0;
+
         public abstract bool requiresData { get; }
         public object data { get; private set; } = null;
 

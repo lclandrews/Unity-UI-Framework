@@ -6,17 +6,13 @@ using UnityEngine.UIElements;
 namespace UIFramework.UIToolkit
 {
     public class WindowAnimator : IWindowAnimator
-    {        
+    {
+        public ICustomWindowAnimation customAnimation { get; private set; }
         public WindowAnimation.Type type { get; private set; }
-
         public PlayMode playMode { get; private set; }
-
         public EasingMode easingMode { get; private set; }
-
         public float length { get; private set; }
-
         public float currentTime { get; private set; }
-
         public float currentNormalisedTime { get { return currentTime / length; } }
 
         public float remainingTime
@@ -35,7 +31,6 @@ namespace UIFramework.UIToolkit
         }
 
         public bool isPlaying { get; private set; } = false;
-
         public virtual WindowAnimation.Type fallbackType { get { return WindowAnimation.Type.Fade; } }
 
         public WindowAnimatorEvent onComplete { get; set; } = default;
@@ -66,6 +61,7 @@ namespace UIFramework.UIToolkit
                 type = fallbackType;
                 Debug.LogWarning(string.Format("No UGUI animation implemented for: {0}, falling back to: {1}", animation.type, fallbackType.ToString()));
             }
+            customAnimation = animation.customAnimation;
 
             isPlaying = true;
             easingMode = animation.easingMode;
@@ -134,6 +130,7 @@ namespace UIFramework.UIToolkit
                 case WindowAnimation.Type.SlideFromTop:
                 case WindowAnimation.Type.Flip:
                 case WindowAnimation.Type.Expand:
+                case WindowAnimation.Type.Custom:
                     return true;
             }
         }
@@ -187,6 +184,9 @@ namespace UIFramework.UIToolkit
                 case WindowAnimation.Type.Expand:
                     Expand(Easing.PerformEase(normalisedTime, easingMode));
                     break;
+                case WindowAnimation.Type.Custom:
+                    customAnimation.Interpolate(Easing.PerformEase(normalisedTime, easingMode));
+                    break;
             }
         }
 
@@ -196,6 +196,10 @@ namespace UIFramework.UIToolkit
             _visualElement.style.translate = new Translate(Length.Percent(0.0F), Length.Percent(0.0F));
             _visualElement.style.scale = new Scale(Vector2.one);
             _visualElement.style.rotate = new Rotate(0.0F);
+            if (customAnimation != null)
+            {
+                customAnimation.Reset();
+            }
         }
 
         public virtual void Fade(float normalisedTime)

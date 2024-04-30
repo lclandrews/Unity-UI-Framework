@@ -4,6 +4,7 @@ namespace UIFramework
 
     public interface IWindowAnimator
     {
+        public ICustomWindowAnimation customAnimation { get; }
         WindowAnimation.Type type { get; }
         PlayMode playMode { get; }
         EasingMode easingMode { get; }

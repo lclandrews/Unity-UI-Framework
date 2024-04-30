@@ -29,19 +29,19 @@ public class UGUIExampleSharedCanvasScreen : Screen<ExampleController>
 
     private void TravelToTransitionScreen()
     {
-        ScreenTransition transition = ScreenTransition.Custom(0.5F, EasingMode.EaseInOut, WindowAnimation.Type.Fade, WindowAnimation.Type.SlideFromRight, ScreenTransition.SortPriority.Target);
+        WindowTransition transition = WindowTransition.Custom(0.5F, EasingMode.EaseInOut, WindowAnimation.Type.Fade, WindowAnimation.Type.SlideFromRight, WindowTransition.SortPriority.Target);
         controller.navigation.Travel<UGUIExampleTransitionScreen>(in transition, null);
     }
 
     private void TravelToAlternateCanvasScreen()
     {
-        ScreenTransition transition = ScreenTransition.Custom(0.5F, EasingMode.EaseInOut, WindowAnimation.Type.Fade, WindowAnimation.Type.Expand, ScreenTransition.SortPriority.Target);
+        WindowTransition transition = WindowTransition.Custom(0.5F, EasingMode.EaseInOut, WindowAnimation.Type.Fade, WindowAnimation.Type.Expand, WindowTransition.SortPriority.Target);
         controller.navigation.Travel<UGUIExampleAlternateCanvasScreen>(in transition, null);
     }
 
     private void TravelToUITKTransitionScreen()
     {
-        ScreenTransition transition = ScreenTransition.Custom(0.5F, EasingMode.EaseInOut, WindowAnimation.Type.Fade, WindowAnimation.Type.Fade);
+        WindowTransition transition = WindowTransition.Custom(0.5F, EasingMode.EaseInOut, WindowAnimation.Type.Fade, WindowAnimation.Type.Fade);
         controller.navigation.Travel<UITKExampleTransitionScreen>(in transition, null);
     }
 }

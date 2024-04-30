@@ -54,73 +54,73 @@ public class UGUIExampleTransitionScreen : Screen<ExampleController>
     // UGUIExampleTransitionScreenBase
     private void FadeTransition()
     {
-        ScreenTransition transition = ScreenTransition.Fade(_transitionLength, EasingMode.EaseInOut);
+        WindowTransition transition = WindowTransition.Fade(_transitionLength, EasingMode.EaseInOut);
         controller.navigation.Travel(_targetScreen, in transition, GetTargetScreenData());
     }
 
     private void DissolveTransition()
     {
-        ScreenTransition transition = ScreenTransition.Dissolve(_transitionLength, EasingMode.EaseInOut);
+        WindowTransition transition = WindowTransition.Dissolve(_transitionLength, EasingMode.EaseInOut);
         controller.navigation.Travel(_targetScreen, in transition, GetTargetScreenData());
     }
 
     private void SlideFromLeftTransition()
     {
-        ScreenTransition transition = ScreenTransition.SlideFromLeft(_transitionLength, EasingMode.EaseOutBounce);
+        WindowTransition transition = WindowTransition.SlideFromLeft(_transitionLength, EasingMode.EaseOutBounce);
         controller.navigation.Travel(_targetScreen, in transition, GetTargetScreenData());
     }
 
     private void SlideFromRightTransition()
     {
-        ScreenTransition transition = ScreenTransition.SlideFromRight(_transitionLength, EasingMode.EaseOutBounce);
+        WindowTransition transition = WindowTransition.SlideFromRight(_transitionLength, EasingMode.EaseOutBounce);
         controller.navigation.Travel(_targetScreen, in transition, GetTargetScreenData());
     }
 
     private void SlideFromBottomTransition()
     {
-        ScreenTransition transition = ScreenTransition.SlideFromBottom(_transitionLength, EasingMode.EaseInOut);
+        WindowTransition transition = WindowTransition.SlideFromBottom(_transitionLength, EasingMode.EaseInOut);
         controller.navigation.Travel(_targetScreen, in transition, GetTargetScreenData());
     }
 
     private void SlideFromTopTransition()
     {
-        ScreenTransition transition = ScreenTransition.SlideFromTop(_transitionLength, EasingMode.EaseOutBounce);
+        WindowTransition transition = WindowTransition.SlideFromTop(_transitionLength, EasingMode.EaseOutBounce);
         controller.navigation.Travel(_targetScreen, in transition, GetTargetScreenData());
     }
 
     private void SlideOverLeftTransition()
     {
-        ScreenTransition transition = ScreenTransition.SlideOverFromLeft(_transitionLength, EasingMode.EaseOutBounce);
+        WindowTransition transition = WindowTransition.SlideOverFromLeft(_transitionLength, EasingMode.EaseOutBounce);
         controller.navigation.Travel(_targetScreen, in transition, GetTargetScreenData());
     }
 
     private void SlideOverRightTransition()
     {
-        ScreenTransition transition = ScreenTransition.SlideOverFromRight(_transitionLength, EasingMode.EaseOutBounce);
+        WindowTransition transition = WindowTransition.SlideOverFromRight(_transitionLength, EasingMode.EaseOutBounce);
         controller.navigation.Travel(_targetScreen, in transition, GetTargetScreenData());
     }
 
     private void SlideOverBottomTransition()
     {
-        ScreenTransition transition = ScreenTransition.SlideOverFromBottom(_transitionLength, EasingMode.EaseOutBounce);
+        WindowTransition transition = WindowTransition.SlideOverFromBottom(_transitionLength, EasingMode.EaseOutBounce);
         controller.navigation.Travel(_targetScreen, in transition, GetTargetScreenData());
     }
 
     private void SlideOverTopTransition()
     {
-        ScreenTransition transition = ScreenTransition.SlideOverFromTop(_transitionLength, EasingMode.EaseOutBounce);
+        WindowTransition transition = WindowTransition.SlideOverFromTop(_transitionLength, EasingMode.EaseOutBounce);
         controller.navigation.Travel(_targetScreen, in transition, GetTargetScreenData());
     }
 
     private void FlipTransition()
     {
-        ScreenTransition transition = ScreenTransition.Flip(_transitionLength, EasingMode.EaseInBounce);
+        WindowTransition transition = WindowTransition.Flip(_transitionLength, EasingMode.EaseInBounce);
         controller.navigation.Travel(_targetScreen, in transition, GetTargetScreenData());
     }
 
     private void ExpandTransition()
     {
-        ScreenTransition transition = ScreenTransition.Expand(_transitionLength, EasingMode.EaseInOutBack);
+        WindowTransition transition = WindowTransition.Expand(_transitionLength, EasingMode.EaseInOutBack);
         controller.navigation.Travel(_targetScreen, in transition, GetTargetScreenData());
     }
 

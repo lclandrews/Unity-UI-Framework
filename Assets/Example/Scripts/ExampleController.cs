@@ -86,7 +86,7 @@ public class ExampleController : Controller<ExampleController>
 
     protected override void SetBackButtonActive(bool active)
     {
-        if(navigation.activeScreen != null && navigation.activeScreen.SetBackButtonActive(active))
+        if(navigation.activeElement != null && navigation.activeElement.SetBackButtonActive(active))
         {
             backButton?.gameObject.SetActive(false);
         }        
