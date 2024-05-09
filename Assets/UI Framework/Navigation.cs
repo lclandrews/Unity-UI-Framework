@@ -17,17 +17,17 @@ namespace UIFramework
 
         public Type type { get; private set; }
         public bool success { get; private set; }
-        public System.Type target { get; private set; }
+        public System.Type targetType { get; private set; }
         public int historyCount { get; private set; }
         public bool isLocked { get; private set; }
 
-        public bool exit { get { return type == Type.Back && target == null && success; } }
+        public bool exit { get { return type == Type.Back && targetType == null && success; } }
 
-        public NavigationEvent(Type type, bool success, System.Type target, int historyCount, bool isLocked)
+        public NavigationEvent(Type type, bool success, System.Type targetType, int historyCount, bool isLocked)
         {
             this.type = type;
             this.success = success;
-            this.target = target;
+            this.targetType = targetType;
             this.historyCount = historyCount;
             this.isLocked = isLocked;
         }
@@ -43,7 +43,7 @@ namespace UIFramework
     // controller class, also there is a issue where in this current implementation the history stack of navigation is
     // coupled with a transition. This moves toward a model where the controller is the single point of responsibility for
     // controlling all dependant components instead of chaining dependency in this way.
-    public class Navigation<Navigatable> where Navigatable : INavigatable, IWindow
+    public class Navigation<Navigatable> where Navigatable : INavigable, IWindow
     {
         private ArrayDictionary<Navigatable> _elements = null;
 
@@ -81,11 +81,11 @@ namespace UIFramework
         private int _isLockedCounter = 0;
 
         private History _history = null;
-        private TransitionManager _transitionManager = null;
+        private WindowTransitionManager _transitionManager = null;
 
         private Navigation() { }
 
-        public Navigation(ArrayDictionary<Navigatable> elements)
+        public Navigation(ArrayDictionary<Navigatable> elements, bool unscaledTime)
         {
             if (elements == null)
             {
@@ -93,7 +93,7 @@ namespace UIFramework
             }
             _elements = elements;
             _history = new History(_elements.array.Length);
-            _transitionManager = new TransitionManager();
+            _transitionManager = new WindowTransitionManager(false);
         }
 
         public NavigationEvent Init<ElementType>(object targetElementData) where ElementType : Navigatable
@@ -108,7 +108,7 @@ namespace UIFramework
             return InitInternal(targetElementType, targetElement, targetElementData, null);
         }
 
-        public NavigationEvent Init<ElementType>(in WindowAnimation animation, object targetElementData) where ElementType : Navigatable
+        public NavigationEvent Init<ElementType>(in WindowAccessPlayable animation, object targetElementData) where ElementType : Navigatable
         {
             Type targetElementType = typeof(ElementType);
             Navigatable targetElement;
@@ -131,7 +131,7 @@ namespace UIFramework
             return InitInternal(targetElementType, targetElement, targetElementData, null);
         }
 
-        public NavigationEvent Init(Navigatable targetElement, in WindowAnimation animation, object targetElementData)
+        public NavigationEvent Init(Navigatable targetElement, in WindowAccessPlayable animation, object targetElementData)
         {
             Type targetElementType = targetElement.GetType();
             if (!ValidateInit(targetElementType, targetElement))
@@ -158,7 +158,7 @@ namespace UIFramework
             return InitInternal(targetElementType, targetElement, targetElementData, null);
         }
 
-        public NavigationEvent Init(Type targetElementType, in WindowAnimation animation, object targetElementData)
+        public NavigationEvent Init(Type targetElementType, in WindowAccessPlayable animation, object targetElementData)
         {
             if (!targetElementType.IsSubclassOf(typeof(Navigatable)))
             {
@@ -174,13 +174,13 @@ namespace UIFramework
             return InitInternal(targetElementType, targetElement, targetElementData, animation);
         }
 
-        private NavigationEvent InitInternal(Type elementType, Navigatable element, object data, WindowAnimation? windowAnimation)
+        private NavigationEvent InitInternal(Type elementType, Navigatable element, object data, WindowAccessPlayable? animation)
         {
             activeElementType = elementType;
             element.SetData(data);   
-            if(windowAnimation != null)
+            if(animation != null)
             {
-                element.Open(windowAnimation.Value);
+                element.Open(animation.Value.CreatePlayable(element));
             }
             else
             {
@@ -226,7 +226,7 @@ namespace UIFramework
             return true;
         }
 
-        public NavigationEvent Travel<ElementType>(in WindowTransition transition, object data, bool excludeCurrentFromHistory = false)
+        public NavigationEvent Travel<ElementType>(in WindowTransitionPlayable transition, object data, bool excludeCurrentFromHistory = false)
             where ElementType : Navigatable
         {
             Type targetType = typeof(ElementType);
@@ -250,7 +250,7 @@ namespace UIFramework
             return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Travel, false, targetType, historyCount, isLocked));
         }
 
-        public NavigationEvent Travel(Navigatable targetElement, in WindowTransition transition, object data, bool excludeCurrentFromHistory = false)
+        public NavigationEvent Travel(Navigatable targetElement, in WindowTransitionPlayable transition, object data, bool excludeCurrentFromHistory = false)
         {
             Type targetElementType = targetElement.GetType();
             if (ValidateTravelTarget(targetElementType, targetElement))
@@ -270,7 +270,7 @@ namespace UIFramework
             return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.Travel, false, targetElementType, historyCount, isLocked));
         }
 
-        public NavigationEvent Travel(Type elementType, in WindowTransition transition, object data, bool excludeCurrentFromHistory = false)
+        public NavigationEvent Travel(Type elementType, in WindowTransitionPlayable transition, object data, bool excludeCurrentFromHistory = false)
         {
             if (elementType.IsSubclassOf(typeof(Navigatable)))
             {
@@ -301,7 +301,7 @@ namespace UIFramework
             return TravelInternal(elementType, element, element.defaultTransition, data, excludeCurrentFromHistory);
         }
 
-        private NavigationEvent TravelInternal(Type elementType, Navigatable element, in WindowTransition transition, object data, bool excludeCurrentFromHistory)
+        private NavigationEvent TravelInternal(Type elementType, Navigatable element, in WindowTransitionPlayable transition, object data, bool excludeCurrentFromHistory)
         {
             if(isLocked)
             {
@@ -377,7 +377,7 @@ namespace UIFramework
                 if (historyCount > 0)
                 {                    
                     Type previousElementType;
-                    WindowTransition transition; 
+                    WindowTransitionPlayable transition; 
                     _history.Pop(out previousElementType, out transition);
                     Navigatable previousElement = _elements.dictionary[previousElementType];
 
@@ -416,12 +416,12 @@ namespace UIFramework
             activeElement.Close();
         }
 
-        public void Terminate(in WindowAnimation animation)
+        public void Terminate(in WindowAccessPlayable animation)
         {
             Navigatable activeElement = this.activeElement;
             TerminateInternal();
             _transitionManager.Terminate(false);
-            activeElement.Close(in animation);
+            activeElement.Close(animation.CreatePlayable(activeElement));
         }
 
         private void TerminateInternal()
@@ -456,7 +456,7 @@ namespace UIFramework
             return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.History, false, null, historyCount, isLocked));
         }
 
-        public NavigationEvent InsertHistory<T>(in WindowTransition transition) where T : Navigatable
+        public NavigationEvent InsertHistory<T>(in WindowTransitionPlayable transition) where T : Navigatable
         {
             _history.Push(typeof(T), in transition);
             return InvokeNavigationUpdate(new NavigationEvent(NavigationEvent.Type.History, true, null, historyCount, isLocked));

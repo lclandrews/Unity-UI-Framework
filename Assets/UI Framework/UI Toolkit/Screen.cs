@@ -9,7 +9,7 @@ namespace UIFramework.UIToolkit
 
         public virtual bool supportsHistory { get; } = true;
 
-        public virtual WindowTransition defaultTransition { get; protected set; } = WindowTransition.Fade(0.25F, EasingMode.EaseInOut);
+        public virtual WindowTransitionPlayable defaultTransition { get; protected set; } = WindowTransitionPlayable.Fade(0.25F, EasingMode.EaseInOut);
 
         protected virtual string backButtonName { get; } = null;
         private Button backButton = null;
@@ -54,7 +54,7 @@ namespace UIFramework.UIToolkit
             return false;
         }
 
-        public bool Equals(INavigatable other)
+        public bool Equals(INavigable other)
         {
             return other as Screen<ControllerType> == this;
         }

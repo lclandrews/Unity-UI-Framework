@@ -8,7 +8,7 @@ using UnityEditor;
 
 using UnityEngine;
 
-namespace UIFramework.UIToolkit.Editor
+namespace UIFramework.Editor
 {
     [CustomPropertyDrawer(typeof(SubclassOf<>))]
     public class SubclassOfDrawer : PropertyDrawer

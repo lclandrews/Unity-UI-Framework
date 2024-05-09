@@ -6,18 +6,22 @@ using UnityEngine.UIElements;
 namespace UIFramework.UIToolkit
 {
     [RequireComponent(typeof(UIDocument))]
-    public abstract class Window : UIBehaviour, IWindow, IWindowAnimatorFactory
+    public abstract class Window : UIBehaviour, IWindow
     {
+        // UI Toolkit Window
         public UIDocument uiDocument { get { return _uiDocument; } }
         private UIDocument _uiDocument = null;
 
         public VisualElement visualElement { get { return _visualElement; } }
         private VisualElement _visualElement = null;
 
-        public WindowState state { get { return _state; } protected set { _state = value; } }
-        private WindowState _state = WindowState.Unitialized;
+        // IAccessible
+        public AccessState accessState { get; private set; } = AccessState.Unitialized;
+        public AnimationPlayer.PlaybackData accessAnimationPlaybackData { get; private set; } = default;
+        public AnimationPlayable accessAnimationPlayable { get; private set; } = default;
 
-        public bool isVisible { get { return state != WindowState.Closed; } }
+        // IWindow
+        public bool isVisible { get { return accessState != AccessState.Closed; } }
 
         public virtual bool isEnabled
         {
@@ -96,24 +100,14 @@ namespace UIFramework.UIToolkit
         }
         private int _sortOrder = 0;
 
+        // IDataRecipient
         public abstract bool requiresData { get; }
         public object data { get; private set; } = null;
 
-        public IWindowAnimator animator
-        {
-            get
-            {
-                if (_animator == null)
-                {
-                    _animator = CreateAnimator();
-                    animator.onComplete += OnAnimationComplete;
-                }
-                return _animator;
-            }
-        }
-        private IWindowAnimator _animator = null;
-
+        // UI Toolkit Window
         private bool _isWaiting = false;
+        private AnimationPlayer _animationPlayer = null;
+        private IAccessibleAction _onAccessAnimationComplete = null;
 
         protected Window() { }
 
@@ -123,33 +117,10 @@ namespace UIFramework.UIToolkit
             _visualElement = visualElement;
         }
 
-        // IWindowAnimatorFactory
-        public virtual IWindowAnimator CreateAnimator()
-        {
-            return new WindowAnimator(visualElement);
-        }
-
-        // UIToolkitBehaviour
-        public override void UpdateUI(float deltaTime)
-        {
-            base.UpdateUI(deltaTime);
-            if (animator != null)
-            {
-                animator.Update(deltaTime);
-            }
-        }
-
         // IWindow
-        public void Init()
+        public Animation CreateAnimation(WindowAnimationType type, float length)
         {
-            if (state != WindowState.Unitialized)
-            {
-                throw new InvalidOperationException("Window already initialized.");
-            }
-
-            state = WindowState.Closed;
-            SetActive(false);
-            OnInit();
+            return new WindowAnimation(visualElement, type, length);
         }
 
         public bool SetWaiting(bool waiting)
@@ -166,30 +137,38 @@ namespace UIFramework.UIToolkit
             return false;
         }
 
-        public bool Open(in WindowAnimation animation)
+        // IAccessible
+        public void Init()
         {
-            if (animator == null)
+            if (accessState != AccessState.Unitialized)
             {
-                throw new Exception("Attempted to open Window with animation while animator is null.");
+                throw new InvalidOperationException("Window already initialized.");
             }
 
-            if (state == WindowState.Closing || state == WindowState.Closed)
+            accessState = AccessState.Closed;
+            SetActive(false);
+            OnInit();
+        }        
+
+        public bool Open(in AnimationPlayable animationPlayable, IAccessibleAction onComplete = null)
+        {
+            if (accessState == AccessState.Closing || accessState == AccessState.Closed)
             {
-                if (animator.isPlaying)
+                if (_animationPlayer != null)
                 {
-                    if (animator.type != animation.type)
-                    {
-                        Debug.Log(string.Format("Window is already playing a close animation of type {0}, " +
-                            "provided open animation of type {1} is ignored and the current close animation is rewound.", animator.type, animation.type));
-                    }
-                    animator.Rewind();
+                    Debug.Log("Window is already playing a close animation, the provided open animation is ignored and the current close animation is rewound.");
+                    _animationPlayer.Rewind();
                 }
                 else
                 {
                     isInteractable = false;
-                    animator.Play(in animation);
+                    accessAnimationPlayable = animationPlayable;
+                    _animationPlayer = this.PlayAnimation(in animationPlayable);
+                    _animationPlayer.onComplete += OnAnimationComplete;
+                    accessAnimationPlaybackData = _animationPlayer.playbackData;
                 }
-                state = WindowState.Opening;
+                _onAccessAnimationComplete = onComplete;
+                accessState = AccessState.Opening;
                 SetActive(true);
                 OnOpen();
                 return true;
@@ -199,29 +178,86 @@ namespace UIFramework.UIToolkit
 
         public bool Open()
         {
-            if (state == WindowState.Closing || state == WindowState.Closed)
+            if (accessState == AccessState.Closing || accessState == AccessState.Closed)
             {
-                if (state == WindowState.Closing)
+                if (accessState == AccessState.Closing)
                 {
                     Debug.Log("Open was called on a Window without an animation while already playing a state animation, " +
                         "this may cause unexpected behviour of the UI.");
                     isInteractable = true;
-                    animator.Stop();
+                    _animationPlayer.SetCurrentTime(0.0F);
+                    _animationPlayer.Stop();
+                    ClearAnimationReferences();
+                    _onAccessAnimationComplete = null;
                 }
-
-                state = WindowState.Open;
+                accessState = AccessState.Open;
                 SetActive(true);
-                if (animator != null)
-                {
-                    animator.ResetAnimatedComponents();
-                }
                 OnOpen();
                 OnOpened();
                 return true;
             }
             return false;
+        }        
+
+        public bool Close(in AnimationPlayable animationPlayable, IAccessibleAction onComplete = null)
+        {
+            if (accessState == AccessState.Opening || accessState == AccessState.Open)
+            {
+                if (_animationPlayer != null)
+                {
+                    Debug.Log("Window is already playing a open animation, the provided open animation is ignored and the current close animation is rewound.");
+                    _animationPlayer.Rewind();
+                }
+                else
+                {
+                    isInteractable = false;
+                    accessAnimationPlayable = animationPlayable;
+                    _animationPlayer = this.PlayAnimation(in animationPlayable);
+                    _animationPlayer.onComplete += OnAnimationComplete;
+                    accessAnimationPlaybackData = _animationPlayer.playbackData;
+                }
+                _onAccessAnimationComplete = onComplete;
+                accessState = AccessState.Closing;
+                OnClose();
+                return true;
+            }
+            return false;
         }
 
+        public bool Close()
+        {
+            if (accessState == AccessState.Opening || accessState == AccessState.Open)
+            {
+                if (accessState == AccessState.Opening)
+                {
+                    Debug.Log("Close was called on a Window without an animation while already playing a state animation, " +
+                        "this may cause unexpected behviour of the UI.");
+                    isInteractable = true;
+                    _animationPlayer.SetCurrentTime(0.0F);
+                    _animationPlayer.Stop();
+                    ClearAnimationReferences();
+                    _onAccessAnimationComplete = null;
+                }
+                accessState = AccessState.Closed;
+                OnClose();
+                SetActive(false);
+                OnClosed();
+                return true;
+            }
+            return false;
+        }
+
+        public bool SkipAccessAnimation()
+        {
+            if(_animationPlayer != null)
+            {
+                _animationPlayer.Complete();
+                return true;
+            }
+            return false;
+        }
+
+        // IDataRecipient
         public void SetData(object data)
         {
             if (requiresData)
@@ -244,58 +280,6 @@ namespace UIFramework.UIToolkit
 
         public abstract bool IsValidData(object data);
 
-        public bool Close(in WindowAnimation animation)
-        {
-            if (animator == null)
-            {
-                throw new Exception("Attempted to close Controller with animation while animator is null.");
-            }
-
-            if (state == WindowState.Opening || state == WindowState.Open)
-            {
-                if (animator.isPlaying)
-                {
-                    if (animator.type != animation.type)
-                    {
-                        Debug.Log(string.Format("Controller is already playing a open animation of type {0}, " +
-                            "provided close animation of type {1} is ignored and the current open animation is rewound.", animator.type, animation.type));
-                    }
-                    animator.Rewind();
-                }
-                else
-                {
-                    isInteractable = false;
-                    animator.Play(in animation);
-                }
-
-                state = WindowState.Closing;
-                OnClose();
-                return true;
-            }
-            return false;
-        }
-
-        public bool Close()
-        {
-            if (state == WindowState.Opening || state == WindowState.Open)
-            {
-                if (state == WindowState.Opening)
-                {
-                    Debug.Log("Close was called on a Window without an animation while already playing a state animation, " +
-                        "this may cause unexpected behviour of the UI.");
-                    isInteractable = true;
-                    animator.Stop();
-                }
-
-                state = WindowState.Closed;
-                OnClose();
-                SetActive(false);
-                OnClosed();
-                return true;
-            }
-            return false;
-        }
-
         // UIToolkitWindow
         public virtual bool ShowWaitingIndicator(bool show)
         {
@@ -314,23 +298,28 @@ namespace UIFramework.UIToolkit
 
         protected virtual void OnClosed() { }
 
-        private void OnAnimationComplete(IWindowAnimator animator)
+        private void OnAnimationComplete(Animation animator)
         {
+            ClearAnimationReferences();
             isInteractable = true;
-            if (state == WindowState.Opening)
+            if (accessState == AccessState.Opening)
             {
-                state = WindowState.Open;
+                accessState = AccessState.Open;
                 OnOpened();
+                _onAccessAnimationComplete?.Invoke(this);
+                _onAccessAnimationComplete = null;
             }
-            else if (state == WindowState.Closing)
+            else if (accessState == AccessState.Closing)
             {
-                state = WindowState.Closed;
+                accessState = AccessState.Closed;
                 SetActive(false);
                 OnClosed();
+                _onAccessAnimationComplete?.Invoke(this);
+                _onAccessAnimationComplete = null;
             }
             else
             {
-                throw new Exception(string.Format("Window animation complete while in unexpected state: {0}", state.ToString()));
+                throw new Exception(string.Format("Window animation complete while in unexpected state: {0}", accessState.ToString()));
             }
         }
 
@@ -346,6 +335,13 @@ namespace UIFramework.UIToolkit
             {
                 v.pickingMode = interactable ? PickingMode.Position : PickingMode.Ignore;
             });
+        }
+
+        private void ClearAnimationReferences()
+        {
+            _animationPlayer.onComplete = null;
+            _animationPlayer = null;
+            accessAnimationPlaybackData.ReleaseReferences();
         }
     }
 }

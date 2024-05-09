@@ -5,13 +5,12 @@ using UnityEngine;
 
 namespace UIFramework
 {
-    public abstract class Controller<ControllerType> : MonoBehaviour, IWindowAnimatorFactory where ControllerType : Controller<ControllerType>
+    public abstract class Controller<ControllerType> : MonoBehaviour  where ControllerType : Controller<ControllerType>
     {
         public enum UpdateTimeMode
         {
             Scaled,
-            Unscaled,
-            Disabled
+            Unscaled
         }
 
         [Flags]
@@ -22,8 +21,8 @@ namespace UIFramework
             Screen = 2
         }
 
-        public WindowState state { get; private set; } = WindowState.Unitialized;
-        public bool isVisible { get { return state != WindowState.Closed; } }
+        public AccessState state { get; private set; } = AccessState.Unitialized;
+        public bool isVisible { get { return state != AccessState.Closed; } }
 
         public bool isEnabled
         {
@@ -46,29 +45,29 @@ namespace UIFramework
         }
         private bool _isEnabled = false;
 
-        protected abstract UpdateTimeMode updateTimeMode { get; set; }
+        public abstract UpdateTimeMode updateTimeMode { get; protected set; }
 
         protected abstract StateAnimationMode stateAnimationMode { get; }
 
-        protected IWindowAnimator animator
+        protected WindowAnimationBase animator
         {
             get
             {
                 if (_animator == null)
                 {
-                    _animator = CreateAnimator();
+                    _animator = CreateAnimationSequences();
                 }
                 return _animator;
             }
         }
-        private IWindowAnimator _animator = null;
+        private WindowAnimationBase _animator = null;
 
         public Navigation<IScreen<ControllerType>> navigation = null;
 
         public Action onOpenAction { get; set; } = null;
         public Action onCloseAction { get; set; } = null;
 
-        protected abstract IScreenCollector<ControllerType>[] screenCollectors { get; }
+        [SerializeField] protected CollectorComponent[] screenCollectors = null;
         private ArrayDictionary<IScreen<ControllerType>> _screens = null;
 
         private bool stateAnimatesSelf { get { return stateAnimationMode.HasFlag(StateAnimationMode.Self); } }
@@ -78,7 +77,7 @@ namespace UIFramework
 #if UNITY_EDITOR
         protected virtual void OnValidate()
         {
-
+            
         }
 #endif
 
@@ -108,10 +107,7 @@ namespace UIFramework
                         break;
                 }
 
-                if (updateTimeMode != UpdateTimeMode.Disabled)
-                {
-                    UpdateUI(deltaTime);
-                }
+                UpdateUI(deltaTime);
             }
         }
 
@@ -126,25 +122,30 @@ namespace UIFramework
         }
 
         // IWindowAnimatorFactor
-        public abstract IWindowAnimator CreateAnimator();
+        public abstract WindowAnimationBase CreateAnimationSequences();
 
         // ScreenController<ControllerType>
         public void Init()
         {
-            if (state != WindowState.Unitialized)
+            if (state != AccessState.Unitialized)
             {
                 throw new InvalidOperationException("Controller already initialized.");
+            }
+
+            if(screenCollectors == null)
+            {
+                throw new InvalidOperationException("screenCollectors are null.");
             }
 
             List<IScreen<ControllerType>> screenList = new List<IScreen<ControllerType>>();
             for (int i = 0; i < screenCollectors.Length; i++)
             {
-                screenList.AddRange(screenCollectors[i].Collect());
+                screenList.AddRange(screenCollectors[i].Collect<IScreen<ControllerType>>());
             }
 
             _screens = new ArrayDictionary<IScreen<ControllerType>>(screenList.ToArray());
 
-            navigation = new Navigation<IScreen<ControllerType>>(_screens);
+            navigation = new Navigation<IScreen<ControllerType>>(_screens, updateTimeMode == UpdateTimeMode.Unscaled);
             navigation.onNavigationUpdate += OnNavigationUpdate;            
 
             if (animator != null)
@@ -153,7 +154,7 @@ namespace UIFramework
             }
 
             SetBackButtonActive(false);
-            state = WindowState.Closed;
+            state = AccessState.Closed;
             for (int i = 0; i < _screens.array.Length; i++)
             {
                 _screens.array[i].Init(this);
@@ -213,7 +214,7 @@ namespace UIFramework
       
         public bool Open<ScreenType>(object data) where ScreenType : IScreen<ControllerType>
         {
-            if (state == WindowState.Closing || state == WindowState.Closed)
+            if (state == AccessState.Closing || state == AccessState.Closed)
             {
                 Type targetScreenType = typeof(ScreenType);
                 IScreen<ControllerType> targetScreen;
@@ -222,7 +223,7 @@ namespace UIFramework
                     throw new Exception("Attempted to open Controller to a screen that cannot be found.");
                 }
 
-                if(state == WindowState.Closing)
+                if(state == AccessState.Closing)
                 {
                     Debug.Log("Open was called on a Controller without an animation while already playing a state animation, " +
                         "this may cause unexpected behaviour of the UI.");
@@ -232,7 +233,7 @@ namespace UIFramework
                     }                    
                 }
 
-                state = WindowState.Open;
+                state = AccessState.Open;
                 navigation.Init<ScreenType>(data);
                 OnOpen();
                 onOpenAction?.Invoke();
@@ -242,7 +243,7 @@ namespace UIFramework
             return false;
         }
 
-        public bool Open<ScreenType>(in WindowAnimation animation, object data) where ScreenType : IScreen<ControllerType>
+        public bool Open<ScreenType>(in WindowAnimationBase animation, object data) where ScreenType : IScreen<ControllerType>
         {
             if (stateAnimationMode == StateAnimationMode.None)
             {
@@ -254,7 +255,7 @@ namespace UIFramework
                 throw new Exception("Attempted to open Controller with animation while animator is null.");
             }
 
-            if (state == WindowState.Closing || state == WindowState.Closed)
+            if (state == AccessState.Closing || state == AccessState.Closed)
             {
                 Type targetScreenType = typeof(ScreenType);
                 IScreen<ControllerType> targetScreen;
@@ -265,7 +266,7 @@ namespace UIFramework
 
                 if(stateAnimatesSelf)
                 {
-                    if (state == WindowState.Closing)
+                    if (state == AccessState.Closing)
                     {
                         if (animator.type != animation.type)
                         {
@@ -280,7 +281,7 @@ namespace UIFramework
                     }
                 }                
 
-                state = WindowState.Opening;
+                state = AccessState.Opening;
                 if (stateAnimatesScreen)
                 {
                     navigation.Init<ScreenType>(in animation, data);
@@ -298,7 +299,7 @@ namespace UIFramework
 
         private void OpenInternal(Type targetScreenType, object data)
         {
-            if (state == WindowState.Closing)
+            if (state == AccessState.Closing)
             {
                 Debug.Log("Open was called on a Controller without an animation while already playing a state animation, " +
                     "this may cause unexpected behaviour of the UI.");
@@ -308,14 +309,14 @@ namespace UIFramework
                 }
             }
 
-            state = WindowState.Open;
+            state = AccessState.Open;
             navigation.Init(targetScreenType, data);
             OnOpen();
             onOpenAction?.Invoke();
             OnOpened();
         }
 
-        public void OpenInternal(Type targetScreenType, in WindowAnimation animation, object data)
+        public void OpenInternal(Type targetScreenType, in WindowAnimationBase animation, object data)
         {
             if (stateAnimationMode == StateAnimationMode.None)
             {
@@ -329,7 +330,7 @@ namespace UIFramework
 
             if (stateAnimatesSelf)
             {
-                if (state == WindowState.Closing)
+                if (state == AccessState.Closing)
                 {
                     if (animator.type != animation.type)
                     {
@@ -344,7 +345,7 @@ namespace UIFramework
                 }
             }
 
-            state = WindowState.Opening;
+            state = AccessState.Opening;
             if (stateAnimatesScreen)
             {
                 navigation.Init(targetScreenType, in animation, data);
@@ -376,7 +377,7 @@ namespace UIFramework
         private bool ValidateOpen(Type screenType, out IScreen<ControllerType> screen)
         {
             screen = null;
-            if (state != WindowState.Closing && state != WindowState.Closed)
+            if (state != AccessState.Closing && state != AccessState.Closed)
             {
                 return false;
             }
@@ -393,9 +394,9 @@ namespace UIFramework
 
         public bool Close()
         {
-            if (state == WindowState.Opening || state == WindowState.Open)
+            if (state == AccessState.Opening || state == AccessState.Open)
             {
-                if(state == WindowState.Opening)
+                if(state == AccessState.Opening)
                 {
                     Debug.Log("Close was called on a Controller without an animation while already playing a state animation, " +
                         "this may cause unexpected behaviour of the UI.");
@@ -405,7 +406,7 @@ namespace UIFramework
                     }
                 }
 
-                state = WindowState.Closed;
+                state = AccessState.Closed;
                 navigation.Terminate();
                 OnClose();
                 onCloseAction?.Invoke();
@@ -415,7 +416,7 @@ namespace UIFramework
             return false;
         }
 
-        public bool Close(in WindowAnimation animation)
+        public bool Close(in WindowAnimationBase animation)
         {
             if (stateAnimationMode == StateAnimationMode.None)
             {
@@ -433,11 +434,11 @@ namespace UIFramework
                 return false;
             }
 
-            if (state == WindowState.Opening || state == WindowState.Open)
+            if (state == AccessState.Opening || state == AccessState.Open)
             {
                 if(stateAnimatesSelf)
                 {
-                    if(state == WindowState.Opening)
+                    if(state == AccessState.Opening)
                     {
                         if (animator.type != animation.type)
                         {
@@ -452,7 +453,7 @@ namespace UIFramework
                     }
                 }
 
-                state = WindowState.Closing;
+                state = AccessState.Closing;
                 if (stateAnimatesScreen)
                 {
                     navigation.Terminate(in animation);
@@ -471,16 +472,16 @@ namespace UIFramework
         protected virtual void OnClose() { }
         protected virtual void OnClosed() { }
 
-        private void OnAnimationComplete(IWindowAnimator animator)
+        private void OnAnimationComplete(WindowAnimationBase animator)
         {
-            if (state == WindowState.Opening)
+            if (state == AccessState.Opening)
             {
-                state = WindowState.Open;
+                state = AccessState.Open;
                 OnOpened();
             }
-            else if (state == WindowState.Closing)
+            else if (state == AccessState.Closing)
             {
-                state = WindowState.Closed;
+                state = AccessState.Closed;
                 OnClosed();
             }
             else

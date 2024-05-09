@@ -36,32 +36,14 @@ public class ExampleController : Controller<ExampleController>
 
     [SerializeField] private Button backButton = null;
 
-    protected override UpdateTimeMode updateTimeMode { get; set; } = UpdateTimeMode.Scaled;
+    public override UpdateTimeMode updateTimeMode { get; protected set; } = UpdateTimeMode.Scaled;
     protected override StateAnimationMode stateAnimationMode { get { return StateAnimationMode.Screen | StateAnimationMode.Self; } }
-
-    protected override IScreenCollector<ExampleController>[] screenCollectors
-    {
-        get
-        {
-            if (_screenCollectors == null)
-            {
-                _screenCollectors = new IScreenCollector<ExampleController>[] { _uguiScreenCollector, _uiToolkitScreenCollector };
-            }
-            return _screenCollectors;
-        }
-    }
-    private IScreenCollector<ExampleController>[] _screenCollectors = null;
 
     protected override void OnInit()
     {
         base.OnInit();
         gameObject.SetActive(false);
         backButton.onClick.AddListener(navigation.Back);
-    }
-
-    public override IWindowAnimator CreateAnimator()
-    {
-        return new UIFramework.UGUI.WindowAnimator(rectTransform.root as RectTransform, rectTransform, canvasGroup);
     }
 
     protected override void UpdateUI(float deltaTime)
@@ -106,5 +88,10 @@ public class ExampleController : Controller<ExampleController>
     {
         base.OnClosed();
         gameObject.SetActive(false);
+    }
+
+    public override WindowAnimationBase CreateAnimationSequences()
+    {
+        throw new System.NotImplementedException();
     }
 }

@@ -8,9 +8,9 @@ namespace UIFramework
         private struct Entry
         {
             public Type windowType { get; private set; }
-            public WindowTransition transition { get; private set; }
+            public WindowTransitionPlayable transition { get; private set; }
 
-            public Entry(Type windowType, in WindowTransition transition)
+            public Entry(Type windowType, in WindowTransitionPlayable transition)
             {
                 this.windowType = windowType;
                 this.transition = transition;
@@ -29,14 +29,14 @@ namespace UIFramework
             _history.Add(new Stack<Entry>(capacity));
         }
 
-        public void Push(Type windowType, in WindowTransition transition)
+        public void Push(Type windowType, in WindowTransitionPlayable transition)
         {
             Entry entry = new Entry(windowType, transition);
             _history[_activeGroup].Push(entry);
             count++;
         }
 
-        public void Pop(out Type windowType, out WindowTransition transition)
+        public void Pop(out Type windowType, out WindowTransitionPlayable transition)
         {
             if (_history[_activeGroup].Count > 0)
             {

@@ -1,6 +1,6 @@
 namespace UIFramework
 {
-    public interface IScreen<ControllerType> : IWindow, INavigatable where ControllerType : Controller<ControllerType>
+    public interface IScreen<ControllerType> : IWindow, INavigable where ControllerType : Controller<ControllerType>
     {
         ControllerType controller { get; }
 
