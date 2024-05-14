@@ -14,12 +14,12 @@ namespace UIFramework
     {
         public struct PlaybackData
         {
-            public float currentTime { get { return _player != null ? 0.0F : _player.currentTime; } } 
-            public float currentNormalisedTime { get { return _player != null ? 0.0F : _player.currentNormalisedTime; } }
-            public float length { get { return _player != null ? 0.0F : _player.length; } }
-            public float remainingTime { get { return _player != null ? 0.0F : _player.remainingTime; } }
-            public bool isPlaying { get { return _player != null ? false : _player.isPlaying; } }
-            public bool isPaused { get { return _player != null ? false : _player.isPaused; } }
+            public float currentTime { get { return _player == null ? 0.0F : _player.currentTime; } } 
+            public float currentNormalisedTime { get { return _player == null ? 0.0F : _player.currentNormalisedTime; } }
+            public float length { get { return _player == null ? 0.0F : _player.length; } }
+            public float remainingTime { get { return _player == null ? 0.0F : _player.remainingTime; } }
+            public bool isPlaying { get { return _player == null ? false : _player.isPlaying; } }
+            public bool isPaused { get { return _player == null ? false : _player.isPaused; } }
 
             private AnimationPlayer _player;
 
@@ -38,7 +38,7 @@ namespace UIFramework
         public PlayMode playMode { get; private set; } = PlayMode.Forward;
         public EasingMode easingMode { get; private set; } = EasingMode.Linear;
         public float playbackSpeed { get; private set; } = 1.0F;
-        public bool unscaledTime { get; private set; } = false;
+        public TimeMode timeMode { get; private set; } = TimeMode.Scaled;
         public float currentTime { get; private set; } = 0.0F;
         public float currentNormalisedTime { get { return currentTime / length; } }
 
@@ -87,16 +87,32 @@ namespace UIFramework
             playbackData = new PlaybackData(this);
         }
 
-        public void Play(float startTime = 0.0F, PlayMode playMode = PlayMode.Forward, EasingMode easingMode = EasingMode.Linear, bool unscaledTime = false, 
-            float playbackSpeed = 1.0F)
+        public static AnimationPlayer PlayAnimation(in AnimationPlayable animationPlayable)
+        {
+            return PlayAnimation(animationPlayable.animation, animationPlayable.startTime,
+                animationPlayable.playMode, animationPlayable.easingMode, animationPlayable.timeMode,
+                animationPlayable.playbackSpeed);
+        }
+
+        public static AnimationPlayer PlayAnimation(Animation animation, float startTime = 0.0F, PlayMode playMode = PlayMode.Forward, 
+            EasingMode easingMode = EasingMode.Linear, TimeMode timeMode = TimeMode.Scaled, float playbackSpeed = 1.0F)
+        {
+            AnimationPlayer player = new AnimationPlayer(animation);
+            player.Play(startTime, playMode, easingMode, timeMode);
+            return player;
+        }
+
+        public void Play(float startTime = 0.0F, PlayMode playMode = PlayMode.Forward, EasingMode easingMode = EasingMode.Linear, 
+            TimeMode timeMode = TimeMode.Scaled, float playbackSpeed = 1.0F)
         {   
             if(!isPlaying)
             {
                 isPlaying = true;
                 AnimationSystemRunner.AddPlayer(this);
             }
+            animation.Prepare();
 
-            this.unscaledTime = unscaledTime;
+            this.timeMode = timeMode;
             this.easingMode = easingMode;
             this.playMode = playMode;
             currentTime = Mathf.Clamp(startTime, 0.0F, length);
@@ -184,7 +200,7 @@ namespace UIFramework
         {
             if (isPlaying && _lastUpdateFrame != Time.frameCount)
             {
-                float deltaTime = unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
+                float deltaTime = timeMode == TimeMode.Scaled? Time.deltaTime : Time.unscaledDeltaTime;
                 deltaTime *= playbackSpeed;
 
                 bool isAtEnd = false;

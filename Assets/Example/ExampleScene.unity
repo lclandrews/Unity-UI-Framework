@@ -222,6 +222,7 @@ GameObject:
   m_Component:
   - component: {fileID: 341823576}
   - component: {fileID: 341823575}
+  - component: {fileID: 341823578}
   m_Layer: 5
   m_Name: ExampleUITKScreens
   m_TagString: Untagged
@@ -260,6 +261,32 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &341823578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 341823574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d0f92dd469e66e4fa7427a0ab01c6e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _uiDocument: {fileID: 341823575}
+  _collectableDefinitions:
+  - _name: exampleScreen
+    _type:
+      _classTypeName: UIFramework.UIToolkit.Screen, Assembly-CSharp, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+      _subclassTypeName: UITKExampleScreen, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+        PublicKeyToken=null
+  - _name: exampleTransitionScreen
+    _type:
+      _classTypeName: UIFramework.UIToolkit.Screen, Assembly-CSharp, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+      _subclassTypeName: UITKExampleTransitionScreen, Assembly-CSharp, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
 --- !u!224 &453705596 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8930449176428350625, guid: 0047e4dc4c69abb4ca463e107e7085aa, type: 3}
@@ -322,6 +349,7 @@ GameObject:
   - component: {fileID: 649899463}
   - component: {fileID: 649899462}
   - component: {fileID: 649899461}
+  - component: {fileID: 649899465}
   m_Layer: 5
   m_Name: UGUIPrimaryCanvas
   m_TagString: Untagged
@@ -413,6 +441,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &649899465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 649899460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 449505cb792e0eb44851f5dc9d9b27f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useAttachedTransform: 1
+  additionalTransforms: []
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -1057,6 +1099,7 @@ GameObject:
   - component: {fileID: 2002601820}
   - component: {fileID: 2002601819}
   - component: {fileID: 2002601818}
+  - component: {fileID: 2002601822}
   m_Layer: 5
   m_Name: UGUISecondaryCanvas
   m_TagString: Untagged
@@ -1147,6 +1190,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &2002601822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2002601817}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 449505cb792e0eb44851f5dc9d9b27f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useAttachedTransform: 1
+  additionalTransforms: []
 --- !u!1 &2126988254
 GameObject:
   m_ObjectHideFlags: 0
@@ -1166,7 +1223,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2126988255
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1199,27 +1256,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69b97ee7aedd7014db6af538a58500f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _uguiScreenCollector:
-    rootScreenTransforms:
-    - {fileID: 649899464}
-    - {fileID: 2002601821}
-  _uiToolkitScreenCollector:
-    _uiDocument: {fileID: 341823575}
-    _screenDefinitions:
-    - _name: exampleTransitionScreen
-      _type:
-        _classTypeName: UIFramework.UIToolkit.Screen`1[[ExampleController, Assembly-CSharp,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], Assembly-CSharp,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        _subclassTypeName: UITKExampleTransitionScreen, Assembly-CSharp, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
-    - _name: exampleScreen
-      _type:
-        _classTypeName: UIFramework.UIToolkit.Screen`1[[ExampleController, Assembly-CSharp,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], Assembly-CSharp,
-          Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        _subclassTypeName: UITKExampleScreen, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+  _timeMode: 0
+  screenCollectors:
+  - {fileID: 649899465}
+  - {fileID: 2002601822}
+  - {fileID: 341823578}
   backButton: {fileID: 1729275026}
 --- !u!223 &2126988257
 Canvas:

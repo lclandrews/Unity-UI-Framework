@@ -14,5 +14,7 @@ namespace UIFramework
         }
 
         public abstract void Evaluate(float normalisedTime);
+
+        public virtual void Prepare() { }
     }
 }

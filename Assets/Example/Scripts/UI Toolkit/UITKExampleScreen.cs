@@ -1,11 +1,8 @@
-using System;
-
 using UIFramework;
-using UIFramework.UIToolkit;
 
 using UnityEngine.UIElements;
 
-public class UITKExampleScreen : Screen<ExampleController>
+public class UITKExampleScreen : UIFramework.UIToolkit.Screen
 {
     private Button _returnButton = null;
     private Button _travelToUGUITransitionScreenButton = null;
@@ -26,7 +23,7 @@ public class UITKExampleScreen : Screen<ExampleController>
     {
         base.OnInit();
         _returnButton = visualElement.Q<Button>("returnButton");
-        _returnButton.clicked += controller.navigation.Back;
+        _returnButton.clicked += delegate() { controller.Back(); };
 
         _travelToUGUITransitionScreenButton = visualElement.Q<Button>("uguiTransitionButton");
         _travelToUGUITransitionScreenButton.clicked += TravelToUGUITransitionScreen;
@@ -43,25 +40,25 @@ public class UITKExampleScreen : Screen<ExampleController>
 
     private void TravelToUGUITransitionScreen()
     {
-        WindowTransition transition = WindowTransition.Custom(0.5F, UIFramework.EasingMode.EaseInOut, WindowAnimation.Type.Flip, WindowAnimation.Type.Fade, WindowTransition.SortPriority.Source);
-        controller.navigation.Travel<UGUIExampleTransitionScreen>(in transition, null);
+        WindowTransitionPlayable transition = WindowTransitionPlayable.Custom(0.5F, UIFramework.EasingMode.EaseInOut, GenericWindowAnimationType.Flip, GenericWindowAnimationType.Fade, WindowTransitionPlayable.SortPriority.Source);
+        controller.OpenScreen<UGUIExampleTransitionScreen>(in transition);
     }    
 
     private void TravelToUITKTransitionScreen()
     {
-        WindowTransition transition = WindowTransition.Custom(0.5F, UIFramework.EasingMode.EaseInOut, WindowAnimation.Type.Fade, WindowAnimation.Type.Fade);
-        controller.navigation.Travel<UITKExampleTransitionScreen>(in transition, null);
+        WindowTransitionPlayable transition = WindowTransitionPlayable.Custom(0.5F, UIFramework.EasingMode.EaseInOut, GenericWindowAnimationType.Fade, GenericWindowAnimationType.Fade);
+        controller.OpenScreen<UITKExampleTransitionScreen>(in transition);
     }
 
     private void TravelToUGUISharedCanvasScreen()
     {
-        WindowTransition transition = WindowTransition.Custom(0.5F, UIFramework.EasingMode.EaseInOut, WindowAnimation.Type.Fade, WindowAnimation.Type.Fade, WindowTransition.SortPriority.Target);
-        controller.navigation.Travel<UGUIExampleSharedCanvasScreen>(in transition, null);
+        WindowTransitionPlayable transition = WindowTransitionPlayable.Custom(0.5F, UIFramework.EasingMode.EaseInOut, GenericWindowAnimationType.Fade, GenericWindowAnimationType.Fade, WindowTransitionPlayable.SortPriority.Target);
+        controller.OpenScreen<UGUIExampleSharedCanvasScreen>(in transition);
     }
 
     private void TravelToUGUIAltCanvasScreen()
     {
-        WindowTransition transition = WindowTransition.Custom(0.5F, UIFramework.EasingMode.EaseInOut, WindowAnimation.Type.Fade, WindowAnimation.Type.Expand, WindowTransition.SortPriority.Target);
-        controller.navigation.Travel<UGUIExampleAlternateCanvasScreen>(in transition, null);
+        WindowTransitionPlayable transition = WindowTransitionPlayable.Custom(0.5F, UIFramework.EasingMode.EaseInOut, GenericWindowAnimationType.Fade, GenericWindowAnimationType.Expand, WindowTransitionPlayable.SortPriority.Target);
+        controller.OpenScreen<UGUIExampleAlternateCanvasScreen>(in transition);
     }    
 }

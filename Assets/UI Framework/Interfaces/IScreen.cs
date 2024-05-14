@@ -1,10 +1,12 @@
 namespace UIFramework
 {
-    public interface IScreen<ControllerType> : IWindow, INavigable where ControllerType : Controller<ControllerType>
+    public interface IScreen : INavigableWindow
     {
-        ControllerType controller { get; }
+        Controller controller { get; }
 
-        void Init(Controller<ControllerType> controller);
+        ControllerType GetController<ControllerType>() where ControllerType : Controller;
+
+        void Init(Controller controller);
 
         bool SetBackButtonActive(bool active);
     }

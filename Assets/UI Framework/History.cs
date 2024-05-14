@@ -3,52 +3,38 @@ using System.Collections.Generic;
 
 namespace UIFramework
 {
-    public class History
+    public class History<T>
     {
-        private struct Entry
-        {
-            public Type windowType { get; private set; }
-            public WindowTransitionPlayable transition { get; private set; }
-
-            public Entry(Type windowType, in WindowTransitionPlayable transition)
-            {
-                this.windowType = windowType;
-                this.transition = transition;
-            }
-        }
-
         public int count { get; private set; }
 
-        private List<Stack<Entry>> _history = new List<Stack<Entry>>();
+        private List<Stack<T>> _history = new List<Stack<T>>();
 
         private int _activeGroup = 0;
         private int _groupCapacity = 0;
 
         public History(int capacity)
         {
-            _history.Add(new Stack<Entry>(capacity));
+            _history.Add(new Stack<T>(capacity));
         }
 
-        public void Push(Type windowType, in WindowTransitionPlayable transition)
+        public void Push(T entry)
         {
-            Entry entry = new Entry(windowType, transition);
             _history[_activeGroup].Push(entry);
             count++;
         }
 
-        public void Pop(out Type windowType, out WindowTransitionPlayable transition)
+        public T Pop()
         {
             if (_history[_activeGroup].Count > 0)
             {
                 count--;
-                Entry entry = _history[_activeGroup].Pop();
+                T entry = _history[_activeGroup].Pop();
                 if (_history[_activeGroup].Count == 0 && _activeGroup > 0)
                 {
                     _activeGroup--;
                 }
 
-                windowType = entry.windowType;
-                transition = entry.transition;
+                return entry;
             }
             else
             {
@@ -58,7 +44,7 @@ namespace UIFramework
 
         public void StartNewGroup()
         {
-            _history.Add(new Stack<Entry>(_groupCapacity));
+            _history.Add(new Stack<T>(_groupCapacity));
             _activeGroup = _history.Count - 1;
         }
 

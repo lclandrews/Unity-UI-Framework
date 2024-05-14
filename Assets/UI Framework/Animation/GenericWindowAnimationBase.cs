@@ -9,7 +9,7 @@ namespace UIFramework
     /// Fade, Dissolve, Flip, Expand: These are assumed to be from a inactive state to an active state.
     /// E.g, animating from an alpha of 0 to 1 for Fade.
     /// </summary>
-    public enum WindowAnimationType
+    public enum GenericWindowAnimationType
     {
         Fade,
         Dissolve,
@@ -21,14 +21,14 @@ namespace UIFramework
         Expand
     }
 
-    public abstract class WindowAnimationBase : Animation
+    public abstract class GenericWindowAnimationBase : WindowAccessAnimation
     {
-        public WindowAnimationType type { get; private set; } = WindowAnimationType.Fade;
+        public GenericWindowAnimationType type { get; private set; } = GenericWindowAnimationType.Fade;
 
-        public WindowAnimationType fallbackType { get; private set; } = WindowAnimationType.Fade;
+        public GenericWindowAnimationType fallbackType { get; private set; } = GenericWindowAnimationType.Fade;
 
-        protected WindowAnimationBase(WindowAnimationType type, float length)
-            : base(length)
+        protected GenericWindowAnimationBase(GenericWindowAnimationType type, float length)
+            : base(AccessOperation.Open, length)
         {
             this.type = type;
             if(!IsSupportedType(this.type))
@@ -37,8 +37,8 @@ namespace UIFramework
             }
         }
 
-        protected WindowAnimationBase(WindowAnimationType type, WindowAnimationType fallbackType, float length)
-            : base(length)
+        protected GenericWindowAnimationBase(GenericWindowAnimationType type, GenericWindowAnimationType fallbackType, float length)
+            : base(AccessOperation.Open, length)
         {
             this.type = type;
             this.fallbackType = fallbackType;
@@ -50,36 +50,37 @@ namespace UIFramework
 
         public override void Evaluate(float normalisedTime)
         {
-            WindowAnimationType evaluationType = IsSupportedType(type) ? type : fallbackType;
+            GenericWindowAnimationType evaluationType = IsSupportedType(type) ? type : fallbackType;
             switch (type)
             {
-                case WindowAnimationType.Fade:
+                case GenericWindowAnimationType.Fade:
                     Fade(normalisedTime);
                     break;
-                case WindowAnimationType.Dissolve:
+                case GenericWindowAnimationType.Dissolve:
                     Dissolve(normalisedTime);
                     break;
-                case WindowAnimationType.SlideFromLeft:
+                case GenericWindowAnimationType.SlideFromLeft:
                     SlideFromLeft(normalisedTime);
                     break;
-                case WindowAnimationType.SlideFromRight:
+                case GenericWindowAnimationType.SlideFromRight:
                     SlideFromRight(normalisedTime);
                     break;
-                case WindowAnimationType.SlideFromBottom:
+                case GenericWindowAnimationType.SlideFromBottom:
                     SlideFromBottom(normalisedTime);
                     break;
-                case WindowAnimationType.SlideFromTop:
+                case GenericWindowAnimationType.SlideFromTop:
                     SlideFromTop(normalisedTime);
                     break;
-                case WindowAnimationType.Flip:
+                case GenericWindowAnimationType.Flip:
                     Flip(normalisedTime);
                     break;
-                case WindowAnimationType.Expand:
+                case GenericWindowAnimationType.Expand:
                     Expand(normalisedTime);
                     break;
-            }
-            throw new NotImplementedException();
-        }        
+                default:
+                    throw new NotImplementedException();
+            }            
+        }
 
         protected abstract void Fade(float normalisedTime);
         protected abstract void Dissolve(float normalisedTime);
@@ -89,8 +90,6 @@ namespace UIFramework
         protected abstract void SlideFromTop(float normalisedTime);
         protected abstract void Flip(float normalisedTime);
         protected abstract void Expand(float normalisedTime);
-        protected abstract bool IsSupportedType(WindowAnimationType type);
-
-        public virtual void ResetAnimatedComponents() { }
+        protected abstract bool IsSupportedType(GenericWindowAnimationType type);
     }
 }

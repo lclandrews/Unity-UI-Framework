@@ -3,11 +3,11 @@ using UnityEngine.UIElements;
 
 namespace UIFramework.UIToolkit
 {
-    public class WindowAnimation : WindowAnimationBase
+    public class GenericWindowAnimation : GenericWindowAnimationBase
     {
         private VisualElement _visualElement = null;
 
-        public WindowAnimation(VisualElement visualElement, WindowAnimationType type, float length)
+        public GenericWindowAnimation(VisualElement visualElement, GenericWindowAnimationType type, float length)
             : base(type, length)
         {
             if(visualElement == null)
@@ -15,14 +15,6 @@ namespace UIFramework.UIToolkit
                 throw new System.ArgumentNullException(nameof(visualElement));
             }
             _visualElement = visualElement;
-        }
-
-        public override void ResetAnimatedComponents()
-        {
-            _visualElement.style.opacity = 1;
-            _visualElement.style.translate = new Translate(Length.Percent(0.0F), Length.Percent(0.0F));
-            _visualElement.style.scale = new Scale(Vector2.one);
-            _visualElement.style.rotate = new Rotate(0.0F);
         }
 
         protected override void Fade(float normalisedTime)
@@ -71,18 +63,18 @@ namespace UIFramework.UIToolkit
             _visualElement.style.scale = new Scale(new Vector2(normalisedTime, normalisedTime));
         }
 
-        protected override bool IsSupportedType(WindowAnimationType type)
+        protected override bool IsSupportedType(GenericWindowAnimationType type)
         {
             switch (type)
             {
                 default: return false;
-                case WindowAnimationType.Fade:
-                case WindowAnimationType.SlideFromLeft:
-                case WindowAnimationType.SlideFromRight:
-                case WindowAnimationType.SlideFromTop:
-                case WindowAnimationType.SlideFromBottom:
-                case WindowAnimationType.Flip:
-                case WindowAnimationType.Expand:
+                case GenericWindowAnimationType.Fade:
+                case GenericWindowAnimationType.SlideFromLeft:
+                case GenericWindowAnimationType.SlideFromRight:
+                case GenericWindowAnimationType.SlideFromTop:
+                case GenericWindowAnimationType.SlideFromBottom:
+                case GenericWindowAnimationType.Flip:
+                case GenericWindowAnimationType.Expand:
                     return true;
             }
         }

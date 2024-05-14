@@ -1,9 +1,10 @@
 using UIFramework;
+using UIFramework.UGUI;
 
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ExampleController : Controller<ExampleController>
+public class ExampleController : Controller
 {
     public RectTransform rectTransform
     {
@@ -31,32 +32,41 @@ public class ExampleController : Controller<ExampleController>
     }
     private CanvasGroup _canvasGroup = null;
 
-    [SerializeField] private UIFramework.UGUI.ScreenCollector<ExampleController> _uguiScreenCollector = new UIFramework.UGUI.ScreenCollector<ExampleController> ();
-    [SerializeField] private UIFramework.UIToolkit.ScreenCollector<ExampleController> _uiToolkitScreenCollector = new UIFramework.UIToolkit.ScreenCollector<ExampleController>();
-
     [SerializeField] private Button backButton = null;
 
-    public override UpdateTimeMode updateTimeMode { get; protected set; } = UpdateTimeMode.Scaled;
-    protected override StateAnimationMode stateAnimationMode { get { return StateAnimationMode.Screen | StateAnimationMode.Self; } }
+    public override TimeMode timeMode { get; protected set; } = TimeMode.Scaled;
+
+    protected override AnimationPlayable CreateAccessPlayable(AccessOperation accessOperation, float length)
+    {
+        Canvas canvas = GetComponentInParent<Canvas>(true);
+        GenericWindowAnimation animation =
+            new GenericWindowAnimation(canvas.transform as RectTransform, rectTransform, Vector3.zero, canvasGroup, GenericWindowAnimationType.Fade, length);
+        switch (accessOperation)
+        {
+            default:
+            case AccessOperation.Open:
+                return new AnimationPlayable(animation, 0.0F, UIFramework.PlayMode.Forward, EasingMode.EaseInOut, timeMode);
+            case AccessOperation.Close:
+                return new AnimationPlayable(animation, length, UIFramework.PlayMode.Reverse, EasingMode.EaseInOut, timeMode);
+        }
+    }
 
     protected override void OnInit()
     {
         base.OnInit();
         gameObject.SetActive(false);
-        backButton.onClick.AddListener(navigation.Back);
+        backButton.onClick.AddListener(delegate () { Back(); });
     }
 
-    protected override void UpdateUI(float deltaTime)
+    protected override void OnUpdate(float deltaTime)
     {
-        base.UpdateUI(deltaTime);
+        base.OnUpdate(deltaTime);
 
-        if(Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
-            NavigationEvent navigationEvent = navigation.Back(true);
-            if(navigationEvent.exit)
+            if (!Back())
             {
-                WindowAnimation animation = new WindowAnimation(WindowAnimation.Type.Fade, 0.5F, EasingMode.EaseInOut, 0.5F, UIFramework.PlayMode.Reverse);
-                Close(in animation);
+                CloseScreen(0.5F);
             }
         }
     }
@@ -68,10 +78,10 @@ public class ExampleController : Controller<ExampleController>
 
     protected override void SetBackButtonActive(bool active)
     {
-        if(navigation.activeElement != null && navigation.activeElement.SetBackButtonActive(active))
+        if (activeScreen != null && activeScreen.SetBackButtonActive(active))
         {
             backButton?.gameObject.SetActive(false);
-        }        
+        }
         else
         {
             backButton?.gameObject.SetActive(active);
@@ -88,10 +98,5 @@ public class ExampleController : Controller<ExampleController>
     {
         base.OnClosed();
         gameObject.SetActive(false);
-    }
-
-    public override WindowAnimationBase CreateAnimationSequences()
-    {
-        throw new System.NotImplementedException();
     }
 }

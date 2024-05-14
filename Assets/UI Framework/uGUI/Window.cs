@@ -118,13 +118,14 @@ namespace UIFramework.UGUI
         private bool _isWaiting = false;
         private AnimationPlayer _animationPlayer = null;
         private IAccessibleAction _onAccessAnimationComplete = null;
+        protected Vector3 _activeAnchoredPosition { get; private set; } = Vector3.zero;
 
         // IWindow
-        public virtual Animation CreateAnimation(WindowAnimationType type, float length)
+        public virtual GenericWindowAnimationBase CreateAnimation(GenericWindowAnimationType type, float length)
         {
-            Canvas canvas = GetComponentInParent<Canvas>();
-            return new WindowAnimation(canvas.transform as RectTransform, rectTransform, canvasGroup, type, length);
-        }
+            Canvas canvas = GetComponentInParent<Canvas>(true);
+            return new GenericWindowAnimation(canvas.transform as RectTransform, rectTransform, _activeAnchoredPosition, canvasGroup, type, length);
+        }        
 
         public bool SetWaiting(bool waiting)
         {
@@ -141,6 +142,19 @@ namespace UIFramework.UGUI
         }
 
         // IAccessible
+        public virtual WindowAccessAnimation CreateDefaultAccessAnimation(float length)
+        {
+            return CreateAnimation(GenericWindowAnimationType.Fade, length);
+        }
+
+        public virtual void ResetAnimatedProperties()
+        {
+            _rectTransform.anchoredPosition = _activeAnchoredPosition;
+            _rectTransform.localScale = Vector3.one;
+            _rectTransform.localRotation = Quaternion.identity;
+            _canvasGroup.alpha = 1.0F;
+        }
+
         public void Init()
         {
             if (accessState != AccessState.Unitialized)
@@ -148,6 +162,7 @@ namespace UIFramework.UGUI
                 throw new InvalidOperationException("Window already initialized.");
             }
 
+            _activeAnchoredPosition = rectTransform.anchoredPosition;
             accessState = AccessState.Closed;
             gameObject.SetActive(false);
             OnInit();
@@ -163,10 +178,10 @@ namespace UIFramework.UGUI
                     _animationPlayer.Rewind();
                 }
                 else
-                {                    
+                {
                     isInteractable = false;
-                    accessAnimationPlayable = animationPlayable;
-                    _animationPlayer = this.PlayAnimation(in animationPlayable);
+                    accessAnimationPlayable = animationPlayable;                   
+                    _animationPlayer = AnimationPlayer.PlayAnimation(in animationPlayable);
                     _animationPlayer.onComplete += OnAnimationComplete;
                     accessAnimationPlaybackData = _animationPlayer.playbackData;
                 }
@@ -213,10 +228,10 @@ namespace UIFramework.UGUI
                     _animationPlayer.Rewind();
                 }
                 else
-                {
+                {                    
                     isInteractable = false;
                     accessAnimationPlayable = animationPlayable;
-                    _animationPlayer = this.PlayAnimation(in animationPlayable);
+                    _animationPlayer = AnimationPlayer.PlayAnimation(in animationPlayable);
                     _animationPlayer.onComplete += OnAnimationComplete;
                     accessAnimationPlaybackData = _animationPlayer.playbackData;
                 }
@@ -305,6 +320,7 @@ namespace UIFramework.UGUI
 
         private void OnAnimationComplete(Animation animation)
         {
+            ResetAnimatedProperties();
             ClearAnimationReferences();
             isInteractable = true;
             if(accessState == AccessState.Opening)

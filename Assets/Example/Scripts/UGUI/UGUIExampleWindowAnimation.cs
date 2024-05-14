@@ -3,10 +3,10 @@ using UIFramework.UGUI;
 
 using UnityEngine;
 
-public class UGUIExampleWindowAnimation : WindowAnimation
+public class UGUIExampleWindowAnimation : GenericWindowAnimation
 {
-    public UGUIExampleWindowAnimation(RectTransform displayRectTransform, RectTransform rectTransform, CanvasGroup canvasGroup, WindowAnimationType type, float length)
-        : base(displayRectTransform, rectTransform, canvasGroup, type, length) { }
+    public UGUIExampleWindowAnimation(RectTransform displayRectTransform, RectTransform rectTransform, Vector3 activeAnchoredPosition, CanvasGroup canvasGroup, GenericWindowAnimationType type, float length)
+        : base(displayRectTransform, rectTransform, activeAnchoredPosition, canvasGroup, type, length) { }
 
     protected override void SlideFromLeft(float normalisedTime)
     {

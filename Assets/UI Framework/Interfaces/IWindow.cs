@@ -10,7 +10,7 @@ namespace UIFramework
         bool isInteractable { get; set; }
         int sortOrder { get; set; }
         
-        Animation CreateAnimation(WindowAnimationType type, float length);
+        GenericWindowAnimationBase CreateAnimation(GenericWindowAnimationType type, float length);        
 
         bool SetWaiting(bool waiting);
     }

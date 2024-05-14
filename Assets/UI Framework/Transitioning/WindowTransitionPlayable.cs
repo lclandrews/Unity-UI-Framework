@@ -6,7 +6,7 @@ namespace UIFramework
 {
     public struct WindowTransitionPlayable : IEquatable<WindowTransitionPlayable>
     {
-        public enum AnimationTargets
+        public enum AnimationTargets    
         {
             None,
             Source,
@@ -73,62 +73,62 @@ namespace UIFramework
 
         public static WindowTransitionPlayable Fade(float length, EasingMode easingMode)
         {
-            return new WindowTransitionPlayable(length, easingMode, null, WindowAnimationType.Fade, SortPriority.Auto);
+            return new WindowTransitionPlayable(length, easingMode, null, GenericWindowAnimationType.Fade, SortPriority.Auto);
         }
 
         public static WindowTransitionPlayable Dissolve(float length, EasingMode easingMode)
         {
-            return new WindowTransitionPlayable(length, easingMode, WindowAnimationType.Dissolve, null, SortPriority.Auto);
+            return new WindowTransitionPlayable(length, easingMode, GenericWindowAnimationType.Dissolve, null, SortPriority.Auto);
         }
 
         public static WindowTransitionPlayable SlideFromLeft(float length, EasingMode easingMode)
         {
-            return new WindowTransitionPlayable(length, easingMode, WindowAnimationType.SlideFromRight, WindowAnimationType.SlideFromLeft, SortPriority.Auto);
+            return new WindowTransitionPlayable(length, easingMode, GenericWindowAnimationType.SlideFromRight, GenericWindowAnimationType.SlideFromLeft, SortPriority.Auto);
         }
 
         public static WindowTransitionPlayable SlideFromRight(float length, EasingMode easingMode)
         {
-            return new WindowTransitionPlayable(length, easingMode, WindowAnimationType.SlideFromLeft, WindowAnimationType.SlideFromRight, SortPriority.Auto);
+            return new WindowTransitionPlayable(length, easingMode, GenericWindowAnimationType.SlideFromLeft, GenericWindowAnimationType.SlideFromRight, SortPriority.Auto);
         }
 
         public static WindowTransitionPlayable SlideFromBottom(float length, EasingMode easingMode)
         {
-            return new WindowTransitionPlayable(length, easingMode, WindowAnimationType.SlideFromTop, WindowAnimationType.SlideFromBottom, SortPriority.Auto);
+            return new WindowTransitionPlayable(length, easingMode, GenericWindowAnimationType.SlideFromTop, GenericWindowAnimationType.SlideFromBottom, SortPriority.Auto);
         }
 
         public static WindowTransitionPlayable SlideFromTop(float length, EasingMode easingMode)
         {
-            return new WindowTransitionPlayable(length, easingMode, WindowAnimationType.SlideFromBottom, WindowAnimationType.SlideFromTop, SortPriority.Auto);
+            return new WindowTransitionPlayable(length, easingMode, GenericWindowAnimationType.SlideFromBottom, GenericWindowAnimationType.SlideFromTop, SortPriority.Auto);
         }
 
         public static WindowTransitionPlayable SlideOverFromLeft(float length, EasingMode easingMode)
         {
-            return new WindowTransitionPlayable(length, easingMode, null, WindowAnimationType.SlideFromLeft, SortPriority.Auto);
+            return new WindowTransitionPlayable(length, easingMode, null, GenericWindowAnimationType.SlideFromLeft, SortPriority.Auto);
         }
 
         public static WindowTransitionPlayable SlideOverFromRight(float length, EasingMode easingMode)
         {
-            return new WindowTransitionPlayable(length, easingMode, null, WindowAnimationType.SlideFromRight, SortPriority.Auto);
+            return new WindowTransitionPlayable(length, easingMode, null, GenericWindowAnimationType.SlideFromRight, SortPriority.Auto);
         }
 
         public static WindowTransitionPlayable SlideOverFromBottom(float length, EasingMode easingMode)
         {
-            return new WindowTransitionPlayable(length, easingMode, null, WindowAnimationType.SlideFromBottom, SortPriority.Auto);
+            return new WindowTransitionPlayable(length, easingMode, null, GenericWindowAnimationType.SlideFromBottom, SortPriority.Auto);
         }
 
         public static WindowTransitionPlayable SlideOverFromTop(float length, EasingMode easingMode)
         {
-            return new WindowTransitionPlayable(length, easingMode, null, WindowAnimationType.SlideFromTop, SortPriority.Auto);
+            return new WindowTransitionPlayable(length, easingMode, null, GenericWindowAnimationType.SlideFromTop, SortPriority.Auto);
         }
 
         public static WindowTransitionPlayable Flip(float length, EasingMode easingMode)
         {
-            return new WindowTransitionPlayable(length, easingMode, WindowAnimationType.Flip, null, SortPriority.Auto);
+            return new WindowTransitionPlayable(length, easingMode, GenericWindowAnimationType.Flip, null, SortPriority.Auto);
         }
 
         public static WindowTransitionPlayable Expand(float length, EasingMode easingMode)
         {
-            return new WindowTransitionPlayable(length, easingMode, null, WindowAnimationType.Expand, SortPriority.Auto);
+            return new WindowTransitionPlayable(length, easingMode, null, GenericWindowAnimationType.Expand, SortPriority.Auto);
         }
 
         public static WindowTransitionPlayable Custom(float length, EasingMode easingMode, ImplicitWindowAnimation exitAnimation, ImplicitWindowAnimation entryAnimation, SortPriority sortPriority = SortPriority.Auto)

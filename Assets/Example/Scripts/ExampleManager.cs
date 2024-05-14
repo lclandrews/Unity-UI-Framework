@@ -12,15 +12,17 @@ public class ExampleManager : MonoBehaviour
 
     private void Start()
     {
-        exampleController.Open<UGUIExampleTransitionScreen>(null);
+        exampleController.OpenScreen<UGUIExampleTransitionScreen>();
     }
 
     private void Update()
     {
         if(Input.GetKeyDown(KeyCode.Space))
         {
-            WindowAnimation animation = new WindowAnimation(WindowAnimation.Type.Fade, 0.5F, EasingMode.EaseInOut);
-            exampleController.Open<UGUIExampleTransitionScreen>(in animation, null);
+            if(!exampleController.isOpen)
+            {
+                exampleController.OpenScreen<UGUIExampleTransitionScreen>(new WindowAccessPlayable(GenericWindowAnimationType.Fade, 0.5F, EasingMode.EaseInOut));
+            }
         }
     }
 }

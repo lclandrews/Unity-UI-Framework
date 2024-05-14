@@ -118,9 +118,9 @@ namespace UIFramework.UIToolkit
         }
 
         // IWindow
-        public Animation CreateAnimation(WindowAnimationType type, float length)
+        public GenericWindowAnimationBase CreateAnimation(GenericWindowAnimationType type, float length)
         {
-            return new WindowAnimation(visualElement, type, length);
+            return new GenericWindowAnimation(visualElement, type, length);
         }
 
         public bool SetWaiting(bool waiting)
@@ -138,6 +138,19 @@ namespace UIFramework.UIToolkit
         }
 
         // IAccessible
+        public virtual WindowAccessAnimation CreateDefaultAccessAnimation(float length)
+        {
+            return CreateAnimation(GenericWindowAnimationType.Fade, length);
+        }
+
+        public virtual void ResetAnimatedProperties()
+        {
+            _visualElement.style.opacity = 1;
+            _visualElement.style.translate = new Translate(Length.Percent(0.0F), Length.Percent(0.0F));
+            _visualElement.style.scale = new Scale(Vector2.one);
+            _visualElement.style.rotate = new Rotate(0.0F);
+        }
+
         public void Init()
         {
             if (accessState != AccessState.Unitialized)
@@ -162,8 +175,8 @@ namespace UIFramework.UIToolkit
                 else
                 {
                     isInteractable = false;
-                    accessAnimationPlayable = animationPlayable;
-                    _animationPlayer = this.PlayAnimation(in animationPlayable);
+                    accessAnimationPlayable = animationPlayable;                    
+                    _animationPlayer = AnimationPlayer.PlayAnimation(in animationPlayable);
                     _animationPlayer.onComplete += OnAnimationComplete;
                     accessAnimationPlaybackData = _animationPlayer.playbackData;
                 }
@@ -209,10 +222,10 @@ namespace UIFramework.UIToolkit
                     _animationPlayer.Rewind();
                 }
                 else
-                {
+                {                    
                     isInteractable = false;
                     accessAnimationPlayable = animationPlayable;
-                    _animationPlayer = this.PlayAnimation(in animationPlayable);
+                    _animationPlayer = AnimationPlayer.PlayAnimation(in animationPlayable);
                     _animationPlayer.onComplete += OnAnimationComplete;
                     accessAnimationPlaybackData = _animationPlayer.playbackData;
                 }
@@ -300,6 +313,7 @@ namespace UIFramework.UIToolkit
 
         private void OnAnimationComplete(Animation animator)
         {
+            ResetAnimatedProperties();
             ClearAnimationReferences();
             isInteractable = true;
             if (accessState == AccessState.Opening)

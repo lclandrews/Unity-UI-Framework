@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 namespace UIFramework
 {
-    public class ArrayDictionary<T>
+    public class ObjectTypeMap<T>
     {
         public T[] array { get; private set; } = null;
         public Dictionary<Type, T> dictionary { get; private set; } = null;
 
-        private ArrayDictionary() { }
+        private ObjectTypeMap() { }
 
-        public ArrayDictionary(List<T> list)
+        public ObjectTypeMap(List<T> list)
         {
             if (list == null)
             {
@@ -35,7 +35,7 @@ namespace UIFramework
             }
         }
 
-        public ArrayDictionary(T[] array)
+        public ObjectTypeMap(T[] array)
         {
             if (array == null)
             {

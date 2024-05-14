@@ -2,6 +2,12 @@ namespace UIFramework
 {
     public delegate void IAccessibleAction(IAccessible accessible);
 
+    public enum AccessOperation
+    {
+        Open,
+        Close
+    }
+
     public enum AccessState
     {
         Unitialized,
@@ -9,7 +15,7 @@ namespace UIFramework
         Opening,
         Closed,
         Closing
-    }
+    }    
 
     public interface IAccessible
     {
@@ -17,7 +23,10 @@ namespace UIFramework
 
         AnimationPlayer.PlaybackData accessAnimationPlaybackData { get; }
         AnimationPlayable accessAnimationPlayable { get; }
-        
+
+        WindowAccessAnimation CreateDefaultAccessAnimation(float length);
+        void ResetAnimatedProperties();
+
         void Init();
 
         /// <summary>

@@ -11,24 +11,24 @@ namespace UIFramework
         public PlayMode playMode { get; private set; }
         public EasingMode easingMode { get; private set; }
         public float playbackSpeed { get; private set; }
-        public bool unscaledTime { get; private set; }
+        public TimeMode timeMode { get; private set; }
 
         public AnimationPlayable(Animation animation)
-            : this(animation, 0.0F, PlayMode.Forward, EasingMode.Linear, false, 1.0F) { }
+            : this(animation, 0.0F, PlayMode.Forward, EasingMode.Linear, TimeMode.Scaled, 1.0F) { }
 
         public AnimationPlayable(Animation animation, float startTime)
-            : this(animation, startTime, PlayMode.Forward, EasingMode.Linear, false, 1.0F) { }
+            : this(animation, startTime, PlayMode.Forward, EasingMode.Linear, TimeMode.Scaled, 1.0F) { }
 
         public AnimationPlayable(Animation animation, float startTime, PlayMode playMode)
-            : this(animation, startTime, playMode, EasingMode.Linear, false, 1.0F) { }
+            : this(animation, startTime, playMode, EasingMode.Linear, TimeMode.Scaled, 1.0F) { }
 
         public AnimationPlayable(Animation animation, float startTime, PlayMode playMode, EasingMode easingMode)
-            : this(animation, startTime, playMode, easingMode, false, 1.0F) { }
+            : this(animation, startTime, playMode, easingMode, TimeMode.Scaled, 1.0F) { }
 
-        public AnimationPlayable(Animation animation, float startTime, PlayMode playMode, EasingMode easingMode, bool unscaledTime)
-            : this(animation, startTime, playMode, easingMode, unscaledTime, 1.0F) { }
+        public AnimationPlayable(Animation animation, float startTime, PlayMode playMode, EasingMode easingMode, TimeMode timeMode)
+            : this(animation, startTime, playMode, easingMode, timeMode, 1.0F) { }
 
-        public AnimationPlayable(Animation animation, float startTime, PlayMode playMode, EasingMode easingMode, bool unscaledTime, float playbackSpeed)
+        public AnimationPlayable(Animation animation, float startTime, PlayMode playMode, EasingMode easingMode, TimeMode timeMode, float playbackSpeed)
         {
             if(animation == null)
             {
@@ -39,20 +39,26 @@ namespace UIFramework
             this.easingMode = easingMode;
             this.startTime = Mathf.Clamp(startTime, 0.0F, animation.length);
             this.playMode = playMode;
-            this.unscaledTime = unscaledTime;
+            this.timeMode = timeMode;
             this.playbackSpeed = playbackSpeed;
+        }
+
+        public void Invert()
+        {
+            startTime = animation.length - startTime;
+            playMode = playMode.InvertPlayMode();
         }
 
         public AnimationPlayable CreateInverse(float startTime)
         {
             return new AnimationPlayable(animation, startTime, playMode.InvertPlayMode(), 
-                easingMode.GetInverseEasingMode(), unscaledTime, playbackSpeed);
+                easingMode.GetInverseEasingMode(), timeMode, playbackSpeed);
         }
 
         public AnimationPlayable CreateInverse()
         {
             return new AnimationPlayable(animation, animation.length - startTime, playMode.InvertPlayMode(), 
-                easingMode.GetInverseEasingMode(), unscaledTime, playbackSpeed);
+                easingMode.GetInverseEasingMode(), timeMode, playbackSpeed);
         }
     }
 }

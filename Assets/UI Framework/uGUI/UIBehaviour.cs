@@ -34,7 +34,7 @@ namespace UIFramework.UGUI
         {
             if (transform.parent != null)
             {
-                parent = transform.parent.GetComponentInParent<UIBehaviour>();
+                parent = transform.parent.GetComponentInParent<UIBehaviour>(true);
                 if (parent != null)
                 {
                     parent.AddChild(this);

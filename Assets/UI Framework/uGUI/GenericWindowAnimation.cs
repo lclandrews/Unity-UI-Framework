@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace UIFramework.UGUI
 {
-    public class WindowAnimation : WindowAnimationBase
+    public class GenericWindowAnimation : GenericWindowAnimationBase
     {
         private RectTransform _displayRectTransform = null;
         private RectTransform _rectTransform = null;
@@ -17,7 +17,7 @@ namespace UIFramework.UGUI
         private Vector3 _offDisplayBottom = Vector3.zero;
         private Vector3 _offDisplayTop = Vector3.zero;
 
-        public WindowAnimation(RectTransform displayRectTransform, RectTransform rectTransform, CanvasGroup canvasGroup, WindowAnimationType type, float length)
+        public GenericWindowAnimation(RectTransform displayRectTransform, RectTransform rectTransform, Vector3 activeAnchoredPosition, CanvasGroup canvasGroup, GenericWindowAnimationType type, float length)
             : base(type, length)
         {
             if (displayRectTransform == null)
@@ -39,31 +39,28 @@ namespace UIFramework.UGUI
             _rectTransform = rectTransform;
             _canvasGroup = canvasGroup;
 
-            _activeAnchoredPosition = _rectTransform.anchoredPosition;
+            _activeAnchoredPosition = activeAnchoredPosition;            
+        }
+
+        public override void Prepare()
+        {
+            base.Prepare();
 
             switch (type)
             {
-                case WindowAnimationType.SlideFromLeft:
+                case GenericWindowAnimationType.SlideFromLeft:
                     CalculateOffDisplayLeft();
                     break;
-                case WindowAnimationType.SlideFromRight:
+                case GenericWindowAnimationType.SlideFromRight:
                     CalculateOffDisplayRight();
                     break;
-                case WindowAnimationType.SlideFromBottom:
+                case GenericWindowAnimationType.SlideFromBottom:
                     CalculateOffDisplayBottom();
                     break;
-                case WindowAnimationType.SlideFromTop:
+                case GenericWindowAnimationType.SlideFromTop:
                     CalculateOffDisplayTop();
                     break;
-            }
-        }
-
-        public override void ResetAnimatedComponents()
-        {
-            _rectTransform.anchoredPosition = _activeAnchoredPosition;
-            _rectTransform.localScale = Vector3.one;
-            _rectTransform.localRotation = Quaternion.identity;
-            _canvasGroup.alpha = 1.0F;
+            }            
         }
 
         protected override void Fade(float normalisedTime)
@@ -110,18 +107,18 @@ namespace UIFramework.UGUI
             _rectTransform.localScale = scale;
         }
 
-        protected override bool IsSupportedType(WindowAnimationType type)
+        protected override bool IsSupportedType(GenericWindowAnimationType type)
         {
             switch (type)
             {
                 default: return false;
-                case WindowAnimationType.Fade:
-                case WindowAnimationType.SlideFromLeft:
-                case WindowAnimationType.SlideFromRight:
-                case WindowAnimationType.SlideFromTop:
-                case WindowAnimationType.SlideFromBottom:
-                case WindowAnimationType.Flip:
-                case WindowAnimationType.Expand:
+                case GenericWindowAnimationType.Fade:
+                case GenericWindowAnimationType.SlideFromLeft:
+                case GenericWindowAnimationType.SlideFromRight:
+                case GenericWindowAnimationType.SlideFromTop:
+                case GenericWindowAnimationType.SlideFromBottom:
+                case GenericWindowAnimationType.Flip:
+                case GenericWindowAnimationType.Expand:
                     return true;
             }
         }
