@@ -13,6 +13,10 @@ namespace UIFramework
         private ImplicitWindowAnimation(Animation animation)
         {
             _animation = animation;
+            if(_animation is WindowAccessAnimation)
+            {
+                isAccessAnimation = true;
+            }
         }
 
         private ImplicitWindowAnimation(GenericWindowAnimationType genericAnimationType)
