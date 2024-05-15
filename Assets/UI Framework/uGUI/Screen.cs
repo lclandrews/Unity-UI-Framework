@@ -49,7 +49,7 @@ namespace UIFramework.UGUI
             _canvas = GetComponentInParent<Canvas>(true);
             if (backButton != null)
             {
-                backButton.onClick.AddListener(delegate () { controller.Back(); });
+                backButton.onClick.AddListener(delegate () { controller.CloseScreen(); });
             }
             Init();
         }

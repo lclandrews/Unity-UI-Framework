@@ -23,7 +23,7 @@ public class UITKExampleScreen : UIFramework.UIToolkit.Screen
     {
         base.OnInit();
         _returnButton = visualElement.Q<Button>("returnButton");
-        _returnButton.clicked += delegate() { controller.Back(); };
+        _returnButton.clicked += delegate() { controller.CloseScreen(); };
 
         _travelToUGUITransitionScreenButton = visualElement.Q<Button>("uguiTransitionButton");
         _travelToUGUITransitionScreenButton.clicked += TravelToUGUITransitionScreen;

@@ -54,85 +54,73 @@ public class UGUIExampleTransitionScreen : UIFramework.UGUI.Screen
     private void FadeTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.Fade(_transitionLength, EasingMode.EaseInOut);
-        controller.OpenScreen(_targetScreen, in transition);
-        _targetScreen.SetData(GetTargetScreenData());
+        controller.OpenScreen(_targetScreen, GetTargetScreenData(), in transition);
     }
 
     private void DissolveTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.Dissolve(_transitionLength, EasingMode.EaseInOut);
-        controller.OpenScreen(_targetScreen, in transition);
-        _targetScreen.SetData(GetTargetScreenData());
+        controller.OpenScreen(_targetScreen, GetTargetScreenData(), in transition);
     }
 
     private void SlideFromLeftTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.SlideFromLeft(_transitionLength, EasingMode.EaseOutBounce);
-        controller.OpenScreen(_targetScreen, in transition);
-        _targetScreen.SetData(GetTargetScreenData());
+        controller.OpenScreen(_targetScreen, GetTargetScreenData(), in transition);
     }
 
     private void SlideFromRightTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.SlideFromRight(_transitionLength, EasingMode.EaseOutBounce);
-        controller.OpenScreen(_targetScreen, in transition);
-        _targetScreen.SetData(GetTargetScreenData());
+        controller.OpenScreen(_targetScreen, GetTargetScreenData(), in transition);
     }
 
     private void SlideFromBottomTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.SlideFromBottom(_transitionLength, EasingMode.EaseOutBounce);
-        controller.OpenScreen(_targetScreen, in transition);
-        _targetScreen.SetData(GetTargetScreenData());
+        controller.OpenScreen(_targetScreen, GetTargetScreenData(), in transition);
     }
 
     private void SlideFromTopTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.SlideFromTop(_transitionLength, EasingMode.EaseOutBounce);
-        controller.OpenScreen(_targetScreen, in transition);
-        _targetScreen.SetData(GetTargetScreenData());
+        controller.OpenScreen(_targetScreen, GetTargetScreenData(), in transition);
     }
 
     private void SlideOverLeftTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.SlideOverFromLeft(_transitionLength, EasingMode.EaseOutBounce);
-        controller.OpenScreen(_targetScreen, in transition);
-        _targetScreen.SetData(GetTargetScreenData());
+        controller.OpenScreen(_targetScreen, GetTargetScreenData(), in transition);
     }
 
     private void SlideOverRightTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.SlideOverFromRight(_transitionLength, EasingMode.EaseOutBounce);
-        controller.OpenScreen(_targetScreen, in transition);
-        _targetScreen.SetData(GetTargetScreenData());
+        controller.OpenScreen(_targetScreen, GetTargetScreenData(), in transition);
     }
 
     private void SlideOverBottomTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.SlideOverFromBottom(_transitionLength, EasingMode.EaseOutBounce);
-        controller.OpenScreen(_targetScreen, in transition);
-        _targetScreen.SetData(GetTargetScreenData());
+        controller.OpenScreen(_targetScreen, GetTargetScreenData(), in transition);
     }
 
     private void SlideOverTopTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.SlideOverFromTop(_transitionLength, EasingMode.EaseOutBounce);
-        controller.OpenScreen(_targetScreen, in transition);
-        _targetScreen.SetData(GetTargetScreenData());
+        controller.OpenScreen(_targetScreen, GetTargetScreenData(), in transition);
     }
 
     private void FlipTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.Flip(_transitionLength, EasingMode.EaseOutBounce);
-        controller.OpenScreen(_targetScreen, in transition);
-        _targetScreen.SetData(GetTargetScreenData());
+        controller.OpenScreen(_targetScreen, GetTargetScreenData(), in transition);
     }
 
     private void ExpandTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.Expand(_transitionLength, EasingMode.EaseInOutBack);
-        controller.OpenScreen(_targetScreen, in transition);
-        _targetScreen.SetData(GetTargetScreenData());
+        controller.OpenScreen(_targetScreen, GetTargetScreenData(),in transition);
     }
 
     protected object GetTargetScreenData()

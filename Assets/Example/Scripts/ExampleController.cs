@@ -55,7 +55,7 @@ public class ExampleController : Controller
     {
         base.OnInit();
         gameObject.SetActive(false);
-        backButton.onClick.AddListener(delegate () { Back(); });
+        backButton.onClick.AddListener(delegate () { CloseScreen(); });
     }
 
     protected override void OnUpdate(float deltaTime)
@@ -64,9 +64,9 @@ public class ExampleController : Controller
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (!Back())
+            if (!CloseScreen())
             {
-                CloseScreen(0.5F);
+                CloseAll(0.5F);
             }
         }
     }

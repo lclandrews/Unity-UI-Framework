@@ -20,7 +20,7 @@ public class UGUIExampleAlternateCanvasScreen : UIFramework.UGUI.Screen
     protected override void OnInit()
     {
         base.OnInit();
-        returnButton?.onClick.AddListener(delegate() { controller.Back(); });
+        returnButton?.onClick.AddListener(delegate() { controller.CloseScreen(); });
         travelToTransitionScreenButton?.onClick.AddListener(TravelToTransitionScreen);
         travelToSharedCanvasScreenButton?.onClick.AddListener(TravelToSharedCanvasScreen);
         travelToUITKTransitionScreenButton?.onClick.AddListener(TravelToUITKTransitionScreen);
