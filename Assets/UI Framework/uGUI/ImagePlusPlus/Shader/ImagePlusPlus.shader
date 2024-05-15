@@ -112,7 +112,7 @@ Shader "UI/Default++"
 				float y = sin(r);
 				float x = cos(r);
 				float a = (v.texcoord.x * x) + (v.texcoord.y * y);
-				half4 gradient = lerp(_GradientColor, v.color, a);
+				half4 gradient = lerp(float4(_GradientColor.xyz, _GradientColor.a * v.color.a), v.color, a);
 				OUT.color = gradient * _Color;
                 #else
                 OUT.color = v.color * _Color;
