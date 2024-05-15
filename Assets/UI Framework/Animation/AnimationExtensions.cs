@@ -11,5 +11,14 @@ namespace UIFramework
         {
             return accessOperation ^ (AccessOperation)1;
         }
+
+        public static AnimationPlayable CreatePlayable(this GenericWindowAnimationType type, IWindow window, float length, AccessOperation accessOperation,
+            float startOffset = 0.0F, EasingMode easingMode = EasingMode.Linear, TimeMode timeMode = TimeMode.Scaled)
+        {
+            PlayMode playMode = accessOperation == AccessOperation.Open ? PlayMode.Forward : PlayMode.Reverse;
+            float startTime = playMode == PlayMode.Forward ? startOffset : length - startOffset;
+            Animation animation = window.CreateAnimation(type, length);
+            return new AnimationPlayable(animation, startTime, playMode, easingMode, timeMode);
+        }
     }
 }
