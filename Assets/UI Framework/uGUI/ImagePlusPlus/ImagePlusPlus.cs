@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Rendering;
+using System;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -44,7 +46,11 @@ namespace UIFramework.UGUI
             {
                 if (_shader == null)
                 {
-                    _shader = Shader.Find("UI/Default++");
+                    _shader = Shader.Find("UI/Default++");                    
+                }
+                if(_shader == null)
+                {
+                    throw new Exception("Unable to find image plus plus shader.");
                 }
                 return _shader;
             }

@@ -1,4 +1,5 @@
 ﻿using System;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -56,13 +57,13 @@ namespace UIFramework.UGUI
                     _isEnabledCounter--;
                 }
 
-                if(_isEnabledCounter > 0)
-                {                    
+                if (_isEnabledCounter > 0)
+                {
                     isInteractable = true;
                     canvasGroup.interactable = true;
                 }
                 else
-                {                    
+                {
                     isInteractable = false;
                     canvasGroup.interactable = false;
                 }
@@ -113,7 +114,7 @@ namespace UIFramework.UGUI
         // IDataRecipient
         public abstract bool requiresData { get; }
         public object data { get; private set; } = null;
-        
+
         // UGUI Window
         private bool _isWaiting = false;
         private AnimationPlayer _animationPlayer = null;
@@ -125,7 +126,7 @@ namespace UIFramework.UGUI
         {
             Canvas canvas = GetComponentInParent<Canvas>(true);
             return new GenericWindowAnimation(canvas.transform as RectTransform, rectTransform, _activeAnchoredPosition, canvasGroup, type, length);
-        }        
+        }
 
         public bool SetWaiting(bool waiting)
         {
@@ -166,12 +167,13 @@ namespace UIFramework.UGUI
             accessState = AccessState.Closed;
             gameObject.SetActive(false);
             OnInit();
-        }        
+        }
 
         public bool Open(in AnimationPlayable animationPlayable, IAccessibleAction onComplete = null)
         {
             if (accessState == AccessState.Closing || accessState == AccessState.Closed)
             {
+                gameObject.SetActive(true);
                 if (_animationPlayer != null)
                 {
                     Debug.Log("Window is already playing a close animation, the provided open animation is ignored and the current close animation is rewound.");
@@ -180,14 +182,13 @@ namespace UIFramework.UGUI
                 else
                 {
                     isInteractable = false;
-                    accessAnimationPlayable = animationPlayable;                   
+                    accessAnimationPlayable = animationPlayable;
                     _animationPlayer = AnimationPlayer.PlayAnimation(in animationPlayable);
                     _animationPlayer.onComplete += OnAnimationComplete;
                     accessAnimationPlaybackData = _animationPlayer.playbackData;
                 }
                 _onAccessAnimationComplete = onComplete;
                 accessState = AccessState.Opening;
-                gameObject.SetActive(true);
                 OnOpen();
                 return true;
             }
@@ -198,7 +199,8 @@ namespace UIFramework.UGUI
         {
             if (accessState == AccessState.Closing || accessState == AccessState.Closed)
             {
-                if(accessState == AccessState.Closing)
+                gameObject.SetActive(true);
+                if (accessState == AccessState.Closing)
                 {
                     Debug.Log("Open was called on a Window without an animation while already playing a state animation, " +
                         "this may cause unexpected behviour of the UI.");
@@ -208,15 +210,13 @@ namespace UIFramework.UGUI
                     ClearAnimationReferences();
                     _onAccessAnimationComplete = null;
                 }
-
                 accessState = AccessState.Open;
-                gameObject.SetActive(true);                
                 OnOpen();
                 OnOpened();
                 return true;
             }
             return false;
-        }        
+        }
 
         public bool Close(in AnimationPlayable animationPlayable, IAccessibleAction onComplete = null)
         {
@@ -228,7 +228,7 @@ namespace UIFramework.UGUI
                     _animationPlayer.Rewind();
                 }
                 else
-                {                    
+                {
                     isInteractable = false;
                     accessAnimationPlayable = animationPlayable;
                     _animationPlayer = AnimationPlayer.PlayAnimation(in animationPlayable);
@@ -247,7 +247,7 @@ namespace UIFramework.UGUI
         {
             if (accessState == AccessState.Opening || accessState == AccessState.Open)
             {
-                if(accessState == AccessState.Opening)
+                if (accessState == AccessState.Opening)
                 {
                     Debug.Log("Close was called on a Window without an animation while already playing a state animation, " +
                         "this may cause unexpected behviour of the UI.");
@@ -323,14 +323,14 @@ namespace UIFramework.UGUI
             ResetAnimatedProperties();
             ClearAnimationReferences();
             isInteractable = true;
-            if(accessState == AccessState.Opening)
+            if (accessState == AccessState.Opening)
             {
                 accessState = AccessState.Open;
                 OnOpened();
                 _onAccessAnimationComplete?.Invoke(this);
                 _onAccessAnimationComplete = null;
             }
-            else if(accessState == AccessState.Closing)
+            else if (accessState == AccessState.Closing)
             {
                 accessState = AccessState.Closed;
                 gameObject.SetActive(false);
@@ -353,7 +353,7 @@ namespace UIFramework.UGUI
         {
             _animationPlayer.onComplete = null;
             _animationPlayer = null;
-            accessAnimationPlaybackData.ReleaseReferences();            
+            accessAnimationPlaybackData.ReleaseReferences();
         }
     }
 }

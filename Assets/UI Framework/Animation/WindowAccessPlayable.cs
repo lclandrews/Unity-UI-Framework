@@ -1,5 +1,3 @@
-using System;
-
 namespace UIFramework
 {
     public struct WindowAccessPlayable
@@ -15,15 +13,10 @@ namespace UIFramework
             : this(animation, length, EasingMode.Linear) { }
 
         public WindowAccessPlayable(float length, EasingMode easingMode)
-            : this(null, length, EasingMode.Linear) { }
+            : this(null, length, easingMode) { }
 
         public WindowAccessPlayable(ImplicitWindowAnimation animation, float length, EasingMode easingMode)
         {
-            if (animation == null)
-            {
-                throw new ArgumentNullException(nameof(animation));
-            }
-
             this.length = length;
             this.animation = animation;
             this.easingMode = easingMode;            
