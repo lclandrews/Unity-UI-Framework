@@ -100,10 +100,6 @@ namespace UIFramework.UIToolkit
         }
         private int _sortOrder = 0;
 
-        // IDataRecipient
-        public abstract bool requiresData { get; }
-        public object data { get; private set; } = null;
-
         // UI Toolkit Window
         private bool _isWaiting = false;
         private AnimationPlayer _animationPlayer = null;
@@ -271,35 +267,15 @@ namespace UIFramework.UIToolkit
         }
 
         // IDataRecipient
-        public void SetData(object data)
-        {
-            if (requiresData)
-            {
-                if (IsValidData(data))
-                {
-                    this.data = data;
-                    OnDataSet();
-                }
-                else
-                {
-                    throw new InvalidOperationException("Attempted to set data on Window of the wrong type.");
-                }
-            }
-            else if (data != null)
-            {
-                throw new InvalidOperationException("Cannot set data on Window as it requires none.");
-            }
-        }
+        public virtual void SetData(object data) { }
 
-        public abstract bool IsValidData(object data);
+        public virtual bool IsValidData(object data) { return false; }
 
         // UIToolkitWindow
         public virtual bool ShowWaitingIndicator(bool show)
         {
             return false;
         }
-
-        protected virtual void OnDataSet() { }
 
         protected virtual void OnInit() { }
 
