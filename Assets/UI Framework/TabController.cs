@@ -23,11 +23,11 @@ namespace UIFramework
 
         public void UpdateUI(float deltaTime)
         {
-            for (int i = 0; i < _windows.array.Length; i++)
+            for (int i = 0; i < _windows.Array.Length; i++)
             {
-                if (_windows.array[i].IsVisible)
+                if (_windows.Array[i].IsVisible)
                 {
-                    _windows.array[i].UpdateUI(deltaTime);
+                    _windows.Array[i].UpdateUI(deltaTime);
                 }
             }
         }
@@ -51,20 +51,20 @@ namespace UIFramework
             }
 
             _windows = new ObjectTypeMap<IWindow>(windows);
-            for (int i = 0; i < _windows.array.Length; i++)
+            for (int i = 0; i < _windows.Array.Length; i++)
             {
-                _windows.array[i].Init();
+                _windows.Array[i].Init();
                 if (i == activeTabIndex)
                 {
-                    _windows.array[i].Open();
-                    _activeTabWindow = _windows.array[i];
+                    _windows.Array[i].Open();
+                    _activeTabWindow = _windows.Array[i];
                     _activeTabIndex = i;
                 }
             }
 
-            if (_activeTabWindow == null && _windows.array.Length > 0)
+            if (_activeTabWindow == null && _windows.Array.Length > 0)
             {
-                _activeTabWindow = _windows.array[0];
+                _activeTabWindow = _windows.Array[0];
                 _activeTabWindow.Open();
             }
         }
@@ -125,11 +125,11 @@ namespace UIFramework
                 if (windowType != _activeTabWindow.GetType())
                 {
                     IWindow targetWindow;
-                    if (_windows.dictionary.TryGetValue(windowType, out targetWindow))
+                    if (_windows.Dictionary.TryGetValue(windowType, out targetWindow))
                     {
-                        for (int i = 0; i < _windows.array.Length; i++)
+                        for (int i = 0; i < _windows.Array.Length; i++)
                         {
-                            if (_windows.array[i] == targetWindow)
+                            if (_windows.Array[i] == targetWindow)
                             {
                                 _activeTabIndex = i;
                                 break;
@@ -160,10 +160,10 @@ namespace UIFramework
             {
                 if (_activeTabWindow != null)
                 {
-                    if (index >= 0 && index < _windows.array.Length)
+                    if (index >= 0 && index < _windows.Array.Length)
                     {
                         _activeTabIndex = index;
-                        IWindow targetWindow = _windows.array[index];
+                        IWindow targetWindow = _windows.Array[index];
 
                         AnimationPlayable closeAnimationPlayable;
                         if (_activeTabWindow.AccessAnimationPlayable.Animation != null)
