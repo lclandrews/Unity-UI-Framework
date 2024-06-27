@@ -40,7 +40,7 @@ namespace UIFramework.UGUI
         private static readonly int _shaderProp_gradientColor = Shader.PropertyToID("_GradientColor");
         private static readonly int _shaderProp_gradientAngle = Shader.PropertyToID("_GradientAngle");
 
-        public static Shader shader
+        public static Shader Shader
         {
             get
             {
@@ -186,7 +186,7 @@ namespace UIFramework.UGUI
 
         public void ForceNewMaterial()
         {
-            Shader imageShader = shader;
+            Shader imageShader = Shader;
             material = new Material(imageShader)
             {
                 hideFlags = HideFlags.HideAndDontSave
@@ -195,7 +195,7 @@ namespace UIFramework.UGUI
 
         public bool Validate()
         {
-            Shader imageShader = shader;
+            Shader imageShader = Shader;
             if (_autoCreateMaterial)
             {
                 if (material == null || material.shader != imageShader)
@@ -212,13 +212,13 @@ namespace UIFramework.UGUI
 
         public void Refresh()
         {
-            if (material != null && material.shader == shader)
+            if (material != null && material.shader == Shader)
             {
                 SetMaterialProperties(material);
             }
 
             Material currentRenderMaterial = materialForRendering;
-            if (currentRenderMaterial != null && currentRenderMaterial != material && currentRenderMaterial.shader == shader)
+            if (currentRenderMaterial != null && currentRenderMaterial != material && currentRenderMaterial.shader == Shader)
             {
                 SetMaterialProperties(currentRenderMaterial);
             }

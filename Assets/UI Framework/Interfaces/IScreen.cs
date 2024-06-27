@@ -2,7 +2,7 @@ namespace UIFramework
 {
     public interface IScreen : INavigableWindow
     {
-        Controller controller { get; }
+        Controller Controller { get; }
 
         ControllerType GetController<ControllerType>() where ControllerType : Controller;
 

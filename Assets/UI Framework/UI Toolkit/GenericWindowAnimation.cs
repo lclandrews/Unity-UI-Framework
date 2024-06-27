@@ -30,25 +30,25 @@ namespace UIFramework.UIToolkit
         protected override void SlideFromLeft(float normalisedTime)
         {
             float percent = (-1.0F + normalisedTime) * 100.0F;
-            _visualElement.style.translate = new Translate(Length.Percent(percent), Length.Percent(0.0F));
+            _visualElement.style.translate = new Translate(UnityEngine.UIElements.Length.Percent(percent), UnityEngine.UIElements.Length.Percent(0.0F));
         }
 
         protected override void SlideFromRight(float normalisedTime)
         {
             float percent = (1.0F - normalisedTime) * 100.0F;
-            _visualElement.style.translate = new Translate(Length.Percent(percent), Length.Percent(0.0F));
+            _visualElement.style.translate = new Translate(UnityEngine.UIElements.Length.Percent(percent), UnityEngine.UIElements.Length.Percent(0.0F));
         }
 
         protected override void SlideFromBottom(float normalisedTime)
         {
             float percent = (1.0F - normalisedTime) * 100.0F;
-            _visualElement.style.translate = new Translate(Length.Percent(0.0F), Length.Percent(percent));
+            _visualElement.style.translate = new Translate(UnityEngine.UIElements.Length.Percent(0.0F), UnityEngine.UIElements.Length.Percent(percent));
         }
 
         protected override void SlideFromTop(float normalisedTime)
         {
             float percent = (-1.0F + normalisedTime) * 100.0F;
-            _visualElement.style.translate = new Translate(Length.Percent(0.0F), Length.Percent(percent));
+            _visualElement.style.translate = new Translate(UnityEngine.UIElements.Length.Percent(0.0F), UnityEngine.UIElements.Length.Percent(percent));
         }
 
         protected override void Flip(float normalisedTime)

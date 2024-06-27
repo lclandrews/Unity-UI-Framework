@@ -2,9 +2,9 @@ namespace UIFramework
 {
     public struct WindowAccessPlayable
     {
-        public ImplicitWindowAnimation animation { get; private set; }
-        public float length { get; private set; }
-        public EasingMode easingMode { get; private set; }
+        public ImplicitWindowAnimation Animation { get; private set; }
+        public float Length { get; private set; }
+        public EasingMode EasingMode { get; private set; }
 
         public WindowAccessPlayable(float length)
             : this(null, length, EasingMode.Linear) { }
@@ -17,18 +17,18 @@ namespace UIFramework
 
         public WindowAccessPlayable(ImplicitWindowAnimation animation, float length, EasingMode easingMode)
         {
-            this.length = length;
-            this.animation = animation;
-            this.easingMode = easingMode;            
+            this.Length = length;
+            this.Animation = animation;
+            this.EasingMode = easingMode;            
         }
 
         public AnimationPlayable CreatePlayable(IWindow window, AccessOperation accessOperation, float startOffset = 0.0F, TimeMode timeMode = TimeMode.Scaled)
         {            
-            if(animation == null)
+            if(Animation == null)
             {
-                animation = window.CreateDefaultAccessAnimation(length);
+                Animation = window.CreateDefaultAccessAnimation(Length);
             }
-            return animation.CreatePlayable(window, length, accessOperation, startOffset, easingMode, timeMode);
+            return Animation.CreatePlayable(window, Length, accessOperation, startOffset, EasingMode, timeMode);
         }
     }
 }

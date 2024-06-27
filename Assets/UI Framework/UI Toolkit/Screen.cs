@@ -6,31 +6,31 @@ namespace UIFramework.UIToolkit
 {
     public abstract class Screen : Window, IScreen
     {
-        public Controller controller { get; private set; } = null;    
+        public Controller Controller { get; private set; } = null;    
 
-        public virtual bool supportsHistory { get; } = true;
+        public virtual bool SupportsHistory { get; } = true;
 
-        protected virtual string backButtonName { get; } = null;
-        private Button backButton = null;
+        protected virtual string BackButtonName { get; } = null;
+        private Button BackButton = null;        
 
-        public Screen(UIDocument uiDocument, VisualElement visualElement) : base(uiDocument, visualElement) { }
-
-        public override int sortOrder
+        public override int SortOrder
         {
             get
             {
-                return base.sortOrder;
+                return base.SortOrder;
             }
             set
             {
-                base.sortOrder = value;
+                base.SortOrder = value;
             }
         }
+
+        public Screen(UIDocument uiDocument, VisualElement visualElement) : base(uiDocument, visualElement) { }
 
         // IScreen
         public ControllerType GetController<ControllerType>() where ControllerType : Controller
         {
-            return controller as ControllerType;
+            return Controller as ControllerType;
         }
 
         public virtual void Init(Controller controller)
@@ -40,26 +40,26 @@ namespace UIFramework.UIToolkit
                 throw new ArgumentNullException(nameof(controller));
             }
 
-            if (this.controller != null)
+            if (this.Controller != null)
             {
                 throw new InvalidOperationException("Screen already initialized.");
             }
 
-            this.controller = controller;
-            if (!string.IsNullOrWhiteSpace(backButtonName))
+            this.Controller = controller;
+            if (!string.IsNullOrWhiteSpace(BackButtonName))
             {
-                UQueryBuilder<Button> backButtonQueryBuilder = visualElement.Query<Button>(backButtonName);
+                UQueryBuilder<Button> backButtonQueryBuilder = VisualElement.Query<Button>(BackButtonName);
                 UQueryState<Button> backButtonQuery = backButtonQueryBuilder.Build();
-                backButton = backButtonQuery.First();
+                BackButton = backButtonQuery.First();
             }
             Init();
         }
 
         public bool SetBackButtonActive(bool active)
         {
-            if(backButton != null)
+            if(BackButton != null)
             {
-                backButton.style.display = active ? DisplayStyle.Flex : DisplayStyle.None;
+                BackButton.style.display = active ? DisplayStyle.Flex : DisplayStyle.None;
                 return true;
             }            
             return false;

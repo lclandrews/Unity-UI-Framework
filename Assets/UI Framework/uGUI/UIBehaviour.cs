@@ -6,7 +6,7 @@ namespace UIFramework.UGUI
 {
     public abstract class UIBehaviour : MonoBehaviour, IUIBehaviour
     {
-        public UIBehaviour parent { get; private set; } = null;
+        public UIBehaviour Parent { get; private set; } = null;
         private HashSet<UIBehaviour> _children { get; set; } = new HashSet<UIBehaviour>();
 
 
@@ -34,10 +34,10 @@ namespace UIFramework.UGUI
         {
             if (transform.parent != null)
             {
-                parent = transform.parent.GetComponentInParent<UIBehaviour>(true);
-                if (parent != null)
+                Parent = transform.parent.GetComponentInParent<UIBehaviour>(true);
+                if (Parent != null)
                 {
-                    parent.AddChild(this);
+                    Parent.AddChild(this);
                 }
             }
         }
@@ -49,9 +49,9 @@ namespace UIFramework.UGUI
 
         protected virtual void OnDestroy()
         {
-            if (parent != null)
+            if (Parent != null)
             {
-                parent.RemoveChild(this);
+                Parent.RemoveChild(this);
             }
         }
 

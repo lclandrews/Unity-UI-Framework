@@ -7,17 +7,17 @@ namespace UIFramework
     {
         private struct TransitionParams
         {
-            public WindowTransitionPlayable transition { get; private set; }
-            public IWindow sourceWidow { get; private set; }
-            public IWindow targetWindow { get; private set; }
-            public TimeMode timeMode { get; private set; }
+            public WindowTransitionPlayable Transition { get; private set; }
+            public IWindow SourceWidow { get; private set; }
+            public IWindow TargetWindow { get; private set; }
+            public TimeMode TimeMode { get; private set; }
 
             public TransitionParams(in WindowTransitionPlayable transition, IWindow sourceWindow, IWindow targetWindow, TimeMode timeMode)
             {
-                this.transition = transition;
-                this.sourceWidow = sourceWindow;
-                this.targetWindow = targetWindow;
-                this.timeMode = timeMode;
+                this.Transition = transition;
+                this.SourceWidow = sourceWindow;
+                this.TargetWindow = targetWindow;
+                this.TimeMode = timeMode;
             }
 
             public override bool Equals(object obj)
@@ -27,12 +27,12 @@ namespace UIFramework
 
             public bool Equals(TransitionParams other)
             {
-                return transition == other.transition && sourceWidow == other.sourceWidow && targetWindow == other.targetWindow;
+                return Transition == other.Transition && SourceWidow == other.SourceWidow && TargetWindow == other.TargetWindow;
             }
 
             public override int GetHashCode()
             {
-                return HashCode.Combine(transition, sourceWidow, targetWindow);
+                return HashCode.Combine(Transition, SourceWidow, TargetWindow);
             }
 
             public static bool operator ==(TransitionParams lhs, TransitionParams rhs)
@@ -47,18 +47,18 @@ namespace UIFramework
 
             public void ReleaseReferences()
             {
-                sourceWidow = null;
-                targetWindow = null;
+                SourceWidow = null;
+                TargetWindow = null;
             }
 
             public AnimationPlayable CreateTargetWindowPlayable(float startOffset, bool reverse)
             {
-                return CreateWindowPlayable(targetWindow, transition.entryAnimation, startOffset, transition.length, transition.easingMode, AccessOperation.Open, reverse);
+                return CreateWindowPlayable(TargetWindow, Transition.EntryAnimation, startOffset, Transition.Length, Transition.EasingMode, AccessOperation.Open, reverse);
             }
 
             public AnimationPlayable CreateSourceWindowPlayable(float startOffset, bool reverse)
             {
-                return CreateWindowPlayable(sourceWidow, transition.exitAnimation, startOffset, transition.length, transition.easingMode.GetInverseEasingMode(), AccessOperation.Close, reverse);
+                return CreateWindowPlayable(SourceWidow, Transition.ExitAnimation, startOffset, Transition.Length, Transition.EasingMode.GetInverseEasingMode(), AccessOperation.Close, reverse);
             }
 
             private AnimationPlayable CreateWindowPlayable(IWindow window, ImplicitWindowAnimation animation, float startOffset, float length, EasingMode easingMode, AccessOperation accessOperation, bool reverse)
@@ -67,20 +67,20 @@ namespace UIFramework
                 {
                     if (reverse)
                     {
-                        if (!animation.isGeneric && !animation.isAccessAnimation)
+                        if (!animation.IsGeneric && !animation.IsAccessAnimation)
                         {
-                            AnimationPlayable animationPlayable = animation.CreatePlayable(window, length, accessOperation, startOffset, easingMode, timeMode);
+                            AnimationPlayable animationPlayable = animation.CreatePlayable(window, length, accessOperation, startOffset, easingMode, TimeMode);
                             animationPlayable.Invert();
                             return animationPlayable;
                         }
                         else
                         {
-                            return animation.CreatePlayable(window, length, accessOperation.InvertAccessOperation(), startOffset, easingMode.GetInverseEasingMode(), timeMode);
+                            return animation.CreatePlayable(window, length, accessOperation.InvertAccessOperation(), startOffset, easingMode.GetInverseEasingMode(), TimeMode);
                         }
                     }
                     else
                     {
-                        return animation.CreatePlayable(window, length, accessOperation, startOffset, easingMode, timeMode);
+                        return animation.CreatePlayable(window, length, accessOperation, startOffset, easingMode, TimeMode);
                     }
                 }
                 return default;
@@ -89,26 +89,26 @@ namespace UIFramework
 
         private class QueuedTransition
         {
-            public TransitionParams transitionParams { get { return _transitionParams; } }
+            public TransitionParams TransitionParams { get { return _transitionParams; } }
             private TransitionParams _transitionParams = new TransitionParams();
-            public bool reverse { get; private set; } = false;
+            public bool Reverse { get; private set; } = false;
 
             private QueuedTransition() { }
 
             public QueuedTransition(in TransitionParams transitionParams, bool reverse)
             {
                 _transitionParams = transitionParams;
-                this.reverse = reverse;
+                this.Reverse = reverse;
             }
 
             public bool ValuesAreEqualTo(QueuedTransition other)
             {
-                return _transitionParams == other._transitionParams && reverse == other.reverse;
+                return _transitionParams == other._transitionParams && Reverse == other.Reverse;
             }
 
             public bool ValuesAreEqualTo(in TransitionParams otherParams, bool otherReverse)
             {
-                return _transitionParams == otherParams && reverse == otherReverse;
+                return _transitionParams == otherParams && Reverse == otherReverse;
             }
 
             public ref TransitionParams GetTransitionParamsRef()
@@ -117,7 +117,7 @@ namespace UIFramework
             }
         }
 
-        public bool isTransitionActive { get; private set; } = false;
+        public bool IsTransitionActive { get; private set; } = false;
         private TransitionParams _activeTransitionParams = new TransitionParams();
         private bool _isActiveReverse = false;
 
@@ -133,12 +133,12 @@ namespace UIFramework
         {
             get
             {
-                switch (_activeTransitionParams.transition.animationTargets)
+                switch (_activeTransitionParams.Transition.Target)
                 {
-                    case WindowTransitionPlayable.AnimationTargets.Both:
-                    case WindowTransitionPlayable.AnimationTargets.Target:
+                    case WindowTransitionPlayable.AnimationTarget.Both:
+                    case WindowTransitionPlayable.AnimationTarget.Target:
                         return _sourceWindowPlaybackData;
-                    case WindowTransitionPlayable.AnimationTargets.Source:
+                    case WindowTransitionPlayable.AnimationTarget.Source:
                         return _targetWindowPlaybackData;
                 }
                 return default;
@@ -168,17 +168,17 @@ namespace UIFramework
 
         private void HandleNewTransition(in TransitionParams transitionParams, bool reverse)
         {
-            if (transitionParams.sourceWidow == null)
+            if (transitionParams.SourceWidow == null)
             {
-                throw new ArgumentNullException(nameof(transitionParams.sourceWidow));
+                throw new ArgumentNullException(nameof(transitionParams.SourceWidow));
             }
 
-            if (transitionParams.targetWindow == null)
+            if (transitionParams.TargetWindow == null)
             {
-                throw new ArgumentNullException(nameof(transitionParams.targetWindow));
+                throw new ArgumentNullException(nameof(transitionParams.TargetWindow));
             }
 
-            if (!isTransitionActive)
+            if (!IsTransitionActive)
             {
                 ExecuteTransition(in transitionParams, reverse);
             }
@@ -198,8 +198,8 @@ namespace UIFramework
                     //}
 
                     QueuedTransition leadingQueuedTransition = PeekQueuedTransition();
-                    leadingTransitionParams = leadingQueuedTransition.transitionParams;
-                    newTransitionOpposesLeading = AreOpposingTransitions(in transitionParams, reverse, in leadingTransitionParams, leadingQueuedTransition.reverse);
+                    leadingTransitionParams = leadingQueuedTransition.TransitionParams;
+                    newTransitionOpposesLeading = AreOpposingTransitions(in transitionParams, reverse, in leadingTransitionParams, leadingQueuedTransition.Reverse);
                 }
                 else
                 {
@@ -231,7 +231,7 @@ namespace UIFramework
                     if (reverse)
                     {
                         // Ensure that the enqueueing transition is viable given the current leading transition.
-                        if (leadingTransitionParams.sourceWidow != transitionParams.targetWindow)
+                        if (leadingTransitionParams.SourceWidow != transitionParams.TargetWindow)
                         {
                             throw new InvalidOperationException(
                                 "Attempting to reverse a transition to a previous screen while the leading transitions source differs from the reverse transitions target.");
@@ -242,7 +242,7 @@ namespace UIFramework
                     else
                     {
                         // Ensure that the enqueueing transition is viable given the current leading transition.
-                        if (leadingTransitionParams.targetWindow != transitionParams.sourceWidow)
+                        if (leadingTransitionParams.TargetWindow != transitionParams.SourceWidow)
                         {
                             throw new InvalidOperationException(
                                 "Attempting to transition to a new screen while the leading transitions target differs from the new transitions source.");
@@ -256,45 +256,45 @@ namespace UIFramework
 
         private void ExecuteTransition(in TransitionParams transitionParams, bool reverse)
         {
-            isTransitionActive = true;
+            IsTransitionActive = true;
             _isActiveReverse = reverse;
             _activeTransitionParams = transitionParams;
 
-            if (_activeTransitionParams.transition.sortPriority == WindowTransitionPlayable.SortPriority.Auto)
+            if (_activeTransitionParams.Transition.WindowSortPriority == WindowTransitionPlayable.SortPriority.Auto)
             {
-                switch (_activeTransitionParams.transition.animationTargets)
+                switch (_activeTransitionParams.Transition.Target)
                 {
                     default:
-                    case WindowTransitionPlayable.AnimationTargets.Both:
-                        _activeTransitionParams.sourceWidow.sortOrder = 0;
-                        _activeTransitionParams.targetWindow.sortOrder = 0;
+                    case WindowTransitionPlayable.AnimationTarget.Both:
+                        _activeTransitionParams.SourceWidow.SortOrder = 0;
+                        _activeTransitionParams.TargetWindow.SortOrder = 0;
                         break;
-                    case WindowTransitionPlayable.AnimationTargets.Target:
-                        _activeTransitionParams.sourceWidow.sortOrder = 0;
-                        _activeTransitionParams.targetWindow.sortOrder = 1;
+                    case WindowTransitionPlayable.AnimationTarget.Target:
+                        _activeTransitionParams.SourceWidow.SortOrder = 0;
+                        _activeTransitionParams.TargetWindow.SortOrder = 1;
                         break;
-                    case WindowTransitionPlayable.AnimationTargets.Source:
-                        _activeTransitionParams.sourceWidow.sortOrder = 1;
-                        _activeTransitionParams.targetWindow.sortOrder = 0;
+                    case WindowTransitionPlayable.AnimationTarget.Source:
+                        _activeTransitionParams.SourceWidow.SortOrder = 1;
+                        _activeTransitionParams.TargetWindow.SortOrder = 0;
                         break;
                 }
             }
             else
             {
-                switch (_activeTransitionParams.transition.sortPriority)
+                switch (_activeTransitionParams.Transition.WindowSortPriority)
                 {
                     case WindowTransitionPlayable.SortPriority.Source:
-                        _activeTransitionParams.sourceWidow.sortOrder = 1;
-                        _activeTransitionParams.targetWindow.sortOrder = 0;
+                        _activeTransitionParams.SourceWidow.SortOrder = 1;
+                        _activeTransitionParams.TargetWindow.SortOrder = 0;
                         break;
                     case WindowTransitionPlayable.SortPriority.Target:
-                        _activeTransitionParams.sourceWidow.sortOrder = 0;
-                        _activeTransitionParams.targetWindow.sortOrder = 1;
+                        _activeTransitionParams.SourceWidow.SortOrder = 0;
+                        _activeTransitionParams.TargetWindow.SortOrder = 1;
                         break;
                 }
             }
 
-            if (_activeTransitionParams.transition.animationTargets == WindowTransitionPlayable.AnimationTargets.None)
+            if (_activeTransitionParams.Transition.Target == WindowTransitionPlayable.AnimationTarget.None)
             {
                 ExecuteNone(in _activeTransitionParams, reverse);
                 CompleteTransition();
@@ -307,29 +307,29 @@ namespace UIFramework
 
         private void InvertActiveTransition()
         {
-            if (_activeTransitionParams.transition.animationTargets == WindowTransitionPlayable.AnimationTargets.None)
+            if (_activeTransitionParams.Transition.Target == WindowTransitionPlayable.AnimationTarget.None)
             {
                 throw new InvalidOperationException("Cannot invert transition with no animation targets.");
             }
 
             _isActiveReverse = !_isActiveReverse;
 
-            float normalisedStartOffset = _isActiveReverse ? 1.0F - _primaryPlaybackData.currentNormalisedTime : _primaryPlaybackData.currentNormalisedTime;
+            float normalisedStartOffset = _isActiveReverse ? 1.0F - _primaryPlaybackData.CurrentNormalisedTime : _primaryPlaybackData.CurrentNormalisedTime;
             ExecuteTransition(in _activeTransitionParams, _isActiveReverse, normalisedStartOffset);
         }
 
         private void ExecuteTransition(in TransitionParams transitionParams, bool reverse, float normalisedStartOffset)
         {
-            float startOffset = transitionParams.transition.length * normalisedStartOffset;
-            switch (_activeTransitionParams.transition.animationTargets)
+            float startOffset = transitionParams.Transition.Length * normalisedStartOffset;
+            switch (_activeTransitionParams.Transition.Target)
             {
-                case WindowTransitionPlayable.AnimationTargets.Both:
+                case WindowTransitionPlayable.AnimationTarget.Both:
                     ExecuteOnBoth(in transitionParams, reverse, startOffset);
                     break;
-                case WindowTransitionPlayable.AnimationTargets.Target:
+                case WindowTransitionPlayable.AnimationTarget.Target:
                     ExecuteOnTarget(in transitionParams, reverse, startOffset);
                     break;
-                case WindowTransitionPlayable.AnimationTargets.Source:
+                case WindowTransitionPlayable.AnimationTarget.Source:
                     ExecuteOnSource(in transitionParams, reverse, startOffset);
                     break;
             }
@@ -339,13 +339,13 @@ namespace UIFramework
         {
             if (reverse)
             {
-                transitionParams.sourceWidow.Open();
-                transitionParams.targetWindow.Close();
+                transitionParams.SourceWidow.Open();
+                transitionParams.TargetWindow.Close();
             }
             else
             {
-                transitionParams.sourceWidow.Close();
-                transitionParams.targetWindow.Open();
+                transitionParams.SourceWidow.Close();
+                transitionParams.TargetWindow.Open();
             }
         }
 
@@ -353,17 +353,17 @@ namespace UIFramework
         {
             if (reverse)
             {
-                transitionParams.sourceWidow.Open();
+                transitionParams.SourceWidow.Open();
 
                 AnimationPlayable targetWindowPlayable = transitionParams.CreateTargetWindowPlayable(startOffset, reverse);
-                transitionParams.targetWindow.Close(in targetWindowPlayable, OnAccessAnimationComplete);
+                transitionParams.TargetWindow.Close(in targetWindowPlayable, OnAccessAnimationComplete);
             }
             else
             {
                 AnimationPlayable targetWindowPlayable = transitionParams.CreateTargetWindowPlayable(startOffset, reverse);
-                transitionParams.targetWindow.Open(in targetWindowPlayable, OnAccessAnimationComplete);
+                transitionParams.TargetWindow.Open(in targetWindowPlayable, OnAccessAnimationComplete);
             }
-            _targetWindowPlaybackData = transitionParams.targetWindow.accessAnimationPlaybackData;
+            _targetWindowPlaybackData = transitionParams.TargetWindow.AccessAnimationPlaybackData;
         }
 
         private void ExecuteOnSource(in TransitionParams transitionParams, bool reverse, float startOffset)
@@ -371,16 +371,16 @@ namespace UIFramework
             if (reverse)
             {
                 AnimationPlayable sourceWindowPlayable = transitionParams.CreateSourceWindowPlayable(startOffset, reverse);
-                transitionParams.sourceWidow.Open(in sourceWindowPlayable, OnAccessAnimationComplete);
+                transitionParams.SourceWidow.Open(in sourceWindowPlayable, OnAccessAnimationComplete);
             }
             else
             {
-                transitionParams.targetWindow.Open();
+                transitionParams.TargetWindow.Open();
 
                 AnimationPlayable sourceWindowPlayable = transitionParams.CreateSourceWindowPlayable(startOffset, reverse);
-                transitionParams.sourceWidow.Close(in sourceWindowPlayable, OnAccessAnimationComplete);
+                transitionParams.SourceWidow.Close(in sourceWindowPlayable, OnAccessAnimationComplete);
             }
-            _sourceWindowPlaybackData = transitionParams.sourceWidow.accessAnimationPlaybackData;
+            _sourceWindowPlaybackData = transitionParams.SourceWidow.AccessAnimationPlaybackData;
         }
 
         private void ExecuteOnBoth(in TransitionParams transitionParams, bool reverse, float startOffset)
@@ -388,21 +388,21 @@ namespace UIFramework
             if (reverse)
             {
                 AnimationPlayable sourceWindowPlayable = transitionParams.CreateSourceWindowPlayable(startOffset, reverse);
-                transitionParams.sourceWidow.Open(in sourceWindowPlayable, OnAccessAnimationComplete);
+                transitionParams.SourceWidow.Open(in sourceWindowPlayable, OnAccessAnimationComplete);
 
                 AnimationPlayable targetWindowPlayable = transitionParams.CreateTargetWindowPlayable(startOffset, reverse);
-                transitionParams.targetWindow.Close(in targetWindowPlayable, OnAccessAnimationComplete);
+                transitionParams.TargetWindow.Close(in targetWindowPlayable, OnAccessAnimationComplete);
             }
             else
             {
                 AnimationPlayable sourceWindowPlayable = transitionParams.CreateSourceWindowPlayable(startOffset, reverse);
-                transitionParams.sourceWidow.Close(in sourceWindowPlayable, OnAccessAnimationComplete);
+                transitionParams.SourceWidow.Close(in sourceWindowPlayable, OnAccessAnimationComplete);
 
                 AnimationPlayable targetWindowPlayable = transitionParams.CreateTargetWindowPlayable(startOffset, reverse);
-                transitionParams.targetWindow.Open(in targetWindowPlayable, OnAccessAnimationComplete);
+                transitionParams.TargetWindow.Open(in targetWindowPlayable, OnAccessAnimationComplete);
             }
-            _targetWindowPlaybackData = transitionParams.targetWindow.accessAnimationPlaybackData;
-            _sourceWindowPlaybackData = transitionParams.sourceWidow.accessAnimationPlaybackData;
+            _targetWindowPlaybackData = transitionParams.TargetWindow.AccessAnimationPlaybackData;
+            _sourceWindowPlaybackData = transitionParams.SourceWidow.AccessAnimationPlaybackData;
         }
 
         private void EnqueueTransition(in TransitionParams transitionParams, bool reverse)
@@ -447,7 +447,7 @@ namespace UIFramework
         {
             for (int i = _queuedTransitionsCount - 1; i >= 0; i--)
             {
-                if (_queuedTransitions[i].transitionParams == transitionParams && _queuedTransitions[i].reverse == reverse)
+                if (_queuedTransitions[i].TransitionParams == transitionParams && _queuedTransitions[i].Reverse == reverse)
                 {
                     return true;
                 }
@@ -457,20 +457,20 @@ namespace UIFramework
 
         private void CompleteTransition()
         {
-            if (_activeTransitionParams.transition.animationTargets != WindowTransitionPlayable.AnimationTargets.Both)
+            if (_activeTransitionParams.Transition.Target != WindowTransitionPlayable.AnimationTarget.Both)
             {
                 if (_isActiveReverse)
                 {
-                    if (_activeTransitionParams.transition.animationTargets == WindowTransitionPlayable.AnimationTargets.Source)
+                    if (_activeTransitionParams.Transition.Target == WindowTransitionPlayable.AnimationTarget.Source)
                     {
-                        _activeTransitionParams.targetWindow.Close();
+                        _activeTransitionParams.TargetWindow.Close();
                     }
                 }
                 else
                 {
-                    if (_activeTransitionParams.transition.animationTargets == WindowTransitionPlayable.AnimationTargets.Target)
+                    if (_activeTransitionParams.Transition.Target == WindowTransitionPlayable.AnimationTarget.Target)
                     {
-                        _activeTransitionParams.sourceWidow.Close();
+                        _activeTransitionParams.SourceWidow.Close();
                     }
                 }
             }
@@ -478,11 +478,11 @@ namespace UIFramework
             if (_queuedTransitionsCount > 0)
             {
                 QueuedTransition queuedTransition = DequeueTransition();
-                ExecuteTransition(in queuedTransition.GetTransitionParamsRef(), queuedTransition.reverse);
+                ExecuteTransition(in queuedTransition.GetTransitionParamsRef(), queuedTransition.Reverse);
             }
             else
             {
-                isTransitionActive = false;
+                IsTransitionActive = false;
                 _isActiveReverse = false;
                 _activeTransitionParams.ReleaseReferences();
             }
@@ -492,17 +492,17 @@ namespace UIFramework
         {
             if (!_terminating)
             {
-                if (accessible == _activeTransitionParams.sourceWidow)
+                if (accessible == _activeTransitionParams.SourceWidow)
                 {
                     _sourceWindowPlaybackData.ReleaseReferences();
                 }
 
-                if (accessible == _activeTransitionParams.targetWindow)
+                if (accessible == _activeTransitionParams.TargetWindow)
                 {
                     _targetWindowPlaybackData.ReleaseReferences();
                 }
 
-                if (!_sourceWindowPlaybackData.isPlaying && !_targetWindowPlaybackData.isPlaying)
+                if (!_sourceWindowPlaybackData.IsPlaying && !_targetWindowPlaybackData.IsPlaying)
                 {
                     CompleteTransition();
                 }
@@ -511,44 +511,44 @@ namespace UIFramework
 
         private bool AreOpposingTransitions(in TransitionParams lhsTransitionParams, bool lhsReverse, in TransitionParams rhsTransitionParams, bool rhsReverse)
         {
-            return lhsTransitionParams.targetWindow == rhsTransitionParams.targetWindow && lhsTransitionParams.sourceWidow == rhsTransitionParams.sourceWidow &&
+            return lhsTransitionParams.TargetWindow == rhsTransitionParams.TargetWindow && lhsTransitionParams.SourceWidow == rhsTransitionParams.SourceWidow &&
                 lhsReverse != rhsReverse;
         }
 
         public void Terminate(bool skipAnimations)
         {
             _terminating = true;
-            if (isTransitionActive)
+            if (IsTransitionActive)
             {
                 _targetWindowPlaybackData.ReleaseReferences();
                 _sourceWindowPlaybackData.ReleaseReferences();
 
                 if (skipAnimations)
                 {
-                    switch (_activeTransitionParams.transition.animationTargets)
+                    switch (_activeTransitionParams.Transition.Target)
                     {
-                        case WindowTransitionPlayable.AnimationTargets.Source:
-                            _activeTransitionParams.sourceWidow.SkipAccessAnimation();
+                        case WindowTransitionPlayable.AnimationTarget.Source:
+                            _activeTransitionParams.SourceWidow.SkipAccessAnimation();
                             if (_isActiveReverse)
                             {
-                                _activeTransitionParams.targetWindow.Close();
+                                _activeTransitionParams.TargetWindow.Close();
                             }
                             break;
-                        case WindowTransitionPlayable.AnimationTargets.Target:
-                            _activeTransitionParams.targetWindow.SkipAccessAnimation();
+                        case WindowTransitionPlayable.AnimationTarget.Target:
+                            _activeTransitionParams.TargetWindow.SkipAccessAnimation();
                             if (!_isActiveReverse)
                             {
-                                _activeTransitionParams.sourceWidow.Close();
+                                _activeTransitionParams.SourceWidow.Close();
                             }
                             break;
-                        case WindowTransitionPlayable.AnimationTargets.Both:
-                            _activeTransitionParams.sourceWidow.SkipAccessAnimation();
-                            _activeTransitionParams.targetWindow.SkipAccessAnimation();
+                        case WindowTransitionPlayable.AnimationTarget.Both:
+                            _activeTransitionParams.SourceWidow.SkipAccessAnimation();
+                            _activeTransitionParams.TargetWindow.SkipAccessAnimation();
                             break;
                     }
                 }
 
-                isTransitionActive = false;
+                IsTransitionActive = false;
                 _isActiveReverse = false;
                 _activeTransitionParams.ReleaseReferences();
                 _queuedTransitions.Clear();

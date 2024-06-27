@@ -42,7 +42,7 @@ namespace UIFramework
             {
                 AnimationPlayer player = _playerList[i];
                 player.Update();
-                if(!player.isPlaying)
+                if(!player.IsPlaying)
                 {
                     _playerList.RemoveAt(i);
                     _playerHashSet.Remove(player);

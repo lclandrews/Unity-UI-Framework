@@ -9,21 +9,21 @@ namespace UIFramework.UIToolkit
     public abstract class Window : UIBehaviour, IWindow
     {
         // UI Toolkit Window
-        public UIDocument uiDocument { get { return _uiDocument; } }
+        public UIDocument UIDocument { get { return _uiDocument; } }
         private UIDocument _uiDocument = null;
 
-        public VisualElement visualElement { get { return _visualElement; } }
+        public VisualElement VisualElement { get { return _visualElement; } }
         private VisualElement _visualElement = null;
 
         // IAccessible
-        public AccessState accessState { get; private set; } = AccessState.Unitialized;
-        public AnimationPlayer.PlaybackData accessAnimationPlaybackData { get; private set; } = default;
-        public AnimationPlayable accessAnimationPlayable { get; private set; } = default;
+        public AccessState AccessState { get; private set; } = AccessState.Unitialized;
+        public AnimationPlayer.PlaybackData AccessAnimationPlaybackData { get; private set; } = default;
+        public AnimationPlayable AccessAnimationPlayable { get; private set; } = default;
 
         // IWindow
-        public bool isVisible { get { return accessState != AccessState.Closed; } }
+        public bool IsVisible { get { return AccessState != AccessState.Closed; } }
 
-        public virtual bool isEnabled
+        public virtual bool IsEnabled
         {
             get { return _isEnabledCounter > 0; }
             set
@@ -39,19 +39,19 @@ namespace UIFramework.UIToolkit
 
                 if (_isEnabledCounter > 0)
                 {
-                    isInteractable = true;
-                    visualElement.SetEnabled(true);
+                    IsInteractable = true;
+                    VisualElement.SetEnabled(true);
                 }
                 else
                 {
-                    isInteractable = false;
-                    visualElement.SetEnabled(false);
+                    IsInteractable = false;
+                    VisualElement.SetEnabled(false);
                 }
             }
         }
         private int _isEnabledCounter = 1;
 
-        public bool isInteractable
+        public bool IsInteractable
         {
             get { return _isInteractableCounter > 0; }
             set
@@ -67,17 +67,17 @@ namespace UIFramework.UIToolkit
 
                 if (_isInteractableCounter > 0)
                 {
-                    SetInteractable(visualElement, true);
+                    SetInteractable(VisualElement, true);
                 }
                 else
                 {
-                    SetInteractable(visualElement, false);
+                    SetInteractable(VisualElement, false);
                 }
             }
         }
         private int _isInteractableCounter = 1;
 
-        public virtual int sortOrder
+        public virtual int SortOrder
         {
             get
             {
@@ -87,15 +87,15 @@ namespace UIFramework.UIToolkit
             {
                 _sortOrder = value;
 
-                VisualElement.Hierarchy parentHierarchy = visualElement.parent.hierarchy;
+                VisualElement.Hierarchy parentHierarchy = VisualElement.parent.hierarchy;
                 int newIndexInHierarchy = Mathf.Clamp(_sortOrder, 0, parentHierarchy.childCount - 1);
-                int existingIndexInHierarchy = parentHierarchy.IndexOf(visualElement);
+                int existingIndexInHierarchy = parentHierarchy.IndexOf(VisualElement);
                 if (newIndexInHierarchy != existingIndexInHierarchy)
                 {
-                    visualElement.PlaceInFront(parentHierarchy.ElementAt(newIndexInHierarchy));
+                    VisualElement.PlaceInFront(parentHierarchy.ElementAt(newIndexInHierarchy));
                 }
 
-                uiDocument.sortingOrder = _sortOrder;
+                UIDocument.sortingOrder = _sortOrder;
             }
         }
         private int _sortOrder = 0;
@@ -116,7 +116,7 @@ namespace UIFramework.UIToolkit
         // IWindow
         public GenericWindowAnimationBase CreateAnimation(GenericWindowAnimationType type, float length)
         {
-            return new GenericWindowAnimation(visualElement, type, length);
+            return new GenericWindowAnimation(VisualElement, type, length);
         }
 
         public bool SetWaiting(bool waiting)
@@ -126,7 +126,7 @@ namespace UIFramework.UIToolkit
                 if (waiting != _isWaiting)
                 {
                     _isWaiting = waiting;
-                    isEnabled = !waiting;
+                    IsEnabled = !waiting;
                 }
                 return true;
             }
@@ -149,19 +149,19 @@ namespace UIFramework.UIToolkit
 
         public void Init()
         {
-            if (accessState != AccessState.Unitialized)
+            if (AccessState != AccessState.Unitialized)
             {
                 throw new InvalidOperationException("Window already initialized.");
             }
 
-            accessState = AccessState.Closed;
+            AccessState = AccessState.Closed;
             SetActive(false);
             OnInit();
         }        
 
         public bool Open(in AnimationPlayable animationPlayable, IAccessibleAction onComplete = null)
         {
-            if (accessState == AccessState.Closing || accessState == AccessState.Closed)
+            if (AccessState == AccessState.Closing || AccessState == AccessState.Closed)
             {
                 if (_animationPlayer != null)
                 {
@@ -170,14 +170,14 @@ namespace UIFramework.UIToolkit
                 }
                 else
                 {
-                    isInteractable = false;
-                    accessAnimationPlayable = animationPlayable;                    
+                    IsInteractable = false;
+                    AccessAnimationPlayable = animationPlayable;                    
                     _animationPlayer = AnimationPlayer.PlayAnimation(in animationPlayable);
-                    _animationPlayer.onComplete += OnAnimationComplete;
-                    accessAnimationPlaybackData = _animationPlayer.playbackData;
+                    _animationPlayer.OnComplete += OnAnimationComplete;
+                    AccessAnimationPlaybackData = _animationPlayer.Data;
                 }
                 _onAccessAnimationComplete = onComplete;
-                accessState = AccessState.Opening;
+                AccessState = AccessState.Opening;
                 SetActive(true);
                 OnOpen();
                 return true;
@@ -187,19 +187,19 @@ namespace UIFramework.UIToolkit
 
         public bool Open()
         {
-            if (accessState == AccessState.Closing || accessState == AccessState.Closed)
+            if (AccessState == AccessState.Closing || AccessState == AccessState.Closed)
             {
-                if (accessState == AccessState.Closing)
+                if (AccessState == AccessState.Closing)
                 {
                     Debug.Log("Open was called on a Window without an animation while already playing a state animation, " +
                         "this may cause unexpected behviour of the UI.");
-                    isInteractable = true;
+                    IsInteractable = true;
                     _animationPlayer.SetCurrentTime(0.0F);
                     _animationPlayer.Stop();
                     ClearAnimationReferences();
                     _onAccessAnimationComplete = null;
                 }
-                accessState = AccessState.Open;
+                AccessState = AccessState.Open;
                 SetActive(true);
                 OnOpen();
                 OnOpened();
@@ -210,7 +210,7 @@ namespace UIFramework.UIToolkit
 
         public bool Close(in AnimationPlayable animationPlayable, IAccessibleAction onComplete = null)
         {
-            if (accessState == AccessState.Opening || accessState == AccessState.Open)
+            if (AccessState == AccessState.Opening || AccessState == AccessState.Open)
             {
                 if (_animationPlayer != null)
                 {
@@ -219,14 +219,14 @@ namespace UIFramework.UIToolkit
                 }
                 else
                 {                    
-                    isInteractable = false;
-                    accessAnimationPlayable = animationPlayable;
+                    IsInteractable = false;
+                    AccessAnimationPlayable = animationPlayable;
                     _animationPlayer = AnimationPlayer.PlayAnimation(in animationPlayable);
-                    _animationPlayer.onComplete += OnAnimationComplete;
-                    accessAnimationPlaybackData = _animationPlayer.playbackData;
+                    _animationPlayer.OnComplete += OnAnimationComplete;
+                    AccessAnimationPlaybackData = _animationPlayer.Data;
                 }
                 _onAccessAnimationComplete = onComplete;
-                accessState = AccessState.Closing;
+                AccessState = AccessState.Closing;
                 OnClose();
                 return true;
             }
@@ -235,19 +235,19 @@ namespace UIFramework.UIToolkit
 
         public bool Close()
         {
-            if (accessState == AccessState.Opening || accessState == AccessState.Open)
+            if (AccessState == AccessState.Opening || AccessState == AccessState.Open)
             {
-                if (accessState == AccessState.Opening)
+                if (AccessState == AccessState.Opening)
                 {
                     Debug.Log("Close was called on a Window without an animation while already playing a state animation, " +
                         "this may cause unexpected behviour of the UI.");
-                    isInteractable = true;
+                    IsInteractable = true;
                     _animationPlayer.SetCurrentTime(0.0F);
                     _animationPlayer.Stop();
                     ClearAnimationReferences();
                     _onAccessAnimationComplete = null;
                 }
-                accessState = AccessState.Closed;
+                AccessState = AccessState.Closed;
                 OnClose();
                 SetActive(false);
                 OnClosed();
@@ -291,17 +291,17 @@ namespace UIFramework.UIToolkit
         {
             ResetAnimatedProperties();
             ClearAnimationReferences();
-            isInteractable = true;
-            if (accessState == AccessState.Opening)
+            IsInteractable = true;
+            if (AccessState == AccessState.Opening)
             {
-                accessState = AccessState.Open;
+                AccessState = AccessState.Open;
                 OnOpened();
                 _onAccessAnimationComplete?.Invoke(this);
                 _onAccessAnimationComplete = null;
             }
-            else if (accessState == AccessState.Closing)
+            else if (AccessState == AccessState.Closing)
             {
-                accessState = AccessState.Closed;
+                AccessState = AccessState.Closed;
                 SetActive(false);
                 OnClosed();
                 _onAccessAnimationComplete?.Invoke(this);
@@ -309,13 +309,13 @@ namespace UIFramework.UIToolkit
             }
             else
             {
-                throw new Exception(string.Format("Window animation complete while in unexpected state: {0}", accessState.ToString()));
+                throw new Exception(string.Format("Window animation complete while in unexpected state: {0}", AccessState.ToString()));
             }
         }
 
         protected void SetActive(bool active)
         {
-            visualElement.style.display = active ? DisplayStyle.Flex : DisplayStyle.None;
+            VisualElement.style.display = active ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         protected void SetInteractable(VisualElement visualElement, bool interactable)
@@ -329,9 +329,9 @@ namespace UIFramework.UIToolkit
 
         private void ClearAnimationReferences()
         {
-            _animationPlayer.onComplete = null;
+            _animationPlayer.OnComplete = null;
             _animationPlayer = null;
-            accessAnimationPlaybackData.ReleaseReferences();
+            AccessAnimationPlaybackData.ReleaseReferences();
         }
     }
 }

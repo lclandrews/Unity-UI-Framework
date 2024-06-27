@@ -7,22 +7,22 @@ namespace UIFramework.UGUI
 {    
     public abstract class Screen : Window, IScreen
     {
-        public Controller controller { get; private set; } = null;   
+        public Controller Controller { get; private set; } = null;   
 
-        public virtual bool supportsHistory { get; } = true;
+        public virtual bool SupportsHistory { get; } = true;
 
-        protected virtual Button backButton { get; } = null;
+        protected virtual Button BackButton { get; } = null;
         private Canvas _canvas = null;
 
-        public override int sortOrder
+        public override int SortOrder
         {
             get
             {
-                return base.sortOrder;
+                return base.SortOrder;
             }
             set
             {
-                base.sortOrder = value;
+                base.SortOrder = value;
                 _canvas.sortingOrder = value;
             }
         }
@@ -30,7 +30,7 @@ namespace UIFramework.UGUI
         // IScreen
         public ControllerType GetController<ControllerType>() where ControllerType : Controller
         {
-            return controller as ControllerType;
+            return Controller as ControllerType;
         }
 
         public virtual void Init(Controller controller)
@@ -40,25 +40,25 @@ namespace UIFramework.UGUI
                 throw new ArgumentNullException(nameof(controller));
             }
 
-            if (this.controller != null)
+            if (this.Controller != null)
             {
                 throw new InvalidOperationException("Screen already initialized.");
             }
 
-            this.controller = controller;
+            this.Controller = controller;
             _canvas = GetComponentInParent<Canvas>(true);
-            if (backButton != null)
+            if (BackButton != null)
             {
-                backButton.onClick.AddListener(delegate () { controller.CloseScreen(); });
+                BackButton.onClick.AddListener(delegate () { controller.CloseScreen(); });
             }
             Init();
         }
 
         public bool SetBackButtonActive(bool active)
         {
-            if (backButton != null)
+            if (BackButton != null)
             {
-                backButton.gameObject.SetActive(active);
+                BackButton.gameObject.SetActive(active);
                 return true;
             }
             return false;

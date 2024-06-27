@@ -7,19 +7,19 @@ namespace UIFramework
 {
     public struct WindowNavigationEvent
     {
-        public bool success { get; private set; }
-        public INavigableWindow previousActiveWindow { get; private set; }
-        public INavigableWindow activeWindow { get; private set; }
-        public int historyCount { get; private set; }
-        public bool isLocked { get; private set; }
+        public bool Success { get; private set; }
+        public INavigableWindow PreviousActiveWindow { get; private set; }
+        public INavigableWindow ActiveWindow { get; private set; }
+        public int HistoryCount { get; private set; }
+        public bool IsLocked { get; private set; }
 
         public WindowNavigationEvent(bool success, INavigableWindow previousActiveWindow, INavigableWindow activeWindow, int historyCount, bool isLocked)
         {
-            this.success = success;
-            this.previousActiveWindow = previousActiveWindow;
-            this.activeWindow = activeWindow;
-            this.historyCount = historyCount;
-            this.isLocked = isLocked;
+            this.Success = success;
+            this.PreviousActiveWindow = previousActiveWindow;
+            this.ActiveWindow = activeWindow;
+            this.HistoryCount = historyCount;
+            this.IsLocked = isLocked;
         }
     }
 
@@ -29,21 +29,21 @@ namespace UIFramework
     {
         private Dictionary<Type, Navigable> _windows = null;
 
-        public Navigable activeWindow
+        public Navigable ActiveWindow
         {
             get
             {
-                return activeWindowType != null ? _windows[activeWindowType] : default;
+                return ActiveWindowType != null ? _windows[ActiveWindowType] : default;
             }
         }
 
-        public Type activeWindowType { get; private set; } = null;
+        public Type ActiveWindowType { get; private set; } = null;
 
-        public int historyCount { get { return _history.count; } }
+        public int HistoryCount { get { return _history.Count; } }
 
-        public WindowNavigationUpdate onNavigationUpdate = null;
+        public WindowNavigationUpdate OnNavigationUpdate = null;
 
-        public bool isLocked
+        public bool IsLocked
         {
             get { return _isLockedCounter > 0; }
             private set
@@ -83,7 +83,7 @@ namespace UIFramework
             {
                 return InvokeNavigationUpdate(Travel(targetType, targetWindow, excludeCurrentFromHistory));
             }
-            return InvokeNavigationUpdate(new WindowNavigationEvent(false, null, activeWindow, historyCount, isLocked));
+            return InvokeNavigationUpdate(new WindowNavigationEvent(false, null, ActiveWindow, HistoryCount, IsLocked));
         }
 
         public WindowNavigationEvent Travel(Navigable targetWindow, bool excludeCurrentFromHistory = false)
@@ -93,24 +93,24 @@ namespace UIFramework
             {
                 return Travel(targetWindowType, targetWindow, excludeCurrentFromHistory);
             }
-            return InvokeNavigationUpdate(new WindowNavigationEvent(false, null, activeWindow, historyCount, isLocked));
+            return InvokeNavigationUpdate(new WindowNavigationEvent(false, null, ActiveWindow, HistoryCount, IsLocked));
         }
 
         private WindowNavigationEvent Travel(Type windowType, Navigable window, bool excludeCurrentFromHistory)
         {
-            if (isLocked)
+            if (IsLocked)
             {
-                return InvokeNavigationUpdate(new WindowNavigationEvent(false, null, activeWindow, historyCount, isLocked));
+                return InvokeNavigationUpdate(new WindowNavigationEvent(false, null, ActiveWindow, HistoryCount, IsLocked));
             }
 
-            if (activeWindowType != null && activeWindow.supportsHistory && !excludeCurrentFromHistory)
+            if (ActiveWindowType != null && ActiveWindow.SupportsHistory && !excludeCurrentFromHistory)
             {
-                _history.Push(activeWindowType);
+                _history.Push(ActiveWindowType);
             }
 
-            Navigable previousActiveWindow = activeWindow;
-            activeWindowType = windowType;
-            return InvokeNavigationUpdate(new WindowNavigationEvent(true, previousActiveWindow, window, historyCount, isLocked));
+            Navigable previousActiveWindow = ActiveWindow;
+            ActiveWindowType = windowType;
+            return InvokeNavigationUpdate(new WindowNavigationEvent(true, previousActiveWindow, window, HistoryCount, IsLocked));
         }
 
         private bool ValidateTravelTarget(Type windowType, Navigable window)
@@ -131,7 +131,7 @@ namespace UIFramework
         private bool ValidateTravelTarget(Type windowType, out Navigable window)
         {
             window = default;
-            if (activeWindowType == windowType)
+            if (ActiveWindowType == windowType)
             {
                 Debug.LogWarning(string.Format("Unable to travel to: {0} as it is already the active window.", windowType.ToString()));
                 return false;
@@ -146,51 +146,51 @@ namespace UIFramework
 
         public WindowNavigationEvent Back()
         {
-            if (activeWindow != null)
+            if (ActiveWindow != null)
             {
-                if (isLocked)
+                if (IsLocked)
                 {
-                    return InvokeNavigationUpdate(new WindowNavigationEvent(false, null, activeWindow, historyCount, isLocked));
+                    return InvokeNavigationUpdate(new WindowNavigationEvent(false, null, ActiveWindow, HistoryCount, IsLocked));
                 }
 
-                if (historyCount > 0)
+                if (HistoryCount > 0)
                 {
                     Type targetWindowType = _history.Pop();
                     Navigable targetWindow = _windows[targetWindowType];
 
-                    Navigable previousActiveWindow = activeWindow;
-                    activeWindowType = targetWindowType;
+                    Navigable previousActiveWindow = ActiveWindow;
+                    ActiveWindowType = targetWindowType;
 
-                    return InvokeNavigationUpdate(new WindowNavigationEvent(true, previousActiveWindow, targetWindow, historyCount, isLocked));
+                    return InvokeNavigationUpdate(new WindowNavigationEvent(true, previousActiveWindow, targetWindow, HistoryCount, IsLocked));
                 }
             }
-            return InvokeNavigationUpdate(new WindowNavigationEvent(false, null, activeWindow, historyCount, isLocked));
+            return InvokeNavigationUpdate(new WindowNavigationEvent(false, null, ActiveWindow, HistoryCount, IsLocked));
         }
 
         public WindowNavigationEvent Lock()
         {
-            isLocked = true;
-            return InvokeNavigationUpdate(new WindowNavigationEvent(isLocked == true, null, activeWindow, historyCount, isLocked));
+            IsLocked = true;
+            return InvokeNavigationUpdate(new WindowNavigationEvent(IsLocked == true, null, ActiveWindow, HistoryCount, IsLocked));
         }
 
         public WindowNavigationEvent Unlock()
         {
-            isLocked = false;
-            return InvokeNavigationUpdate(new WindowNavigationEvent(isLocked == false, null, activeWindow, historyCount, isLocked));
+            IsLocked = false;
+            return InvokeNavigationUpdate(new WindowNavigationEvent(IsLocked == false, null, ActiveWindow, HistoryCount, IsLocked));
         }
 
         public WindowNavigationEvent Clear()
         {
-            if (activeWindowType != null)
+            if (ActiveWindowType != null)
             {
-                isLocked = false;
+                IsLocked = false;
 
-                Navigable previousActiveWindow = activeWindow;
+                Navigable previousActiveWindow = ActiveWindow;
                 ClearHistory();
-                activeWindowType = null;
-                return InvokeNavigationUpdate(new WindowNavigationEvent(true, previousActiveWindow, null, historyCount, isLocked));
+                ActiveWindowType = null;
+                return InvokeNavigationUpdate(new WindowNavigationEvent(true, previousActiveWindow, null, HistoryCount, IsLocked));
             }
-            return InvokeNavigationUpdate(new WindowNavigationEvent(false, null, activeWindow, historyCount, isLocked));
+            return InvokeNavigationUpdate(new WindowNavigationEvent(false, null, ActiveWindow, HistoryCount, IsLocked));
         }
 
         public void StartNewHistoryGroup()
@@ -202,29 +202,29 @@ namespace UIFramework
         {
             if (_history.ClearLatestGroup())
             {
-                return InvokeNavigationUpdate(new WindowNavigationEvent(true, null, activeWindow, historyCount, isLocked));
+                return InvokeNavigationUpdate(new WindowNavigationEvent(true, null, ActiveWindow, HistoryCount, IsLocked));
             }
-            return InvokeNavigationUpdate(new WindowNavigationEvent(false, null, activeWindow, historyCount, isLocked));
+            return InvokeNavigationUpdate(new WindowNavigationEvent(false, null, ActiveWindow, HistoryCount, IsLocked));
         }
 
         public WindowNavigationEvent InsertHistory<T>() where T : Navigable
         {
             _history.Push(typeof(T));
-            return InvokeNavigationUpdate(new WindowNavigationEvent(true, null, activeWindow, historyCount, isLocked));
+            return InvokeNavigationUpdate(new WindowNavigationEvent(true, null, ActiveWindow, HistoryCount, IsLocked));
         }
 
         public WindowNavigationEvent ClearHistory()
         {
             if (_history.Clear())
             {
-                return InvokeNavigationUpdate(new WindowNavigationEvent(true, null, activeWindow, historyCount, isLocked));
+                return InvokeNavigationUpdate(new WindowNavigationEvent(true, null, ActiveWindow, HistoryCount, IsLocked));
             }
-            return InvokeNavigationUpdate(new WindowNavigationEvent(false, null, activeWindow, historyCount, isLocked));
+            return InvokeNavigationUpdate(new WindowNavigationEvent(false, null, ActiveWindow, HistoryCount, IsLocked));
         }
 
         private WindowNavigationEvent InvokeNavigationUpdate(WindowNavigationEvent navigationEvent)
         {
-            onNavigationUpdate.Invoke(navigationEvent);
+            OnNavigationUpdate.Invoke(navigationEvent);
             return navigationEvent;
         }
     }

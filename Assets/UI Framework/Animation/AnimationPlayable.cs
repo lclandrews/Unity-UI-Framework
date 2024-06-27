@@ -6,12 +6,12 @@ namespace UIFramework
 {    
     public struct AnimationPlayable
     {       
-        public Animation animation { get; private set; }        
-        public float startTime { get; private set; }
-        public PlayMode playMode { get; private set; }
-        public EasingMode easingMode { get; private set; }
-        public float playbackSpeed { get; private set; }
-        public TimeMode timeMode { get; private set; }
+        public Animation Animation { get; private set; }        
+        public float StartTime { get; private set; }
+        public PlayMode PlayMode { get; private set; }
+        public EasingMode EasingMode { get; private set; }
+        public float PlaybackSpeed { get; private set; }
+        public TimeMode TimeMode { get; private set; }
 
         public AnimationPlayable(Animation animation)
             : this(animation, 0.0F, PlayMode.Forward, EasingMode.Linear, TimeMode.Scaled, 1.0F) { }
@@ -35,30 +35,30 @@ namespace UIFramework
                 throw new ArgumentNullException(nameof(animation));
             }
 
-            this.animation = animation;
-            this.easingMode = easingMode;
-            this.startTime = Mathf.Clamp(startTime, 0.0F, animation.length);
-            this.playMode = playMode;
-            this.timeMode = timeMode;
-            this.playbackSpeed = playbackSpeed;
+            this.Animation = animation;
+            this.EasingMode = easingMode;
+            this.StartTime = Mathf.Clamp(startTime, 0.0F, animation.Length);
+            this.PlayMode = playMode;
+            this.TimeMode = timeMode;
+            this.PlaybackSpeed = playbackSpeed;
         }
 
         public void Invert()
         {
-            startTime = animation.length - startTime;
-            playMode = playMode.InvertPlayMode();
+            StartTime = Animation.Length - StartTime;
+            PlayMode = PlayMode.InvertPlayMode();
         }
 
         public AnimationPlayable CreateInverse(float startTime)
         {
-            return new AnimationPlayable(animation, startTime, playMode.InvertPlayMode(), 
-                easingMode.GetInverseEasingMode(), timeMode, playbackSpeed);
+            return new AnimationPlayable(Animation, startTime, PlayMode.InvertPlayMode(), 
+                EasingMode.GetInverseEasingMode(), TimeMode, PlaybackSpeed);
         }
 
         public AnimationPlayable CreateInverse()
         {
-            return new AnimationPlayable(animation, animation.length - startTime, playMode.InvertPlayMode(), 
-                easingMode.GetInverseEasingMode(), timeMode, playbackSpeed);
+            return new AnimationPlayable(Animation, Animation.Length - StartTime, PlayMode.InvertPlayMode(), 
+                EasingMode.GetInverseEasingMode(), TimeMode, PlaybackSpeed);
         }
     }
 }

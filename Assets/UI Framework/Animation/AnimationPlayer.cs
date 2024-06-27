@@ -14,12 +14,12 @@ namespace UIFramework
     {
         public struct PlaybackData
         {
-            public float currentTime { get { return _player == null ? 0.0F : _player.currentTime; } } 
-            public float currentNormalisedTime { get { return _player == null ? 0.0F : _player.currentNormalisedTime; } }
-            public float length { get { return _player == null ? 0.0F : _player.length; } }
-            public float remainingTime { get { return _player == null ? 0.0F : _player.remainingTime; } }
-            public bool isPlaying { get { return _player == null ? false : _player.isPlaying; } }
-            public bool isPaused { get { return _player == null ? false : _player.isPaused; } }
+            public float CurrentTime { get { return _player == null ? 0.0F : _player.CurrentTime; } } 
+            public float CurrentNormalisedTime { get { return _player == null ? 0.0F : _player.CurrentNormalisedTime; } }
+            public float Length { get { return _player == null ? 0.0F : _player.Length; } }
+            public float RemainingTime { get { return _player == null ? 0.0F : _player.RemainingTime; } }
+            public bool IsPlaying { get { return _player == null ? false : _player.IsPlaying; } }
+            public bool IsPaused { get { return _player == null ? false : _player.IsPaused; } }
 
             private AnimationPlayer _player;
 
@@ -34,43 +34,43 @@ namespace UIFramework
             }
         }
 
-        public Animation animation { get; private set; } = null;
-        public PlayMode playMode { get; private set; } = PlayMode.Forward;
-        public EasingMode easingMode { get; private set; } = EasingMode.Linear;
-        public float playbackSpeed { get; private set; } = 1.0F;
-        public TimeMode timeMode { get; private set; } = TimeMode.Scaled;
-        public float currentTime { get; private set; } = 0.0F;
-        public float currentNormalisedTime { get { return currentTime / length; } }
+        public Animation Animation { get; private set; } = null;
+        public PlayMode PlayMode { get; private set; } = PlayMode.Forward;
+        public EasingMode EasingMode { get; private set; } = EasingMode.Linear;
+        public float PlaybackSpeed { get; private set; } = 1.0F;
+        public TimeMode TimeMode { get; private set; } = TimeMode.Scaled;
+        public float CurrentTime { get; private set; } = 0.0F;
+        public float CurrentNormalisedTime { get { return CurrentTime / Length; } }
 
-        public float length
+        public float Length
         {
             get
             {
-                return animation != null ? animation.length : 0.0F;
+                return Animation != null ? Animation.Length : 0.0F;
             }
         }
 
-        public float remainingTime
+        public float RemainingTime
         {
             get
             {
-                switch (playMode)
+                switch (PlayMode)
                 {
                     case PlayMode.Forward:
-                        return length - currentTime;
+                        return Length - CurrentTime;
                     case PlayMode.Reverse:
-                        return currentTime;
+                        return CurrentTime;
                 }
                 return 0.0F;
             }
         }
 
-        public bool isPlaying { get; private set; } = false;
-        public bool isPaused { get; private set; } = false;
+        public bool IsPlaying { get; private set; } = false;
+        public bool IsPaused { get; private set; } = false;
 
-        public PlaybackData playbackData { get; private set; } = default;
+        public PlaybackData Data { get; private set; } = default;
 
-        public AnimationEvent onComplete { get; set; } = default;
+        public AnimationEvent OnComplete { get; set; } = default;
 
         private int _lastUpdateFrame = 0;
 
@@ -83,15 +83,15 @@ namespace UIFramework
                 throw new ArgumentNullException(nameof(animation));
             }
 
-            this.animation = animation;
-            playbackData = new PlaybackData(this);
+            this.Animation = animation;
+            Data = new PlaybackData(this);
         }
 
         public static AnimationPlayer PlayAnimation(in AnimationPlayable animationPlayable)
         {
-            return PlayAnimation(animationPlayable.animation, animationPlayable.startTime,
-                animationPlayable.playMode, animationPlayable.easingMode, animationPlayable.timeMode,
-                animationPlayable.playbackSpeed);
+            return PlayAnimation(animationPlayable.Animation, animationPlayable.StartTime,
+                animationPlayable.PlayMode, animationPlayable.EasingMode, animationPlayable.TimeMode,
+                animationPlayable.PlaybackSpeed);
         }
 
         public static AnimationPlayer PlayAnimation(Animation animation, float startTime = 0.0F, PlayMode playMode = PlayMode.Forward, 
@@ -105,26 +105,26 @@ namespace UIFramework
         public void Play(float startTime = 0.0F, PlayMode playMode = PlayMode.Forward, EasingMode easingMode = EasingMode.Linear, 
             TimeMode timeMode = TimeMode.Scaled, float playbackSpeed = 1.0F)
         {   
-            if(!isPlaying)
+            if(!IsPlaying)
             {
-                isPlaying = true;
+                IsPlaying = true;
                 AnimationSystemRunner.AddPlayer(this);
             }
-            animation.Prepare();
+            Animation.Prepare();
 
-            this.timeMode = timeMode;
-            this.easingMode = easingMode;
-            this.playMode = playMode;
-            currentTime = Mathf.Clamp(startTime, 0.0F, length);
+            this.TimeMode = timeMode;
+            this.EasingMode = easingMode;
+            this.PlayMode = playMode;
+            CurrentTime = Mathf.Clamp(startTime, 0.0F, Length);
 
             EvaluateAnimation();
         }
 
         public bool Rewind()
         {
-            if (isPlaying)
+            if (IsPlaying)
             {
-                playMode ^= (PlayMode)1;
+                PlayMode ^= (PlayMode)1;
                 return true;
             }
             return false;
@@ -132,10 +132,10 @@ namespace UIFramework
 
         public bool Stop()
         {
-            if (isPlaying)
+            if (IsPlaying)
             {
-                isPlaying = false;
-                isPaused = false;
+                IsPlaying = false;
+                IsPaused = false;
                 return true;
             }
             return false;
@@ -143,9 +143,9 @@ namespace UIFramework
 
         public bool Pause()
         {
-            if(isPlaying && !isPaused)
+            if(IsPlaying && !IsPaused)
             {
-                isPaused = true;
+                IsPaused = true;
                 return true;
             }
             return false;
@@ -153,9 +153,9 @@ namespace UIFramework
 
         public bool Resume()
         {
-            if(isPlaying && isPaused)
+            if(IsPlaying && IsPaused)
             {
-                isPaused = false;
+                IsPaused = false;
                 return true;
             }
             return false;
@@ -163,18 +163,18 @@ namespace UIFramework
 
         public bool SetCurrentTime(float time)
         {
-            if (isPlaying)
+            if (IsPlaying)
             {
-                currentTime = Mathf.Clamp(time, 0.0F, length);
-                float endTime = playMode == PlayMode.Forward ? length : 0.0F;
-                bool isAtEnd = Mathf.Approximately(currentTime, endTime);
+                CurrentTime = Mathf.Clamp(time, 0.0F, Length);
+                float endTime = PlayMode == PlayMode.Forward ? Length : 0.0F;
+                bool isAtEnd = Mathf.Approximately(CurrentTime, endTime);
 
                 EvaluateAnimation();
 
                 if (isAtEnd)
                 {
-                    isPlaying = false;
-                    onComplete.Invoke(animation);
+                    IsPlaying = false;
+                    OnComplete.Invoke(Animation);
                 }
                 return true;
             }
@@ -183,14 +183,14 @@ namespace UIFramework
 
         public bool Complete()
         {
-            if (isPlaying)
+            if (IsPlaying)
             {
-                currentTime = playMode == PlayMode.Forward ? length : 0.0F;
+                CurrentTime = PlayMode == PlayMode.Forward ? Length : 0.0F;
 
                 EvaluateAnimation();
 
-                isPlaying = false;
-                onComplete.Invoke(animation);
+                IsPlaying = false;
+                OnComplete.Invoke(Animation);
                 return true;
             }
             return false;
@@ -198,29 +198,29 @@ namespace UIFramework
 
         public void Update()
         {
-            if (isPlaying && _lastUpdateFrame != Time.frameCount)
+            if (IsPlaying && _lastUpdateFrame != Time.frameCount)
             {
-                float deltaTime = timeMode == TimeMode.Scaled? Time.deltaTime : Time.unscaledDeltaTime;
-                deltaTime *= playbackSpeed;
+                float deltaTime = TimeMode == TimeMode.Scaled? Time.deltaTime : Time.unscaledDeltaTime;
+                deltaTime *= PlaybackSpeed;
 
                 bool isAtEnd = false;
-                if (!isPaused)
+                if (!IsPaused)
                 {
-                    float animationDelta = playMode == PlayMode.Forward ? deltaTime : -deltaTime;
-                    currentTime = Mathf.Clamp(currentTime + animationDelta, 0.0F, length);
+                    float animationDelta = PlayMode == PlayMode.Forward ? deltaTime : -deltaTime;
+                    CurrentTime = Mathf.Clamp(CurrentTime + animationDelta, 0.0F, Length);
 
-                    float endTime = playMode == PlayMode.Forward ? length : 0.0F;
-                    isAtEnd = Mathf.Approximately(currentTime, endTime);
+                    float endTime = PlayMode == PlayMode.Forward ? Length : 0.0F;
+                    isAtEnd = Mathf.Approximately(CurrentTime, endTime);
                     // Double set to account for tolerance
-                    currentTime = isAtEnd ? endTime : currentTime;
+                    CurrentTime = isAtEnd ? endTime : CurrentTime;
                 }
 
                 EvaluateAnimation();
 
                 if (isAtEnd)
                 {
-                    isPlaying = false;
-                    onComplete.Invoke(animation);
+                    IsPlaying = false;
+                    OnComplete.Invoke(Animation);
                 }
             }                        
         }
@@ -228,7 +228,7 @@ namespace UIFramework
         private void EvaluateAnimation()
         {
             _lastUpdateFrame = Time.frameCount;
-            animation.Evaluate(Easing.PerformEase(currentNormalisedTime, easingMode));
+            Animation.Evaluate(Easing.PerformEase(CurrentNormalisedTime, EasingMode));
         }
     }
 }

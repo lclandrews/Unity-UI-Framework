@@ -19,10 +19,10 @@ namespace UIFramework
 
     public interface IAccessible
     {
-        AccessState accessState { get; }
+        AccessState AccessState { get; }
 
-        AnimationPlayer.PlaybackData accessAnimationPlaybackData { get; }
-        AnimationPlayable accessAnimationPlayable { get; }
+        AnimationPlayer.PlaybackData AccessAnimationPlaybackData { get; }
+        AnimationPlayable AccessAnimationPlayable { get; }
 
         WindowAccessAnimation CreateDefaultAccessAnimation(float length);
         void ResetAnimatedProperties();

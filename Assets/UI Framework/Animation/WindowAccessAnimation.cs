@@ -2,20 +2,20 @@ namespace UIFramework
 {
     public abstract class WindowAccessAnimation : Animation
     {
-        public AccessOperation accessOperation { get; protected set; } = AccessOperation.Open;
+        public AccessOperation AccessOperation { get; protected set; } = AccessOperation.Open;
 
         protected WindowAccessAnimation(AccessOperation accessOperation, float length) : base(length)
         {
-            this.accessOperation = accessOperation;
+            this.AccessOperation = accessOperation;
         }
 
         public AnimationPlayable CreatePlayable(float length, AccessOperation accessOperation,
             float startOffset = 0.0F, EasingMode easingMode = EasingMode.Linear, TimeMode timeMode = TimeMode.Scaled)
         {
-            PlayMode playMode = accessOperation == this.accessOperation ? PlayMode.Forward : PlayMode.Reverse;
+            PlayMode playMode = accessOperation == this.AccessOperation ? PlayMode.Forward : PlayMode.Reverse;
 
             float startTime = playMode == PlayMode.Forward ? startOffset : length - startOffset;
-            float playbackSpeed = this.length / length;
+            float playbackSpeed = this.Length / length;
             return new AnimationPlayable(this, startTime, playMode, easingMode, timeMode, playbackSpeed);
         }
     }

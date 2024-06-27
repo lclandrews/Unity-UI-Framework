@@ -9,8 +9,8 @@ namespace UIFramework.UIToolkit
     [Serializable]
     public struct CollectableDefinition<UIBehaviourType> where UIBehaviourType : class
     {
-        public string name { get { return _name; } }
-        public SubclassOf<UIBehaviourType> type { get { return _type; } }
+        public string Name { get { return _name; } }
+        public SubclassOf<UIBehaviourType> Type { get { return _type; } }
 
         [SerializeField] private string _name;
         [SerializeField] private SubclassOf<UIBehaviourType> _type;
@@ -50,12 +50,12 @@ namespace UIFramework.UIToolkit
             UIBehaviourType[] builtBehaviours = new UIBehaviourType[_collectableDefinitions.Length];
             for (int i = 0; i < _collectableDefinitions.Length; i++)
             {
-                VisualElement behaviourVisualElement = _uiDocument.rootVisualElement.Q<VisualElement>(_collectableDefinitions[i].name);
+                VisualElement behaviourVisualElement = _uiDocument.rootVisualElement.Q<VisualElement>(_collectableDefinitions[i].Name);
                 if (behaviourVisualElement == null)
                 {
-                    throw new InvalidOperationException(string.Format("Unable to find VisualElement for behaviour with name: {0}", _collectableDefinitions[i].name));
+                    throw new InvalidOperationException(string.Format("Unable to find VisualElement for behaviour with name: {0}", _collectableDefinitions[i].Name));
                 }
-                UIBehaviourType behaviour = _collectableDefinitions[i].type.CreateInstance(_uiDocument, behaviourVisualElement);
+                UIBehaviourType behaviour = _collectableDefinitions[i].Type.CreateInstance(_uiDocument, behaviourVisualElement);
                 builtBehaviours[i] = behaviour;
             }
             return Array.ConvertAll(builtBehaviours, delegate (UIBehaviourType input) { return input as CollectableType; });

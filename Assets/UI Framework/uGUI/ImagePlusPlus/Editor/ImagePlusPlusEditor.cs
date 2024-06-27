@@ -116,7 +116,7 @@ namespace UIFramework.UGUI
                 EditorGUILayout.HelpBox("Material is null! Please set a material with the UI/ImagePlusPlus Shader.", MessageType.Warning);
                 validMaterial = false;
             }
-            else if (_imagePlusPlus.material.shader != ImagePlusPlus.shader)
+            else if (_imagePlusPlus.material.shader != ImagePlusPlus.Shader)
             {
                 EditorGUILayout.HelpBox("Material does not use the correct shader! Please set the shader to UI/ImagePlusPlus Shader.", MessageType.Warning);
                 validMaterial = false;

@@ -34,7 +34,7 @@ public class ExampleController : Controller
 
     [SerializeField] private Button backButton = null;
 
-    public override TimeMode timeMode { get; protected set; } = TimeMode.Scaled;
+    public override TimeMode TimeMode { get; protected set; } = TimeMode.Scaled;
 
     protected override AnimationPlayable CreateAccessPlayable(AccessOperation accessOperation, float length)
     {
@@ -45,9 +45,9 @@ public class ExampleController : Controller
         {
             default:
             case AccessOperation.Open:
-                return new AnimationPlayable(animation, 0.0F, UIFramework.PlayMode.Forward, EasingMode.EaseInOut, timeMode);
+                return new AnimationPlayable(animation, 0.0F, UIFramework.PlayMode.Forward, EasingMode.EaseInOut, TimeMode);
             case AccessOperation.Close:
-                return new AnimationPlayable(animation, length, UIFramework.PlayMode.Reverse, EasingMode.EaseInOut, timeMode);
+                return new AnimationPlayable(animation, length, UIFramework.PlayMode.Reverse, EasingMode.EaseInOut, TimeMode);
         }
     }
 
@@ -78,7 +78,7 @@ public class ExampleController : Controller
 
     protected override void SetBackButtonActive(bool active)
     {
-        if (activeScreen != null && activeScreen.SetBackButtonActive(active))
+        if (ActiveScreen != null && ActiveScreen.SetBackButtonActive(active))
         {
             backButton?.gameObject.SetActive(false);
         }

@@ -5,10 +5,10 @@ namespace UIFramework
     /// </summary>
     public interface IWindow : IAccessible, IDataRecipient, IUIBehaviour
     {
-        bool isVisible { get; }
-        bool isEnabled { get; set; }
-        bool isInteractable { get; set; }
-        int sortOrder { get; set; }
+        bool IsVisible { get; }
+        bool IsEnabled { get; set; }
+        bool IsInteractable { get; set; }
+        int SortOrder { get; set; }
         
         GenericWindowAnimationBase CreateAnimation(GenericWindowAnimationType type, float length);        
 

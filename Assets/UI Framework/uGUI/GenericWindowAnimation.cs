@@ -46,7 +46,7 @@ namespace UIFramework.UGUI
         {
             base.Prepare();
 
-            switch (type)
+            switch (Type)
             {
                 case GenericWindowAnimationType.SlideFromLeft:
                     CalculateOffDisplayLeft();

@@ -4,13 +4,13 @@ namespace UIFramework
 
     public abstract class Animation
     {
-        public float length { get; protected set; } = 0.0F;
+        public float Length { get; protected set; } = 0.0F;
 
         private Animation() { }
 
         protected Animation(float length)
         {
-            this.length = length;
+            this.Length = length;
         }
 
         public abstract void Evaluate(float normalisedTime);

@@ -6,7 +6,7 @@ namespace UIFramework
 {
     public struct WindowTransitionPlayable : IEquatable<WindowTransitionPlayable>
     {
-        public enum AnimationTargets    
+        public enum AnimationTarget    
         {
             None,
             Source,
@@ -21,44 +21,44 @@ namespace UIFramework
             Target
         }
 
-        public float length { get; private set; }
-        public int lengthMs { get; private set; }
-        public EasingMode easingMode { get; private set; }
-        public ImplicitWindowAnimation exitAnimation { get; private set; }
-        public ImplicitWindowAnimation entryAnimation { get; private set; }
-        public SortPriority sortPriority { get; private set; }
+        public float Length { get; private set; }
+        public int LengthMs { get; private set; }
+        public EasingMode EasingMode { get; private set; }
+        public ImplicitWindowAnimation ExitAnimation { get; private set; }
+        public ImplicitWindowAnimation EntryAnimation { get; private set; }
+        public SortPriority WindowSortPriority { get; private set; }
 
-        public AnimationTargets animationTargets
+        public AnimationTarget Target
         {
             get
             {
-                if(exitAnimation != null && entryAnimation != null)
+                if(ExitAnimation != null && EntryAnimation != null)
                 {
-                    return AnimationTargets.Both;
+                    return AnimationTarget.Both;
                 }
-                else if(exitAnimation != null)
+                else if(ExitAnimation != null)
                 {
-                    return AnimationTargets.Source;
+                    return AnimationTarget.Source;
                 }
-                else if (entryAnimation != null)
+                else if (EntryAnimation != null)
                 {
-                    return AnimationTargets.Target;
+                    return AnimationTarget.Target;
                 }
                 else
                 {
-                    return AnimationTargets.None;
+                    return AnimationTarget.None;
                 }
             }
         }
 
         private WindowTransitionPlayable(float length, EasingMode easingMode, ImplicitWindowAnimation exitAnimation, ImplicitWindowAnimation entryAnimation, SortPriority sortPriority)
         {
-            this.length = length;
-            lengthMs = SecondsToMilliseconds(length);
-            this.easingMode = easingMode;
-            this.exitAnimation = exitAnimation;
-            this.entryAnimation = entryAnimation;
-            this.sortPriority = sortPriority;
+            this.Length = length;
+            LengthMs = SecondsToMilliseconds(length);
+            this.EasingMode = easingMode;
+            this.ExitAnimation = exitAnimation;
+            this.EntryAnimation = entryAnimation;
+            this.WindowSortPriority = sortPriority;
         }
 
         private static int SecondsToMilliseconds(float seconds)
@@ -143,12 +143,12 @@ namespace UIFramework
 
         public bool Equals(WindowTransitionPlayable other)
         {
-            return lengthMs == other.lengthMs && easingMode == other.easingMode && exitAnimation == other.exitAnimation && entryAnimation == other.entryAnimation;
+            return LengthMs == other.LengthMs && EasingMode == other.EasingMode && ExitAnimation == other.ExitAnimation && EntryAnimation == other.EntryAnimation;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(lengthMs, easingMode, exitAnimation, entryAnimation);
+            return HashCode.Combine(LengthMs, EasingMode, ExitAnimation, EntryAnimation);
         }
 
         public static bool operator ==(WindowTransitionPlayable lhs, WindowTransitionPlayable rhs)

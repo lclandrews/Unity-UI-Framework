@@ -19,7 +19,7 @@ public class ExampleManager : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.Space))
         {
-            if(!exampleController.isOpen)
+            if(!exampleController.IsOpen)
             {
                 exampleController.OpenScreen<UGUIExampleTransitionScreen>(new WindowAccessPlayable(GenericWindowAnimationType.Fade, 0.5F, EasingMode.EaseInOut));
             }

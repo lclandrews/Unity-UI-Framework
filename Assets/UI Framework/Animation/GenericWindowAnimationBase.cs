@@ -23,35 +23,35 @@ namespace UIFramework
 
     public abstract class GenericWindowAnimationBase : WindowAccessAnimation
     {
-        public GenericWindowAnimationType type { get; private set; } = GenericWindowAnimationType.Fade;
+        public GenericWindowAnimationType Type { get; private set; } = GenericWindowAnimationType.Fade;
 
-        public GenericWindowAnimationType fallbackType { get; private set; } = GenericWindowAnimationType.Fade;
+        public GenericWindowAnimationType FallbackType { get; private set; } = GenericWindowAnimationType.Fade;
 
         protected GenericWindowAnimationBase(GenericWindowAnimationType type, float length)
             : base(AccessOperation.Open, length)
         {
-            this.type = type;
-            if(!IsSupportedType(this.type))
+            this.Type = type;
+            if(!IsSupportedType(this.Type))
             {
-                Debug.LogWarning(string.Format("WindowAnimation is unable to support type {0}, falling back to {1}.", this.type, fallbackType));
+                Debug.LogWarning(string.Format("WindowAnimation is unable to support type {0}, falling back to {1}.", this.Type, FallbackType));
             }
         }
 
         protected GenericWindowAnimationBase(GenericWindowAnimationType type, GenericWindowAnimationType fallbackType, float length)
             : base(AccessOperation.Open, length)
         {
-            this.type = type;
-            this.fallbackType = fallbackType;
-            if (!IsSupportedType(this.type))
+            this.Type = type;
+            this.FallbackType = fallbackType;
+            if (!IsSupportedType(this.Type))
             {
-                Debug.LogWarning(string.Format("WindowAnimation is unable to support type {0}, falling back to {1}.", this.type, this.fallbackType));
+                Debug.LogWarning(string.Format("WindowAnimation is unable to support type {0}, falling back to {1}.", this.Type, this.FallbackType));
             }
         }
 
         public override void Evaluate(float normalisedTime)
         {
-            GenericWindowAnimationType evaluationType = IsSupportedType(type) ? type : fallbackType;
-            switch (type)
+            GenericWindowAnimationType evaluationType = IsSupportedType(Type) ? Type : FallbackType;
+            switch (Type)
             {
                 case GenericWindowAnimationType.Fade:
                     Fade(normalisedTime);

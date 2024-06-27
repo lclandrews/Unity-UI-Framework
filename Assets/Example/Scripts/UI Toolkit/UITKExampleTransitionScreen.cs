@@ -33,105 +33,105 @@ public class UITKExampleTransitionScreen : UIFramework.UIToolkit.Screen
     {
         base.OnInit();
 
-        _fadeTransitionButton = visualElement.Q<Button>("fadeButton");
+        _fadeTransitionButton = VisualElement.Q<Button>("fadeButton");
         _fadeTransitionButton.clicked += FadeTransition;
 
-        _dissolveTransitionButton = visualElement.Q<Button>("dissolveButton");
+        _dissolveTransitionButton = VisualElement.Q<Button>("dissolveButton");
         _dissolveTransitionButton.clicked += DissolveTransition;
 
-        _slideFromLeftTransitionButton = visualElement.Q<Button>("slideFromLeftButton");
+        _slideFromLeftTransitionButton = VisualElement.Q<Button>("slideFromLeftButton");
         _slideFromLeftTransitionButton.clicked += SlideFromLeftTransition;
-        _slideFromRightTransitionButton = visualElement.Q<Button>("slideFromRightButton");
+        _slideFromRightTransitionButton = VisualElement.Q<Button>("slideFromRightButton");
         _slideFromRightTransitionButton.clicked += SlideFromRightTransition;
-        _slideFromBottomTransitionButton = visualElement.Q<Button>("slideFromBottomButton");
+        _slideFromBottomTransitionButton = VisualElement.Q<Button>("slideFromBottomButton");
         _slideFromBottomTransitionButton.clicked += SlideFromBottomTransition;
-        _slideFromTopTransitionButton = visualElement.Q<Button>("slideFromTopButton");
+        _slideFromTopTransitionButton = VisualElement.Q<Button>("slideFromTopButton");
         _slideFromTopTransitionButton.clicked += SlideFromTopTransition;
 
-        _slideOverLeftTransitionButton = visualElement.Q<Button>("slideOverLeftButton");
+        _slideOverLeftTransitionButton = VisualElement.Q<Button>("slideOverLeftButton");
         _slideOverLeftTransitionButton.clicked += SlideOverLeftTransition;
-        _slideOverRightTransitionButton = visualElement.Q<Button>("slideOverRightButton");
+        _slideOverRightTransitionButton = VisualElement.Q<Button>("slideOverRightButton");
         _slideOverRightTransitionButton.clicked += SlideOverRightTransition;
-        _slideOverBottomTransitionButton = visualElement.Q<Button>("slideOverBottomButton");
+        _slideOverBottomTransitionButton = VisualElement.Q<Button>("slideOverBottomButton");
         _slideOverBottomTransitionButton.clicked += SlideOverBottomTransition;
-        _slideOverTopTransitionButton = visualElement.Q<Button>("slideOverTopButton");
+        _slideOverTopTransitionButton = VisualElement.Q<Button>("slideOverTopButton");
         _slideOverTopTransitionButton.clicked += SlideOverTopTransition;
 
-        _flipTransitionButton = visualElement.Q<Button>("flipButton");
+        _flipTransitionButton = VisualElement.Q<Button>("flipButton");
         _flipTransitionButton.clicked += FlipTransition;
-        _expandTransitionButton = visualElement.Q<Button>("expandButton");
+        _expandTransitionButton = VisualElement.Q<Button>("expandButton");
         _expandTransitionButton.clicked += ExpandTransition;
     }
 
     private void FadeTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.Fade(_transitionLength, UIFramework.EasingMode.EaseInOut);
-        controller.OpenScreen<UITKExampleScreen>(in transition);
+        Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 
     private void DissolveTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.Dissolve(_transitionLength, UIFramework.EasingMode.EaseInOut);
-        controller.OpenScreen<UITKExampleScreen>(in transition);
+        Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 
     private void SlideFromLeftTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.SlideFromLeft(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
-        controller.OpenScreen<UITKExampleScreen>(in transition);
+        Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 
     private void SlideFromRightTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.SlideFromRight(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
-        controller.OpenScreen<UITKExampleScreen>(in transition);
+        Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 
     private void SlideFromBottomTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.SlideFromBottom(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
-        controller.OpenScreen<UITKExampleScreen>(in transition);
+        Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 
     private void SlideFromTopTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.SlideFromTop(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
-        controller.OpenScreen<UITKExampleScreen>(in transition);
+        Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 
     private void SlideOverLeftTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.SlideOverFromLeft(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
-        controller.OpenScreen<UITKExampleScreen>(in transition);
+        Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 
     private void SlideOverRightTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.SlideOverFromRight(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
-        controller.OpenScreen<UITKExampleScreen>(in transition);
+        Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 
     private void SlideOverBottomTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.SlideOverFromBottom(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
-        controller.OpenScreen<UITKExampleScreen>(in transition);
+        Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 
     private void SlideOverTopTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.SlideOverFromTop(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
-        controller.OpenScreen<UITKExampleScreen>(in transition);
+        Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 
     private void FlipTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.Flip(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
-        controller.OpenScreen<UITKExampleScreen>(in transition);
+        Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 
     private void ExpandTransition()
     {
         WindowTransitionPlayable transition = WindowTransitionPlayable.Expand(_transitionLength, UIFramework.EasingMode.EaseInOutBack);
-        controller.OpenScreen<UITKExampleScreen>(in transition);
+        Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 }

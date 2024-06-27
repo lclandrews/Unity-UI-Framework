@@ -7,36 +7,36 @@ namespace UIFramework
 {
     public interface IModalWindow : IWindow
     {
-        public struct Action
+        public struct ButtonAction
         {
-            public string label { get; private set; }
-            public UnityAction action { get; private set; }
+            public string Label { get; private set; }
+            public UnityAction Action { get; private set; }
 
-            public Action(string label, UnityAction action)
+            public ButtonAction(string label, UnityAction action)
             {
-                this.label = label;
-                this.action = action;
+                this.Label = label;
+                this.Action = action;
             }
         }
 
         public struct Data
         {
-            public string message { get; private set; }
-            public List<Action> actions { get; private set; }
-            public Color? backgroundColor { get; private set; }
+            public string Message { get; private set; }
+            public List<ButtonAction> Actions { get; private set; }
+            public Color? BackgroundColor { get; private set; }
 
-            public Data(string message, List<Action> actions, Color? backgroundColor)
+            public Data(string message, List<ButtonAction> actions, Color? backgroundColor)
             {
-                this.message = message;
-                this.actions = actions;
-                this.backgroundColor = backgroundColor;
+                this.Message = message;
+                this.Actions = actions;
+                this.BackgroundColor = backgroundColor;
             }
 
-            public Data(string message, List<Action> actions)
+            public Data(string message, List<ButtonAction> actions)
             {
-                this.message = message;
-                this.actions = actions;
-                this.backgroundColor = null;
+                this.Message = message;
+                this.Actions = actions;
+                this.BackgroundColor = null;
             }
         }
 

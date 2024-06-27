@@ -8,10 +8,10 @@ namespace UIFramework
     {
         private ObjectTypeMap<IWindow> _windows = null;
 
-        public IWindow activeTabWindow { get { return _activeTabWindow; } }
+        public IWindow ActiveTabWindow { get { return _activeTabWindow; } }
         private IWindow _activeTabWindow = null;
 
-        public int activeTabIndex { get { return _activeTabIndex; } }
+        public int ActiveTabIndex { get { return _activeTabIndex; } }
         private int _activeTabIndex = 0;
 
         private TabController() { }
@@ -25,7 +25,7 @@ namespace UIFramework
         {
             for (int i = 0; i < _windows.array.Length; i++)
             {
-                if (_windows.array[i].isVisible)
+                if (_windows.array[i].IsVisible)
                 {
                     _windows.array[i].UpdateUI(deltaTime);
                 }
@@ -137,13 +137,13 @@ namespace UIFramework
                         }
 
                         AnimationPlayable closeAnimationPlayable;
-                        if (_activeTabWindow.accessAnimationPlayable.animation != null)
+                        if (_activeTabWindow.AccessAnimationPlayable.Animation != null)
                         {
-                            closeAnimationPlayable = _activeTabWindow.accessAnimationPlayable.CreateInverse();
+                            closeAnimationPlayable = _activeTabWindow.AccessAnimationPlayable.CreateInverse();
                         }
                         else
                         {
-                            closeAnimationPlayable = _activeTabWindow.CreateDefaultAccessAnimation(animation.length).CreatePlayable(animation.length, AccessOperation.Close, 0.0F, animation.easingMode, TimeMode.Scaled);
+                            closeAnimationPlayable = _activeTabWindow.CreateDefaultAccessAnimation(animation.Length).CreatePlayable(animation.Length, AccessOperation.Close, 0.0F, animation.EasingMode, TimeMode.Scaled);
                         }
                         _activeTabWindow.Close(in closeAnimationPlayable);
                         _activeTabWindow = targetWindow;
@@ -156,7 +156,7 @@ namespace UIFramework
 
         private IWindow SetActiveIndexInternal(int index, in WindowAccessPlayable animation)
         {
-            if (index != activeTabIndex)
+            if (index != ActiveTabIndex)
             {
                 if (_activeTabWindow != null)
                 {
@@ -166,13 +166,13 @@ namespace UIFramework
                         IWindow targetWindow = _windows.array[index];
 
                         AnimationPlayable closeAnimationPlayable;
-                        if (_activeTabWindow.accessAnimationPlayable.animation != null)
+                        if (_activeTabWindow.AccessAnimationPlayable.Animation != null)
                         {
-                            closeAnimationPlayable = _activeTabWindow.accessAnimationPlayable.CreateInverse();
+                            closeAnimationPlayable = _activeTabWindow.AccessAnimationPlayable.CreateInverse();
                         }
                         else
                         {
-                            closeAnimationPlayable = _activeTabWindow.CreateDefaultAccessAnimation(animation.length).CreatePlayable(animation.length, AccessOperation.Close, 0.0F, animation.easingMode, TimeMode.Scaled);
+                            closeAnimationPlayable = _activeTabWindow.CreateDefaultAccessAnimation(animation.Length).CreatePlayable(animation.Length, AccessOperation.Close, 0.0F, animation.EasingMode, TimeMode.Scaled);
                         }
                         _activeTabWindow.Close(in closeAnimationPlayable);
                         _activeTabWindow = targetWindow;

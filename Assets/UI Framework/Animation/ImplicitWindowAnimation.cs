@@ -5,8 +5,8 @@ namespace UIFramework
         private Animation _animation = null;
         private GenericWindowAnimationType? _genericAnimationType = null;
 
-        public bool isGeneric { get; private set; } = false;
-        public bool isAccessAnimation { get; private set; } = false;
+        public bool IsGeneric { get; private set; } = false;
+        public bool IsAccessAnimation { get; private set; } = false;
 
         private ImplicitWindowAnimation() { }
 
@@ -15,20 +15,20 @@ namespace UIFramework
             _animation = animation;
             if(_animation is WindowAccessAnimation)
             {
-                isAccessAnimation = true;
+                IsAccessAnimation = true;
             }
         }
 
         private ImplicitWindowAnimation(GenericWindowAnimationType genericAnimationType)
         {
             _genericAnimationType = genericAnimationType;
-            isGeneric = true;
+            IsGeneric = true;
         }        
 
         private ImplicitWindowAnimation(WindowAccessAnimation accessAnimation)
         {
             _animation = accessAnimation;
-            isAccessAnimation = true;
+            IsAccessAnimation = true;
         }        
 
         public static implicit operator ImplicitWindowAnimation(Animation animation)
@@ -65,14 +65,14 @@ namespace UIFramework
             float startOffset = 0.0F, EasingMode easingMode = EasingMode.Linear, TimeMode timeMode = TimeMode.Scaled)
         {
             PlayMode playMode;
-            if (isGeneric)
+            if (IsGeneric)
             {
                 playMode = accessOperation == AccessOperation.Open ? PlayMode.Forward : PlayMode.Reverse;
             }
-            else if(isAccessAnimation)
+            else if(IsAccessAnimation)
             {
                 WindowAccessAnimation accessAnimation = _animation as WindowAccessAnimation;
-                playMode = accessOperation == accessAnimation.accessOperation ? PlayMode.Forward : PlayMode.Reverse;
+                playMode = accessOperation == accessAnimation.AccessOperation ? PlayMode.Forward : PlayMode.Reverse;
             }
             else
             {
@@ -88,7 +88,7 @@ namespace UIFramework
         {
             if (_animation != null)
             {
-                float playbackSpeed = _animation.length / length;
+                float playbackSpeed = _animation.Length / length;
                 return new AnimationPlayable(_animation, startTime, playMode, easingMode, timeMode, playbackSpeed);
             }
             else if (_genericAnimationType != null)

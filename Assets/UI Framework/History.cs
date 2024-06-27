@@ -5,7 +5,7 @@ namespace UIFramework
 {
     public class History<T>
     {
-        public int count { get; private set; }
+        public int Count { get; private set; }
 
         private List<Stack<T>> _history = new List<Stack<T>>();
 
@@ -20,14 +20,14 @@ namespace UIFramework
         public void Push(T entry)
         {
             _history[_activeGroup].Push(entry);
-            count++;
+            Count++;
         }
 
         public T Pop()
         {
             if (_history[_activeGroup].Count > 0)
             {
-                count--;
+                Count--;
                 T entry = _history[_activeGroup].Pop();
                 if (_history[_activeGroup].Count == 0 && _activeGroup > 0)
                 {
@@ -52,7 +52,7 @@ namespace UIFramework
         {
             if (_history.Count > 1)
             {
-                count -= _history[_activeGroup].Count;
+                Count -= _history[_activeGroup].Count;
                 _history.RemoveAt(_activeGroup);
                 _activeGroup--;
                 return true;
@@ -62,14 +62,14 @@ namespace UIFramework
 
         public bool Clear()
         {
-            if (count > 0)
+            if (Count > 0)
             {
                 if (_activeGroup > 0)
                 {
                     _history.RemoveRange(1, _activeGroup);
                 }
                 _history[0].Clear();
-                count = 0;
+                Count = 0;
                 return true;
             }
             return false;
