@@ -10,8 +10,6 @@ public class UGUIExampleAlternateCanvasScreen : UIFramework.UGUI.Screen
     [SerializeField] private Button travelToSharedCanvasScreenButton = null;
     [SerializeField] private Button travelToUITKTransitionScreenButton = null;
 
-    public override bool requiresData { get { return false; } }
-
     public override bool IsValidData(object data)
     {
         return false;

@@ -12,8 +12,6 @@ public class UITKExampleScreen : UIFramework.UIToolkit.Screen
 
     public UITKExampleScreen(UIDocument uiDocument, VisualElement visualElement) : base(uiDocument, visualElement) { }
 
-    public override bool requiresData { get { return false; } }
-
     public override bool IsValidData(object data)
     {
         return false;

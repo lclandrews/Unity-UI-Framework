@@ -25,9 +25,6 @@ public class UGUIExampleTransitionScreen : UIFramework.UGUI.Screen
     [SerializeField] private Button _flipTransitionButton = null;
     [SerializeField] private Button _expandTransitionButton = null;
 
-    // UGUIScreen
-    public override bool requiresData { get { return false; } }
-
     public override bool IsValidData(object data)
     {
         return false;
