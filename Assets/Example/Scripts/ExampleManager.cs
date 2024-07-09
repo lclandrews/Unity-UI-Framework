@@ -1,13 +1,16 @@
 using UnityEngine;
 using UIFramework;
 
-public class ExampleManager : MonoBehaviour
+using UnityEngine.Extension;
+
+public class ExampleManager : MonoBehaviour, IUpdatable
 {
     [SerializeField] private ExampleController exampleController = null;
 
     private void Awake()
     {
         exampleController.Init();
+        UpdateManager.AddUpdatable(this);
     }
 
     private void Start()
@@ -15,14 +18,19 @@ public class ExampleManager : MonoBehaviour
         exampleController.OpenScreen<UGUIExampleTransitionScreen>();
     }
 
-    private void Update()
+    public void ManagedUpdate()
     {
-        if(Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            if(!exampleController.IsOpen)
+            if (!exampleController.IsOpen)
             {
                 exampleController.OpenScreen<UGUIExampleTransitionScreen>(new WindowAccessPlayable(GenericWindowAnimationType.Fade, 0.5F, EasingMode.EaseInOut));
             }
         }
     }
+
+    private void OnDestroy()
+    {
+        UpdateManager.RemoveUpdatable(this);
+    }        
 }

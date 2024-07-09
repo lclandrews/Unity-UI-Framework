@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using UnityEngine;
+using UnityEngine.Extension;
 
 namespace UIFramework
 {
@@ -11,7 +12,7 @@ namespace UIFramework
         Unscaled
     }
 
-    public abstract class Controller : MonoBehaviour
+    public abstract class Controller : MonoBehaviour, IUpdatable
     {
         public AccessState AccessState { get; private set; }
 
@@ -72,15 +73,15 @@ namespace UIFramework
 
         protected virtual void Awake()
         {
-
+            UpdateManager.AddUpdatable(this);
         }
 
         protected virtual void Start()
         {
-
+            
         }
 
-        private void Update()
+        public void ManagedUpdate()
         {
             if (IsVisible)
             {
@@ -113,7 +114,7 @@ namespace UIFramework
 
         protected virtual void OnDestroy()
         {
-
+            UpdateManager.RemoveUpdatable(this);
         }
 
         protected virtual void OnApplicationFocus(bool hasFocus)
