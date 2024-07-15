@@ -1,12 +1,14 @@
 #if UNITY_EDITOR
 using System;
 
+using UIFramework.UGUI;
+
 using UnityEditor;
 using UnityEditor.SceneManagement;
 
 using UnityEngine;
 
-namespace UIFramework.UGUI
+namespace UIFramework.Editor.UGUI
 {
     public static class ImagePlusPlusMenuItem
     {

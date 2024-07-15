@@ -1,7 +1,25 @@
 {
   "dependencies": {
+    "com.lukeandrews.ui-framework": {
+      "version": "file:com.lukeandrews.ui-framework",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.lukeandrews.unity-extension": "https://github.com/lclandrews/Unity-Extensions.git?path=Packages/com.lukeandrews.unity-extension#main",
+        "com.unity.ugui": "1.0.0",
+        "com.unity.modules.ui": "1.0.0",
+        "com.unity.modules.uielements": "1.0.0"
+      }
+    },
+    "com.lukeandrews.unity-extension": {
+      "version": "https://github.com/lclandrews/Unity-Extensions.git?path=Packages/com.lukeandrews.unity-extension",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "2272abc4c321b4d99ad39993eea987bbf174cabe"
+    },
     "com.unity.collab-proxy": {
-      "version": "2.3.1",
+      "version": "2.4.3",
       "depth": 0,
       "source": "registry",
       "dependencies": {},

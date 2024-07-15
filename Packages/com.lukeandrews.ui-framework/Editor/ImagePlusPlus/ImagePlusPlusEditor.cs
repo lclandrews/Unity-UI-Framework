@@ -1,9 +1,12 @@
 #if UNITY_EDITOR
+using UIFramework.UGUI;
+
 using UnityEditor;
 using UnityEditor.UI;
+
 using UnityEngine;
 
-namespace UIFramework.UGUI
+namespace UIFramework.Editor.UGUI
 {
     [CustomEditor(typeof(ImagePlusPlus), true)]
     [CanEditMultipleObjects]
