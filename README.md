@@ -1,1 +1,1 @@
-https://github.com/lclandrews/Unity-Extensions.git?path=Packages/com.lukeandrews.unity-extension
+https://github.com/lclandrews/Unity-UI-Framework.git?path=Packages/com.lukeandrews.ui-framework
