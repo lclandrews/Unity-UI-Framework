@@ -165,6 +165,7 @@ namespace UIFramework.UGUI
             }
             else
             {
+                _stateIndex = -1;
                 State = state;
             }
         }
