@@ -6,6 +6,8 @@ namespace UIFramework.UGUI
     [System.Serializable]
     public struct ButtonState
     {
+        public static readonly string DefaultStateName = "default";
+
         public string Name { get { return _name; } }
         [SerializeField] private string _name;
 

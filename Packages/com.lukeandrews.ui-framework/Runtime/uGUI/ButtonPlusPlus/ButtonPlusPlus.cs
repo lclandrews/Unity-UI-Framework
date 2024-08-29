@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace UIFramework.UGUI
@@ -10,24 +11,105 @@ namespace UIFramework.UGUI
         [SerializeField] private Sprite _normalSprite = null;
         [SerializeField] private ButtonState[] _states = null;
 
-        public string State { get; private set; } = "default";
+        public string State { get; private set; } = ButtonState.DefaultStateName;
 
         private IButtonComponent[] _buttonComponents = null;
         private Dictionary<string, int> _stateMap = null;
+        private int _stateIndex = -1;
+
+        private ColorBlock _activeColors
+        {
+            get
+            {
+                if (_stateIndex >= 0)
+                {
+                    return _states[_stateIndex].Colors;
+                }
+                else
+                {
+                    return colors;
+                }
+            }
+        }
+
+        private Sprite _activeNormalSprite
+        {
+            get
+            {
+                if (_stateIndex >= 0)
+                {
+                    return _states[_stateIndex].NormalSprite;
+                }
+                else
+                {
+                    return _normalSprite;
+                }
+            }
+        }
+
+        private SpriteState _activeSpriteState
+        {
+            get
+            {
+                if (_stateIndex >= 0)
+                {
+                    return _states[_stateIndex].SpriteState;
+                }
+                else
+                {
+                    return spriteState;
+                }
+            }
+        }
+
+        private AnimationTriggers _activeAnimationTriggers
+        {
+            get
+            {
+                if (_stateIndex >= 0)
+                {
+                    return _states[_stateIndex].AnimationTriggers;
+                }
+                else
+                {
+                    return animationTriggers;
+                }
+            }
+        }
 
         public void ResetButtonState()
         {
-            SetButtonState("default", colors, spriteState, animationTriggers);
+            SetButtonState(ButtonState.DefaultStateName);
         }
 
         public void SetButtonState(string state)
         {
-            Dictionary<string, int> stateMap = GetStateMap();
-            int index;
-            if (stateMap.TryGetValue(state, out index))
+            if (state != ButtonState.DefaultStateName)
             {
-                SetButtonState(state, _states[index].Colors, _states[index].SpriteState, _states[index].AnimationTriggers);
+                Dictionary<string, int> stateMap = GetStateMap();
+                int index;
+                if (stateMap.TryGetValue(state, out index))
+                {
+                    _stateIndex = index;
+                    State = state;
+                    IButtonComponent[] buttonComponents = GetButtonComponents();
+                    for (int i = 0; i < buttonComponents.Length; i++)
+                    {
+                        buttonComponents[i].SetButtonState(state);
+                    }
+                }
             }
+            else
+            {
+                _stateIndex = -1;
+                State = state;
+                IButtonComponent[] buttonComponents = GetButtonComponents();
+                for (int i = 0; i < buttonComponents.Length; i++)
+                {
+                    buttonComponents[i].SetButtonState(state);
+                }
+            }
+            DoStateTransition(currentSelectionState, false);
         }
 
         private Dictionary<string, int> GetStateMap()
@@ -52,19 +134,29 @@ namespace UIFramework.UGUI
             return _buttonComponents;
         }
 
-        private void SetButtonState(string state, in ColorBlock colors, in SpriteState spriteState, AnimationTriggers animationTriggers)
+#if UNITY_EDITOR
+        protected override void OnValidate()
         {
-            State = state;
-            this.colors = colors;
-            this.spriteState = spriteState;
-            this.animationTriggers = animationTriggers;
-
-            IButtonComponent[] buttonComponents = GetButtonComponents();
-            for (int i = 0; i < buttonComponents.Length; i++)
+            // OnValidate can be called before OnEnable, this makes it unsafe to access other components
+            // since they might not have been initialized yet.
+            // OnSetProperty potentially access Animator or Graphics. (case 618186)
+            if (isActiveAndEnabled)
             {
-                buttonComponents[i].SetButtonState(state);
+                if (!interactable && EventSystem.current != null && EventSystem.current.currentSelectedGameObject == gameObject)
+                    EventSystem.current.SetSelectedGameObject(null);
+                // Need to clear out the override image on the target...
+                DoSpriteSwap(_activeNormalSprite);
+
+                // If the transition mode got changed, we need to clear all the transitions, since we don't know what the old transition mode was.
+                StartColorTween(Color.white, true);
+                TriggerAnimation(_activeAnimationTriggers.normalTrigger);
+
+                // And now go to the right state.
+                DoStateTransition(currentSelectionState, true);
             }
         }
+
+#endif // if UNITY_EDITOR
 
         protected override void DoStateTransition(SelectionState state, bool instant)
         {
@@ -78,29 +170,29 @@ namespace UIFramework.UGUI
             switch (state)
             {
                 case SelectionState.Normal:
-                    tintColor = colors.normalColor;
-                    transitionSprite = _normalSprite;
-                    triggerName = animationTriggers.normalTrigger;
+                    tintColor = _activeColors.normalColor;
+                    transitionSprite = _activeNormalSprite;
+                    triggerName = _activeAnimationTriggers.normalTrigger;
                     break;
                 case SelectionState.Highlighted:
-                    tintColor = colors.highlightedColor;
-                    transitionSprite = spriteState.highlightedSprite;
-                    triggerName = animationTriggers.highlightedTrigger;
+                    tintColor = _activeColors.highlightedColor;
+                    transitionSprite = _activeSpriteState.highlightedSprite;
+                    triggerName = _activeAnimationTriggers.highlightedTrigger;
                     break;
                 case SelectionState.Pressed:
-                    tintColor = colors.pressedColor;
-                    transitionSprite = spriteState.pressedSprite;
-                    triggerName = animationTriggers.pressedTrigger;
+                    tintColor = _activeColors.pressedColor;
+                    transitionSprite = _activeSpriteState.pressedSprite;
+                    triggerName = _activeAnimationTriggers.pressedTrigger;
                     break;
                 case SelectionState.Selected:
-                    tintColor = colors.selectedColor;
-                    transitionSprite = spriteState.selectedSprite;
-                    triggerName = animationTriggers.selectedTrigger;
+                    tintColor = _activeColors.selectedColor;
+                    transitionSprite = _activeSpriteState.selectedSprite;
+                    triggerName = _activeAnimationTriggers.selectedTrigger;
                     break;
                 case SelectionState.Disabled:
-                    tintColor = colors.disabledColor;
-                    transitionSprite = spriteState.disabledSprite;
-                    triggerName = animationTriggers.disabledTrigger;
+                    tintColor = _activeColors.disabledColor;
+                    transitionSprite = _activeSpriteState.disabledSprite;
+                    triggerName = _activeAnimationTriggers.disabledTrigger;
                     break;
                 default:
                     tintColor = Color.black;
@@ -112,7 +204,7 @@ namespace UIFramework.UGUI
             switch (transition)
             {
                 case Transition.ColorTint:
-                    StartColorTween(tintColor * colors.colorMultiplier, instant);
+                    StartColorTween(tintColor * _activeColors.colorMultiplier, instant);
                     break;
                 case Transition.SpriteSwap:
                     DoSpriteSwap(transitionSprite);
@@ -129,15 +221,15 @@ namespace UIFramework.UGUI
             }
         }
 
-        void StartColorTween(Color targetColor, bool instant)
+        private void StartColorTween(Color targetColor, bool instant)
         {
             if (targetGraphic == null)
                 return;
 
-            targetGraphic.CrossFadeColor(targetColor, instant ? 0f : colors.fadeDuration, true, true);
+            targetGraphic.CrossFadeColor(targetColor, instant ? 0f : _activeColors.fadeDuration, true, true);
         }
 
-        void DoSpriteSwap(Sprite newSprite)
+        private void DoSpriteSwap(Sprite newSprite)
         {
             if (image == null)
                 return;
@@ -145,16 +237,16 @@ namespace UIFramework.UGUI
             image.overrideSprite = newSprite;
         }
 
-        void TriggerAnimation(string triggername)
+        private void TriggerAnimation(string triggername)
         {
             if (transition != Transition.Animation || animator == null || !animator.isActiveAndEnabled || !animator.hasBoundPlayables || string.IsNullOrEmpty(triggername))
                 return;
 
-            animator.ResetTrigger(animationTriggers.normalTrigger);
-            animator.ResetTrigger(animationTriggers.highlightedTrigger);
-            animator.ResetTrigger(animationTriggers.pressedTrigger);
-            animator.ResetTrigger(animationTriggers.selectedTrigger);
-            animator.ResetTrigger(animationTriggers.disabledTrigger);
+            animator.ResetTrigger(_activeAnimationTriggers.normalTrigger);
+            animator.ResetTrigger(_activeAnimationTriggers.highlightedTrigger);
+            animator.ResetTrigger(_activeAnimationTriggers.pressedTrigger);
+            animator.ResetTrigger(_activeAnimationTriggers.selectedTrigger);
+            animator.ResetTrigger(_activeAnimationTriggers.disabledTrigger);
 
             animator.SetTrigger(triggername);
         }

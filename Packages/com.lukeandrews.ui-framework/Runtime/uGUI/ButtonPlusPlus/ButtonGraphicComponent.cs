@@ -21,16 +21,71 @@ namespace UIFramework.UGUI
 
         [SerializeField] private ButtonState[] _states = null;
 
-        public string State { get; private set; }
+        public string State { get; private set; } = ButtonState.DefaultStateName;
 
         private Dictionary<string, int> _stateMap = null;
-
+        private int _stateIndex = -1;
         private SelectionState _selectionState = SelectionState.Normal;
 
-        private ColorBlock _activeColors = ColorBlock.defaultColorBlock;
-        private Sprite _activeNormalSprite = null;
-        private SpriteState _activeSpriteState = default;
-        private AnimationTriggers _activeAnimationTriggers = new AnimationTriggers();
+        private ColorBlock _activeColors
+        {
+            get
+            {
+                if (_stateIndex >= 0)
+                {
+                    return _states[_stateIndex].Colors;
+                }
+                else
+                {
+                    return _colors;
+                }
+            }
+        }
+
+        private Sprite _activeNormalSprite
+        {
+            get
+            {
+                if (_stateIndex >= 0)
+                {
+                    return _states[_stateIndex].NormalSprite;
+                }
+                else
+                {
+                    return _normalSprite;
+                }
+            }
+        }
+
+        private SpriteState _activeSpriteState
+        {
+            get
+            {
+                if (_stateIndex >= 0)
+                {
+                    return _states[_stateIndex].SpriteState;
+                }
+                else
+                {
+                    return _spriteState;
+                }
+            }
+        }
+
+        private AnimationTriggers _activeAnimationTriggers
+        {
+            get
+            {
+                if (_stateIndex >= 0)
+                {
+                    return _states[_stateIndex].AnimationTriggers;
+                }
+                else
+                {
+                    return _animationTriggers;
+                }
+            }
+        }
 
         public void DoStateTransition(SelectionState state, bool instant)
         {
@@ -93,16 +148,24 @@ namespace UIFramework.UGUI
 
         public void ResetButtonState()
         {
-            SetButtonState("default", _colors, _normalSprite, _spriteState, _animationTriggers);
+            SetButtonState(ButtonState.DefaultStateName);
         }
 
         public void SetButtonState(string state)
         {
-            Dictionary<string, int> stateMap = GetStateMap();
-            int index;
-            if (stateMap.TryGetValue(state, out index))
+            if (state != ButtonState.DefaultStateName)
             {
-                SetButtonState(state, _states[index].Colors, _states[index].NormalSprite, _states[index].SpriteState, _states[index].AnimationTriggers);
+                Dictionary<string, int> stateMap = GetStateMap();
+                int index;
+                if (stateMap.TryGetValue(state, out index))
+                {
+                    _stateIndex = index;
+                    State = state;
+                }
+            }
+            else
+            {
+                State = state;
             }
         }
 
@@ -139,16 +202,6 @@ namespace UIFramework.UGUI
                     animator.SetTrigger(triggername);
                 }                
             }        
-        }
-
-        private void SetButtonState(string state, in ColorBlock colors, Sprite normalSprite, in SpriteState spriteState, AnimationTriggers animationTriggers)
-        {
-            State = state;
-            _activeColors = colors;
-            _activeNormalSprite = normalSprite;
-            _activeSpriteState = spriteState;
-            _activeAnimationTriggers = animationTriggers;
-            DoStateTransition(_selectionState, false);
         }
 
         private Dictionary<string, int> GetStateMap()
