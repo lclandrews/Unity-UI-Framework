@@ -194,11 +194,20 @@ namespace UIFramework.UGUI
                 Animator animator = GetComponent<Animator>();
                 if (animator != null && animator.isActiveAndEnabled && animator.hasBoundPlayables && !string.IsNullOrEmpty(triggername))
                 {
-                    animator.ResetTrigger(_activeAnimationTriggers.normalTrigger);
-                    animator.ResetTrigger(_activeAnimationTriggers.highlightedTrigger);
-                    animator.ResetTrigger(_activeAnimationTriggers.pressedTrigger);
-                    animator.ResetTrigger(_activeAnimationTriggers.selectedTrigger);
-                    animator.ResetTrigger(_activeAnimationTriggers.disabledTrigger);
+                    animator.ResetTrigger(_animationTriggers.normalTrigger);
+                    animator.ResetTrigger(_animationTriggers.highlightedTrigger);
+                    animator.ResetTrigger(_animationTriggers.pressedTrigger);
+                    animator.ResetTrigger(_animationTriggers.selectedTrigger);
+                    animator.ResetTrigger(_animationTriggers.disabledTrigger);
+
+                    for(int i = 0; i < _states.Length; i++)
+                    {
+                        animator.ResetTrigger(_states[i].AnimationTriggers.normalTrigger);
+                        animator.ResetTrigger(_states[i].AnimationTriggers.highlightedTrigger);
+                        animator.ResetTrigger(_states[i].AnimationTriggers.pressedTrigger);
+                        animator.ResetTrigger(_states[i].AnimationTriggers.selectedTrigger);
+                        animator.ResetTrigger(_states[i].AnimationTriggers.disabledTrigger);
+                    }
 
                     animator.SetTrigger(triggername);
                 }                

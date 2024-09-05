@@ -242,11 +242,20 @@ namespace UIFramework.UGUI
             if (transition != Transition.Animation || animator == null || !animator.isActiveAndEnabled || !animator.hasBoundPlayables || string.IsNullOrEmpty(triggername))
                 return;
 
-            animator.ResetTrigger(_activeAnimationTriggers.normalTrigger);
-            animator.ResetTrigger(_activeAnimationTriggers.highlightedTrigger);
-            animator.ResetTrigger(_activeAnimationTriggers.pressedTrigger);
-            animator.ResetTrigger(_activeAnimationTriggers.selectedTrigger);
-            animator.ResetTrigger(_activeAnimationTriggers.disabledTrigger);
+            animator.ResetTrigger(animationTriggers.normalTrigger);
+            animator.ResetTrigger(animationTriggers.highlightedTrigger);
+            animator.ResetTrigger(animationTriggers.pressedTrigger);
+            animator.ResetTrigger(animationTriggers.selectedTrigger);
+            animator.ResetTrigger(animationTriggers.disabledTrigger);
+
+            for (int i = 0; i < _states.Length; i++)
+            {
+                animator.ResetTrigger(_states[i].AnimationTriggers.normalTrigger);
+                animator.ResetTrigger(_states[i].AnimationTriggers.highlightedTrigger);
+                animator.ResetTrigger(_states[i].AnimationTriggers.pressedTrigger);
+                animator.ResetTrigger(_states[i].AnimationTriggers.selectedTrigger);
+                animator.ResetTrigger(_states[i].AnimationTriggers.disabledTrigger);
+            }
 
             animator.SetTrigger(triggername);
         }

@@ -9,6 +9,13 @@ namespace UIFramework
             this.AccessOperation = accessOperation;
         }
 
+        public AnimationPlayable CreatePlayable(AccessOperation accessOperation, EasingMode easingMode = EasingMode.Linear, TimeMode timeMode = TimeMode.Scaled)
+        {
+            PlayMode playMode = accessOperation == this.AccessOperation ? PlayMode.Forward : PlayMode.Reverse;
+            float startTime = playMode == PlayMode.Forward ? 0.0F : Length;
+            return new AnimationPlayable(this, startTime, playMode, easingMode, timeMode, 1.0F);
+        }
+
         public AnimationPlayable CreatePlayable(float length, AccessOperation accessOperation,
             float startOffset = 0.0F, EasingMode easingMode = EasingMode.Linear, TimeMode timeMode = TimeMode.Scaled)
         {
