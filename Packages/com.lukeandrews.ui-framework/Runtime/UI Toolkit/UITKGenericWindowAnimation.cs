@@ -7,8 +7,7 @@ namespace UIFramework.UIToolkit
     {
         private VisualElement _visualElement = null;
 
-        public UITKGenericWindowAnimation(VisualElement visualElement, GenericWindowAnimationType type, float length)
-            : base(type, length)
+        public UITKGenericWindowAnimation(VisualElement visualElement, GenericWindowAnimationType type) : base(type)
         {
             if(visualElement == null)
             {

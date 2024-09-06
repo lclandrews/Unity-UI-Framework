@@ -34,7 +34,7 @@ namespace UIFramework
             }
         }
 
-        public Animation Animation { get; private set; } = null;
+        public IAnimation Animation { get; private set; } = null;
         public PlayMode PlayMode { get; private set; } = PlayMode.Forward;
         public EasingMode EasingMode { get; private set; } = EasingMode.Linear;
         public float PlaybackSpeed { get; private set; } = 1.0F;
@@ -76,14 +76,14 @@ namespace UIFramework
 
         private AnimationPlayer() { }
 
-        public AnimationPlayer(Animation animation)
+        public AnimationPlayer(IAnimation animation)
         {
             if(animation == null)
             {
                 throw new ArgumentNullException(nameof(animation));
             }
 
-            this.Animation = animation;
+            Animation = animation;
             Data = new PlaybackData(this);
         }
 
@@ -94,7 +94,7 @@ namespace UIFramework
                 animationPlayable.PlaybackSpeed);
         }
 
-        public static AnimationPlayer PlayAnimation(Animation animation, float startTime = 0.0F, PlayMode playMode = PlayMode.Forward, 
+        public static AnimationPlayer PlayAnimation(IAnimation animation, float startTime = 0.0F, PlayMode playMode = PlayMode.Forward, 
             EasingMode easingMode = EasingMode.Linear, TimeMode timeMode = TimeMode.Scaled, float playbackSpeed = 1.0F)
         {
             AnimationPlayer player = new AnimationPlayer(animation);

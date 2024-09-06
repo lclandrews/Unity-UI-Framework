@@ -122,7 +122,7 @@ namespace UIFramework
 
         }
 
-        // ScreenController
+        // Controller
         protected virtual AnimationPlayable CreateAccessPlayable(AccessOperation accessOperation, float length)
         {
             return default;
@@ -194,9 +194,8 @@ namespace UIFramework
             WindowNavigationEvent navigationEvent = NavigateToScreen<ScreenType>(excludeCurrentFromHistory);
             if (navigationEvent.Success)
             {
-                Animation sourceWindowAnimation = navigationEvent.PreviousActiveWindow != null ?
-                navigationEvent.PreviousActiveWindow.CreateDefaultAccessAnimation(animationLength) : null;
-                Animation targetWindowAnimation = navigationEvent.ActiveWindow.CreateDefaultAccessAnimation(animationLength);
+                WindowAccessAnimation sourceWindowAnimation = navigationEvent.PreviousActiveWindow != null ? navigationEvent.PreviousActiveWindow.GetDefaultAccessAnimation() : null;
+                WindowAccessAnimation targetWindowAnimation = navigationEvent.ActiveWindow.GetDefaultAccessAnimation();
 
                 WindowTransitionPlayable transitionPlayable = WindowTransitionPlayable.Custom(animationLength, EasingMode.EaseInOut,
                             sourceWindowAnimation, targetWindowAnimation, WindowTransitionPlayable.SortPriority.Target);
@@ -214,9 +213,8 @@ namespace UIFramework
             WindowNavigationEvent navigationEvent = NavigateToScreen(screen, excludeCurrentFromHistory);
             if (navigationEvent.Success)
             {
-                Animation sourceWindowAnimation = navigationEvent.PreviousActiveWindow != null ?
-                navigationEvent.PreviousActiveWindow.CreateDefaultAccessAnimation(animationLength) : null;
-                Animation targetWindowAnimation = navigationEvent.ActiveWindow.CreateDefaultAccessAnimation(animationLength);
+                WindowAccessAnimation sourceWindowAnimation = navigationEvent.PreviousActiveWindow != null ? navigationEvent.PreviousActiveWindow.GetDefaultAccessAnimation() : null;
+                WindowAccessAnimation targetWindowAnimation = navigationEvent.ActiveWindow.GetDefaultAccessAnimation();
 
                 WindowTransitionPlayable transitionPlayable = WindowTransitionPlayable.Custom(animationLength, EasingMode.EaseInOut,
                             sourceWindowAnimation, targetWindowAnimation, WindowTransitionPlayable.SortPriority.Target);
@@ -230,9 +228,8 @@ namespace UIFramework
             WindowNavigationEvent navigationEvent = NavigateToScreen<ScreenType>(excludeCurrentFromHistory);
             if (navigationEvent.Success)
             {
-                Animation sourceWindowAnimation = navigationEvent.PreviousActiveWindow != null ?
-                navigationEvent.PreviousActiveWindow.CreateDefaultAccessAnimation(animationLength) : null;
-                Animation targetWindowAnimation = navigationEvent.ActiveWindow.CreateDefaultAccessAnimation(animationLength);
+                WindowAccessAnimation sourceWindowAnimation = navigationEvent.PreviousActiveWindow != null ? navigationEvent.PreviousActiveWindow.GetDefaultAccessAnimation() : null;
+                WindowAccessAnimation targetWindowAnimation = navigationEvent.ActiveWindow.GetDefaultAccessAnimation();
 
                 WindowTransitionPlayable transitionPlayable = WindowTransitionPlayable.Custom(animationLength, EasingMode.EaseInOut,
                             sourceWindowAnimation, targetWindowAnimation, WindowTransitionPlayable.SortPriority.Target);
@@ -251,9 +248,8 @@ namespace UIFramework
             WindowNavigationEvent navigationEvent = NavigateToScreen(screen, excludeCurrentFromHistory);
             if (navigationEvent.Success)
             {
-                Animation sourceWindowAnimation = navigationEvent.PreviousActiveWindow != null ?
-                navigationEvent.PreviousActiveWindow.CreateDefaultAccessAnimation(animationLength) : null;
-                Animation targetWindowAnimation = navigationEvent.ActiveWindow.CreateDefaultAccessAnimation(animationLength);
+                WindowAccessAnimation sourceWindowAnimation = navigationEvent.PreviousActiveWindow != null ? navigationEvent.PreviousActiveWindow.GetDefaultAccessAnimation() : null;
+                WindowAccessAnimation targetWindowAnimation = navigationEvent.ActiveWindow.GetDefaultAccessAnimation();
 
                 WindowTransitionPlayable transitionPlayable = WindowTransitionPlayable.Custom(animationLength, EasingMode.EaseInOut,
                             sourceWindowAnimation, targetWindowAnimation, WindowTransitionPlayable.SortPriority.Target);
@@ -271,11 +267,10 @@ namespace UIFramework
             WindowNavigationEvent navigationEvent = NavigateToScreen<ScreenType>(excludeCurrentFromHistory);
             if (navigationEvent.Success)
             {
-                Animation sourceWindowAnimation = navigationEvent.PreviousActiveWindow != null ?
-                navigationEvent.PreviousActiveWindow.CreateDefaultAccessAnimation(accessPlayable.Length) : null;
+                WindowAccessAnimation sourceWindowAnimation = navigationEvent.PreviousActiveWindow != null ? navigationEvent.PreviousActiveWindow.GetDefaultAccessAnimation() : null;
 
                 WindowTransitionPlayable transitionPlayable = WindowTransitionPlayable.Custom(accessPlayable.Length, accessPlayable.EasingMode,
-                            sourceWindowAnimation, accessPlayable.Animation, WindowTransitionPlayable.SortPriority.Target);
+                            sourceWindowAnimation, accessPlayable.ImplicitAnimation, WindowTransitionPlayable.SortPriority.Target);
 
                 return OpenScreenInternal<ScreenType>(in transitionPlayable, navigationEvent.ActiveWindow, navigationEvent.PreviousActiveWindow, excludeCurrentFromHistory);
             }
@@ -290,11 +285,10 @@ namespace UIFramework
             WindowNavigationEvent navigationEvent = NavigateToScreen(screen, excludeCurrentFromHistory);
             if (navigationEvent.Success)
             {
-                Animation sourceWindowAnimation = navigationEvent.PreviousActiveWindow != null ?
-                navigationEvent.PreviousActiveWindow.CreateDefaultAccessAnimation(accessPlayable.Length) : null;
+                WindowAccessAnimation sourceWindowAnimation = navigationEvent.PreviousActiveWindow != null ? navigationEvent.PreviousActiveWindow.GetDefaultAccessAnimation() : null;
 
                 WindowTransitionPlayable transitionPlayable = WindowTransitionPlayable.Custom(accessPlayable.Length, accessPlayable.EasingMode,
-                            sourceWindowAnimation, accessPlayable.Animation, WindowTransitionPlayable.SortPriority.Target);
+                            sourceWindowAnimation, accessPlayable.ImplicitAnimation, WindowTransitionPlayable.SortPriority.Target);
 
                 OpenScreenInternal(in transitionPlayable, navigationEvent.ActiveWindow, navigationEvent.PreviousActiveWindow, excludeCurrentFromHistory);
             }
@@ -305,11 +299,10 @@ namespace UIFramework
             WindowNavigationEvent navigationEvent = NavigateToScreen<ScreenType>(excludeCurrentFromHistory);
             if (navigationEvent.Success)
             {
-                Animation sourceWindowAnimation = navigationEvent.PreviousActiveWindow != null ?
-                navigationEvent.PreviousActiveWindow.CreateDefaultAccessAnimation(accessPlayable.Length) : null;
+                WindowAccessAnimation sourceWindowAnimation = navigationEvent.PreviousActiveWindow != null ? navigationEvent.PreviousActiveWindow.GetDefaultAccessAnimation() : null;
 
                 WindowTransitionPlayable transitionPlayable = WindowTransitionPlayable.Custom(accessPlayable.Length, accessPlayable.EasingMode,
-                            sourceWindowAnimation, accessPlayable.Animation, WindowTransitionPlayable.SortPriority.Target);
+                            sourceWindowAnimation, accessPlayable.ImplicitAnimation, WindowTransitionPlayable.SortPriority.Target);
 
                 return OpenScreenInternal<ScreenType>(in transitionPlayable, navigationEvent.ActiveWindow, navigationEvent.PreviousActiveWindow, data, excludeCurrentFromHistory);
             }
@@ -325,11 +318,10 @@ namespace UIFramework
             WindowNavigationEvent navigationEvent = NavigateToScreen(screen, excludeCurrentFromHistory);
             if (navigationEvent.Success)
             {
-                Animation sourceWindowAnimation = navigationEvent.PreviousActiveWindow != null ?
-                navigationEvent.PreviousActiveWindow.CreateDefaultAccessAnimation(accessPlayable.Length) : null;
+                WindowAccessAnimation sourceWindowAnimation = navigationEvent.PreviousActiveWindow != null ? navigationEvent.PreviousActiveWindow.GetDefaultAccessAnimation() : null;
 
                 WindowTransitionPlayable transitionPlayable = WindowTransitionPlayable.Custom(accessPlayable.Length, accessPlayable.EasingMode,
-                            sourceWindowAnimation, accessPlayable.Animation, WindowTransitionPlayable.SortPriority.Target);
+                            sourceWindowAnimation, accessPlayable.ImplicitAnimation, WindowTransitionPlayable.SortPriority.Target);
 
                 OpenScreenInternal(in transitionPlayable, navigationEvent.ActiveWindow, navigationEvent.PreviousActiveWindow, data, excludeCurrentFromHistory);
             }
@@ -428,8 +420,8 @@ namespace UIFramework
             {
                 if (transitionPlayable.Length > 0.0F && transitionPlayable.EntryAnimation != null)
                 {
-                    AnimationPlayable animationPlayable = transitionPlayable.EntryAnimation.CreatePlayable(targetScreen, transitionPlayable.Length, AccessOperation.Open, 0.0F,
-                    transitionPlayable.EasingMode, TimeMode);
+                    AnimationPlayable animationPlayable = transitionPlayable.EntryAnimation.GetWindowAnimation(targetScreen).CreatePlayable(AccessOperation.Open, transitionPlayable.Length,
+                        transitionPlayable.EasingMode, TimeMode);
                     targetScreen.Open(in animationPlayable);
                 }
                 else
@@ -523,9 +515,7 @@ namespace UIFramework
             WindowNavigationEvent navigationEvent = _navigation.Clear();
             if (navigationEvent.Success)
             {
-                WindowAccessPlayable animationPlayable =
-                    new WindowAccessPlayable(navigationEvent.PreviousActiveWindow.CreateDefaultAccessAnimation(animationLength), animationLength, EasingMode.EaseInOut);
-                CloseAllInternal(in animationPlayable, navigationEvent.PreviousActiveWindow);
+                CloseAllInternal(new WindowAccessPlayable(animationLength, EasingMode.EaseInOut), navigationEvent.PreviousActiveWindow);
                 return true;
             }
             return false;
@@ -643,7 +633,7 @@ namespace UIFramework
             }
         }
 
-        private void OnAnimationComplete(Animation animation)
+        private void OnAnimationComplete(IAnimation animation)
         {
             if (AccessState == AccessState.Opening)
             {

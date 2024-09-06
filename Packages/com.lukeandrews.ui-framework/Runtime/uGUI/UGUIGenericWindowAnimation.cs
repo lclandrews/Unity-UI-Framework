@@ -18,8 +18,7 @@ namespace UIFramework.UGUI
         private Vector3 _offDisplayTop = Vector3.zero;
 
         public UGUIGenericWindowAnimation(RectTransform displayRectTransform, RectTransform rectTransform, Vector3 activeAnchoredPosition, 
-            CanvasGroup canvasGroup, GenericWindowAnimationType type, float length)
-            : base(type, length)
+            CanvasGroup canvasGroup, GenericWindowAnimationType type) : base(type)
         {
             if (displayRectTransform == null)
             {

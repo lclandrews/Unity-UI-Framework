@@ -6,41 +6,26 @@ namespace UIFramework
 {    
     public struct AnimationPlayable
     {       
-        public Animation Animation { get; private set; }        
+        public IAnimation Animation { get; private set; }        
         public float StartTime { get; private set; }
         public PlayMode PlayMode { get; private set; }
         public EasingMode EasingMode { get; private set; }
         public float PlaybackSpeed { get; private set; }
         public TimeMode TimeMode { get; private set; }
 
-        public AnimationPlayable(Animation animation)
-            : this(animation, 0.0F, PlayMode.Forward, EasingMode.Linear, TimeMode.Scaled, 1.0F) { }
-
-        public AnimationPlayable(Animation animation, float startTime)
-            : this(animation, startTime, PlayMode.Forward, EasingMode.Linear, TimeMode.Scaled, 1.0F) { }
-
-        public AnimationPlayable(Animation animation, float startTime, PlayMode playMode)
-            : this(animation, startTime, playMode, EasingMode.Linear, TimeMode.Scaled, 1.0F) { }
-
-        public AnimationPlayable(Animation animation, float startTime, PlayMode playMode, EasingMode easingMode)
-            : this(animation, startTime, playMode, easingMode, TimeMode.Scaled, 1.0F) { }
-
-        public AnimationPlayable(Animation animation, float startTime, PlayMode playMode, EasingMode easingMode, TimeMode timeMode)
-            : this(animation, startTime, playMode, easingMode, timeMode, 1.0F) { }
-
-        public AnimationPlayable(Animation animation, float startTime, PlayMode playMode, EasingMode easingMode, TimeMode timeMode, float playbackSpeed)
+        public AnimationPlayable(IAnimation animation, float startTime, PlayMode playMode, EasingMode easingMode, TimeMode timeMode, float playbackSpeed)
         {
             if(animation == null)
             {
                 throw new ArgumentNullException(nameof(animation));
             }
 
-            this.Animation = animation;
-            this.EasingMode = easingMode;
-            this.StartTime = Mathf.Clamp(startTime, 0.0F, animation.Length);
-            this.PlayMode = playMode;
-            this.TimeMode = timeMode;
-            this.PlaybackSpeed = playbackSpeed;
+            Animation = animation;
+            EasingMode = easingMode;
+            StartTime = Mathf.Clamp(startTime, 0.0F, animation.Length);
+            PlayMode = playMode;
+            TimeMode = timeMode;
+            PlaybackSpeed = playbackSpeed;
         }
 
         public void Invert()

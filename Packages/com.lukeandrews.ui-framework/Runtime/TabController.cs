@@ -74,9 +74,9 @@ namespace UIFramework
             return SetActiveInternal<WindowType>(new WindowAccessPlayable(type, length, easingMode));
         }
 
-        public IWindow SetActive<WindowType>(in WindowAccessPlayable animation) where WindowType : IWindow
+        public IWindow SetActive<WindowType>(in WindowAccessPlayable accessPlayable) where WindowType : IWindow
         {
-            return SetActiveInternal<WindowType>(in animation);
+            return SetActiveInternal<WindowType>(in accessPlayable);
         }
 
         public IWindow SetActive<WindowType>(object data, GenericWindowAnimationType type = GenericWindowAnimationType.Fade, float length = 0.5F, EasingMode easingMode = EasingMode.EaseInOut) where WindowType : IWindow
@@ -86,9 +86,9 @@ namespace UIFramework
             return window;
         }
 
-        public IWindow SetActive<WindowType>(object data, in WindowAccessPlayable animation) where WindowType : IWindow
+        public IWindow SetActive<WindowType>(object data, in WindowAccessPlayable accessPlayable) where WindowType : IWindow
         {
-            IWindow window = SetActiveInternal<WindowType>(in animation);
+            IWindow window = SetActiveInternal<WindowType>(in accessPlayable);
             window.SetData(data);
             return window;
         }
@@ -98,9 +98,9 @@ namespace UIFramework
             return SetActiveIndexInternal(index, new WindowAccessPlayable(type, length, easingMode));
         }
 
-        public IWindow SetActiveIndex(int index, in WindowAccessPlayable animation)
+        public IWindow SetActiveIndex(int index, in WindowAccessPlayable accessPlayable)
         {
-            return SetActiveIndexInternal(index, in animation);
+            return SetActiveIndexInternal(index, in accessPlayable);
         }
 
         public IWindow SetActiveIndex(int index, object data, GenericWindowAnimationType type = GenericWindowAnimationType.Fade, float length = 0.5F, EasingMode easingMode = EasingMode.EaseInOut)
@@ -110,14 +110,14 @@ namespace UIFramework
             return window;
         }
 
-        public IWindow SetActiveIndex(int index, object data, in WindowAccessPlayable animation)
+        public IWindow SetActiveIndex(int index, object data, in WindowAccessPlayable accessPlayable)
         {
-            IWindow window = SetActiveIndexInternal(index, in animation);
+            IWindow window = SetActiveIndexInternal(index, in accessPlayable);
             window.SetData(data);
             return window;
         }
 
-        private IWindow SetActiveInternal<WindowType>(in WindowAccessPlayable animation) where WindowType : IWindow
+        private IWindow SetActiveInternal<WindowType>(in WindowAccessPlayable accessPlayable) where WindowType : IWindow
         {
             if (_activeTabWindow != null)
             {
@@ -143,18 +143,18 @@ namespace UIFramework
                         }
                         else
                         {
-                            closeAnimationPlayable = _activeTabWindow.CreateDefaultAccessAnimation(animation.Length).CreatePlayable(AccessOperation.Close, animation.EasingMode, TimeMode.Scaled);
+                            closeAnimationPlayable = _activeTabWindow.GetDefaultAccessAnimation().CreatePlayable(AccessOperation.Close, accessPlayable.Length, accessPlayable.EasingMode);
                         }
                         _activeTabWindow.Close(in closeAnimationPlayable);
                         _activeTabWindow = targetWindow;
-                        _activeTabWindow.Open(animation.CreatePlayable(_activeTabWindow, AccessOperation.Open));
+                        _activeTabWindow.Open(accessPlayable.CreatePlayable(_activeTabWindow, AccessOperation.Open));
                     }
                 }
             }
             return _activeTabWindow;
         }
 
-        private IWindow SetActiveIndexInternal(int index, in WindowAccessPlayable animation)
+        private IWindow SetActiveIndexInternal(int index, in WindowAccessPlayable accessPlayable)
         {
             if (index != ActiveTabIndex)
             {
@@ -172,11 +172,11 @@ namespace UIFramework
                         }
                         else
                         {
-                            closeAnimationPlayable = _activeTabWindow.CreateDefaultAccessAnimation(animation.Length).CreatePlayable(AccessOperation.Close, animation.EasingMode, TimeMode.Scaled);
+                            closeAnimationPlayable = _activeTabWindow.GetDefaultAccessAnimation().CreatePlayable(AccessOperation.Close, accessPlayable.EasingMode, TimeMode.Scaled);
                         }
                         _activeTabWindow.Close(in closeAnimationPlayable);
                         _activeTabWindow = targetWindow;
-                        _activeTabWindow.Open(animation.CreatePlayable(_activeTabWindow, AccessOperation.Open));
+                        _activeTabWindow.Open(accessPlayable.CreatePlayable(_activeTabWindow, AccessOperation.Open));
                     }
                 }
             }

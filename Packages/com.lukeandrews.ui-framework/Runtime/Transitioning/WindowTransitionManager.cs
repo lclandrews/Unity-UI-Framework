@@ -61,26 +61,18 @@ namespace UIFramework
                 return CreateWindowPlayable(SourceWidow, Transition.ExitAnimation, startOffset, Transition.Length, Transition.EasingMode.GetInverseEasingMode(), AccessOperation.Close, reverse);
             }
 
-            private AnimationPlayable CreateWindowPlayable(IWindow window, ImplicitWindowAnimation animation, float startOffset, float length, EasingMode easingMode, AccessOperation accessOperation, bool reverse)
+            private AnimationPlayable CreateWindowPlayable(IWindow window, ImplicitWindowAnimation implicitAnimation, float startOffset, float length, EasingMode easingMode, AccessOperation accessOperation, bool reverse)
             {
-                if (animation != null)
+                if (implicitAnimation != null)
                 {
+                    WindowAccessAnimation accessAnimation = implicitAnimation.GetWindowAnimation(window);
                     if (reverse)
                     {
-                        if (!animation.IsGeneric && !animation.IsAccessAnimation)
-                        {
-                            AnimationPlayable animationPlayable = animation.CreatePlayable(window, length, accessOperation, startOffset, easingMode, TimeMode);
-                            animationPlayable.Invert();
-                            return animationPlayable;
-                        }
-                        else
-                        {
-                            return animation.CreatePlayable(window, length, accessOperation.InvertAccessOperation(), startOffset, easingMode.GetInverseEasingMode(), TimeMode);
-                        }
+                        return accessAnimation.CreatePlayable(accessOperation.InvertAccessOperation(), length, startOffset, easingMode.GetInverseEasingMode(), TimeMode);
                     }
                     else
                     {
-                        return animation.CreatePlayable(window, length, accessOperation, startOffset, easingMode, TimeMode);
+                        return accessAnimation.CreatePlayable(accessOperation, length, startOffset, easingMode.GetInverseEasingMode(), TimeMode);
                     }
                 }
                 return default;

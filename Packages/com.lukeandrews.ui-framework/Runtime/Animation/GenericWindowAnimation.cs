@@ -27,24 +27,22 @@ namespace UIFramework
 
         public GenericWindowAnimationType FallbackType { get; private set; } = GenericWindowAnimationType.Fade;
 
-        protected GenericWindowAnimation(GenericWindowAnimationType type, float length)
-            : base(AccessOperation.Open, length)
+        protected GenericWindowAnimation(GenericWindowAnimationType type) : base(AccessOperation.Open)
         {
-            this.Type = type;
-            if(!IsSupportedType(this.Type))
+            Type = type;
+            if(!IsSupportedType(Type))
             {
-                Debug.LogWarning(string.Format("WindowAnimation is unable to support type {0}, falling back to {1}.", this.Type, FallbackType));
+                Debug.LogWarning(string.Format("WindowAnimation is unable to support type {0}, falling back to {1}.", Type, FallbackType));
             }
         }
 
-        protected GenericWindowAnimation(GenericWindowAnimationType type, GenericWindowAnimationType fallbackType, float length)
-            : base(AccessOperation.Open, length)
+        protected GenericWindowAnimation(GenericWindowAnimationType type, GenericWindowAnimationType fallbackType) : base(AccessOperation.Open)
         {
-            this.Type = type;
-            this.FallbackType = fallbackType;
-            if (!IsSupportedType(this.Type))
+            Type = type;
+            FallbackType = fallbackType;
+            if (!IsSupportedType(Type))
             {
-                Debug.LogWarning(string.Format("WindowAnimation is unable to support type {0}, falling back to {1}.", this.Type, this.FallbackType));
+                Debug.LogWarning(string.Format("WindowAnimation is unable to support type {0}, falling back to {1}.", Type, FallbackType));
             }
         }
 

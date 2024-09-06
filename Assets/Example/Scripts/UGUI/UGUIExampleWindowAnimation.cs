@@ -6,7 +6,7 @@ using UnityEngine;
 public class UGUIExampleWindowAnimation : UGUIGenericWindowAnimation
 {
     public UGUIExampleWindowAnimation(RectTransform displayRectTransform, RectTransform rectTransform, Vector3 activeAnchoredPosition, CanvasGroup canvasGroup, GenericWindowAnimationType type, float length)
-        : base(displayRectTransform, rectTransform, activeAnchoredPosition, canvasGroup, type, length) { }
+        : base(displayRectTransform, rectTransform, activeAnchoredPosition, canvasGroup, type) { }
 
     protected override void SlideFromLeft(float normalisedTime)
     {

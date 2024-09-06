@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -117,11 +118,19 @@ namespace UIFramework.UGUI
         private IAccessibleAction _onAccessAnimationComplete = null;
         protected Vector3 _activeAnchoredPosition { get; private set; } = Vector3.zero;
 
+        private Dictionary<GenericWindowAnimationType, GenericWindowAnimation> _genericAnimations = new Dictionary<GenericWindowAnimationType, GenericWindowAnimation>();
+
         // IWindow
-        public virtual GenericWindowAnimation CreateAnimation(GenericWindowAnimationType type, float length)
+        public virtual GenericWindowAnimation GetAnimation(GenericWindowAnimationType type)
         {
-            Canvas canvas = GetComponentInParent<Canvas>(true);
-            return new UGUIGenericWindowAnimation(canvas.transform as RectTransform, RectTransform, _activeAnchoredPosition, CanvasGroup, type, length);
+            GenericWindowAnimation animation;
+            if(!_genericAnimations.TryGetValue(type, out animation))
+            {
+                Canvas canvas = GetComponentInParent<Canvas>(true);
+                animation = new UGUIGenericWindowAnimation(canvas.transform as RectTransform, RectTransform, _activeAnchoredPosition, CanvasGroup, type);
+                _genericAnimations.Add(type, animation);
+            }
+            return animation;
         }        
 
         public bool SetWaiting(bool waiting)
@@ -139,9 +148,9 @@ namespace UIFramework.UGUI
         }
 
         // IAccessible
-        public virtual WindowAccessAnimation CreateDefaultAccessAnimation(float length)
+        public virtual WindowAccessAnimation GetDefaultAccessAnimation()
         {
-            return CreateAnimation(GenericWindowAnimationType.Fade, length);
+            return GetAnimation(GenericWindowAnimationType.Fade);
         }
 
         public virtual void ResetAnimatedProperties()
@@ -293,7 +302,7 @@ namespace UIFramework.UGUI
 
         protected virtual void OnClosed() { }
 
-        private void OnAnimationComplete(Animation animation)
+        private void OnAnimationComplete(IAnimation animation)
         {
             ResetAnimatedProperties();
             ClearAnimationReferences();

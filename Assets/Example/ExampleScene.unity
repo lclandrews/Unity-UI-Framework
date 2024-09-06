@@ -1334,7 +1334,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _timeMode: 0
-  ScreenCollectors: []
+  ScreenCollectors:
+  - {fileID: 649899465}
+  - {fileID: 2002601822}
+  - {fileID: 341823578}
   backButton: {fileID: 1729275026}
 --- !u!223 &2126988257
 Canvas:

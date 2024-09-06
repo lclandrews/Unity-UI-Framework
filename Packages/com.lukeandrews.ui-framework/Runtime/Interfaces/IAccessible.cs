@@ -24,7 +24,7 @@ namespace UIFramework
         AnimationPlayer.PlaybackData AccessAnimationPlaybackData { get; }
         AnimationPlayable AccessAnimationPlayable { get; }
 
-        WindowAccessAnimation CreateDefaultAccessAnimation(float length);
+        WindowAccessAnimation GetDefaultAccessAnimation();
         void ResetAnimatedProperties();
 
         void Init();

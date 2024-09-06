@@ -53,12 +53,12 @@ namespace UIFramework
 
         private WindowTransitionPlayable(float length, EasingMode easingMode, ImplicitWindowAnimation exitAnimation, ImplicitWindowAnimation entryAnimation, SortPriority sortPriority)
         {
-            this.Length = length;
+            Length = length;
             LengthMs = SecondsToMilliseconds(length);
-            this.EasingMode = easingMode;
-            this.ExitAnimation = exitAnimation;
-            this.EntryAnimation = entryAnimation;
-            this.WindowSortPriority = sortPriority;
+            EasingMode = easingMode;
+            ExitAnimation = exitAnimation;
+            EntryAnimation = entryAnimation;
+            WindowSortPriority = sortPriority;
         }
 
         private static int SecondsToMilliseconds(float seconds)

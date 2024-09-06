@@ -40,15 +40,8 @@ public class ExampleController : Controller
     {
         Canvas canvas = GetComponentInParent<Canvas>(true);
         UGUIGenericWindowAnimation animation =
-            new UGUIGenericWindowAnimation(canvas.transform as RectTransform, rectTransform, Vector3.zero, canvasGroup, GenericWindowAnimationType.Fade, length);
-        switch (accessOperation)
-        {
-            default:
-            case AccessOperation.Open:
-                return new AnimationPlayable(animation, 0.0F, UIFramework.PlayMode.Forward, EasingMode.EaseInOut, TimeMode);
-            case AccessOperation.Close:
-                return new AnimationPlayable(animation, length, UIFramework.PlayMode.Reverse, EasingMode.EaseInOut, TimeMode);
-        }
+            new UGUIGenericWindowAnimation(canvas.transform as RectTransform, rectTransform, Vector3.zero, canvasGroup, GenericWindowAnimationType.Fade);
+        return animation.CreatePlayable(accessOperation, EasingMode.EaseInOut, TimeMode);
     }
 
     protected override void OnInit()

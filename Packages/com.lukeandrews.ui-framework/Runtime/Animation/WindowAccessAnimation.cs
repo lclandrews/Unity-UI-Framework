@@ -1,24 +1,41 @@
+using System;
+
 namespace UIFramework
 {
-    public abstract class WindowAccessAnimation : Animation
+    public abstract class WindowAccessAnimation : IAnimation
     {
+        public virtual float Length { get; } = 1.0F;
         public AccessOperation AccessOperation { get; private set; } = AccessOperation.Open;
 
-        protected WindowAccessAnimation(AccessOperation accessOperation, float length) : base(length)
+        protected WindowAccessAnimation(AccessOperation accessOperation)
         {
-            this.AccessOperation = accessOperation;
+            AccessOperation = accessOperation;
         }
 
-        public AnimationPlayable CreatePlayable(EasingMode easingMode = EasingMode.Linear, TimeMode timeMode = TimeMode.Scaled)
-        {
-            return new AnimationPlayable(this, 0.0F, PlayMode.Forward, easingMode, timeMode, 1.0F);
-        }
+        public abstract void Evaluate(float normalisedTime);
+        public virtual void Prepare() { }
 
         public AnimationPlayable CreatePlayable(AccessOperation accessOperation, EasingMode easingMode = EasingMode.Linear, TimeMode timeMode = TimeMode.Scaled)
         {
-            PlayMode playMode = accessOperation == this.AccessOperation ? PlayMode.Forward : PlayMode.Reverse;
+            PlayMode playMode = accessOperation == AccessOperation ? PlayMode.Forward : PlayMode.Reverse;
             float startTime = playMode == PlayMode.Forward ? 0.0F : Length;
             return new AnimationPlayable(this, startTime, playMode, easingMode, timeMode, 1.0F);
+        }
+
+        public AnimationPlayable CreatePlayable(AccessOperation accessOperation, float length, EasingMode easingMode = EasingMode.Linear, TimeMode timeMode = TimeMode.Scaled)
+        {
+            float playbackSpeed = Length / length;
+            PlayMode playMode = accessOperation == AccessOperation ? PlayMode.Forward : PlayMode.Reverse;
+            float startTime = playMode == PlayMode.Forward ? 0.0F : Length;
+            return new AnimationPlayable(this, startTime, playMode, easingMode, timeMode, playbackSpeed);
+        }
+
+        public AnimationPlayable CreatePlayable(AccessOperation accessOperation, float length, float startOffset, EasingMode easingMode = EasingMode.Linear, TimeMode timeMode = TimeMode.Scaled)
+        {
+            float playbackSpeed = Length / length;
+            PlayMode playMode = accessOperation == AccessOperation ? PlayMode.Forward : PlayMode.Reverse;
+            float startTime = playMode == PlayMode.Forward ? startOffset : length - startOffset;
+            return new AnimationPlayable(this, startTime, playMode, easingMode, timeMode, playbackSpeed);
         }
     }
 }
