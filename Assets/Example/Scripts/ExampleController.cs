@@ -39,8 +39,8 @@ public class ExampleController : Controller
     protected override AnimationPlayable CreateAccessPlayable(AccessOperation accessOperation, float length)
     {
         Canvas canvas = GetComponentInParent<Canvas>(true);
-        GenericWindowAnimation animation =
-            new GenericWindowAnimation(canvas.transform as RectTransform, rectTransform, Vector3.zero, canvasGroup, GenericWindowAnimationType.Fade, length);
+        UGUIGenericWindowAnimation animation =
+            new UGUIGenericWindowAnimation(canvas.transform as RectTransform, rectTransform, Vector3.zero, canvasGroup, GenericWindowAnimationType.Fade, length);
         switch (accessOperation)
         {
             default:

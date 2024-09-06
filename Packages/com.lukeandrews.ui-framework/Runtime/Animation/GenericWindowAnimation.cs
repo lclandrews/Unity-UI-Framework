@@ -21,13 +21,13 @@ namespace UIFramework
         Expand
     }
 
-    public abstract class GenericWindowAnimationBase : WindowAccessAnimation
+    public abstract class GenericWindowAnimation : WindowAccessAnimation
     {
         public GenericWindowAnimationType Type { get; private set; } = GenericWindowAnimationType.Fade;
 
         public GenericWindowAnimationType FallbackType { get; private set; } = GenericWindowAnimationType.Fade;
 
-        protected GenericWindowAnimationBase(GenericWindowAnimationType type, float length)
+        protected GenericWindowAnimation(GenericWindowAnimationType type, float length)
             : base(AccessOperation.Open, length)
         {
             this.Type = type;
@@ -37,7 +37,7 @@ namespace UIFramework
             }
         }
 
-        protected GenericWindowAnimationBase(GenericWindowAnimationType type, GenericWindowAnimationType fallbackType, float length)
+        protected GenericWindowAnimation(GenericWindowAnimationType type, GenericWindowAnimationType fallbackType, float length)
             : base(AccessOperation.Open, length)
         {
             this.Type = type;

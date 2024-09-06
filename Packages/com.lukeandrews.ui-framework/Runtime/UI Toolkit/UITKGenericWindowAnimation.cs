@@ -3,11 +3,11 @@ using UnityEngine.UIElements;
 
 namespace UIFramework.UIToolkit
 {
-    public class GenericWindowAnimation : GenericWindowAnimationBase
+    public class UITKGenericWindowAnimation : GenericWindowAnimation
     {
         private VisualElement _visualElement = null;
 
-        public GenericWindowAnimation(VisualElement visualElement, GenericWindowAnimationType type, float length)
+        public UITKGenericWindowAnimation(VisualElement visualElement, GenericWindowAnimationType type, float length)
             : base(type, length)
         {
             if(visualElement == null)

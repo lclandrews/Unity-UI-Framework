@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace UIFramework.UGUI
 {
-    public class GenericWindowAnimation : GenericWindowAnimationBase
+    public class UGUIGenericWindowAnimation : GenericWindowAnimation
     {
         private RectTransform _displayRectTransform = null;
         private RectTransform _rectTransform = null;
@@ -17,7 +17,8 @@ namespace UIFramework.UGUI
         private Vector3 _offDisplayBottom = Vector3.zero;
         private Vector3 _offDisplayTop = Vector3.zero;
 
-        public GenericWindowAnimation(RectTransform displayRectTransform, RectTransform rectTransform, Vector3 activeAnchoredPosition, CanvasGroup canvasGroup, GenericWindowAnimationType type, float length)
+        public UGUIGenericWindowAnimation(RectTransform displayRectTransform, RectTransform rectTransform, Vector3 activeAnchoredPosition, 
+            CanvasGroup canvasGroup, GenericWindowAnimationType type, float length)
             : base(type, length)
         {
             if (displayRectTransform == null)

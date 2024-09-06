@@ -114,9 +114,9 @@ namespace UIFramework.UIToolkit
         }
 
         // IWindow
-        public GenericWindowAnimationBase CreateAnimation(GenericWindowAnimationType type, float length)
+        public GenericWindowAnimation CreateAnimation(GenericWindowAnimationType type, float length)
         {
-            return new GenericWindowAnimation(VisualElement, type, length);
+            return new UITKGenericWindowAnimation(VisualElement, type, length);
         }
 
         public bool SetWaiting(bool waiting)

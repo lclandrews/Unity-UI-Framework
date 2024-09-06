@@ -531,31 +531,31 @@ namespace UIFramework
             return false;
         }
 
-        public bool CloseAll(in WindowAccessPlayable animationPlayable)
+        public bool CloseAll(in WindowAccessPlayable accessPlayable)
         {
             WindowNavigationEvent navigationEvent = _navigation.Clear();
             if (navigationEvent.Success)
             {
-                CloseAllInternal(in animationPlayable, navigationEvent.PreviousActiveWindow);
+                CloseAllInternal(in accessPlayable, navigationEvent.PreviousActiveWindow);
                 return true;
             }
             return false;
         }
 
-        private void CloseAllInternal(in WindowAccessPlayable animationPlayable, IWindow targetScreen)
+        private void CloseAllInternal(in WindowAccessPlayable accessPlayable, IWindow targetScreen)
         {
-            _transitionManager.Terminate(Mathf.Approximately(animationPlayable.Length, 0.0F));
+            _transitionManager.Terminate(Mathf.Approximately(accessPlayable.Length, 0.0F));
 
-            if (animationPlayable.Length > 0.0F)
+            if (accessPlayable.Length > 0.0F)
             {
-                targetScreen.Close(animationPlayable.CreatePlayable(targetScreen, AccessOperation.Close, 0.0F, TimeMode));
+                targetScreen.Close(accessPlayable.CreatePlayable(targetScreen, AccessOperation.Close, 0.0F, TimeMode));
             }
             else
             {
                 targetScreen.Close();
             }
 
-            CloseInternal(animationPlayable.Length);
+            CloseInternal(accessPlayable.Length);
         }
 
         private void CloseInternal(float animationLength)

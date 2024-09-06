@@ -118,11 +118,11 @@ namespace UIFramework.UGUI
         protected Vector3 _activeAnchoredPosition { get; private set; } = Vector3.zero;
 
         // IWindow
-        public virtual GenericWindowAnimationBase CreateAnimation(GenericWindowAnimationType type, float length)
+        public virtual GenericWindowAnimation CreateAnimation(GenericWindowAnimationType type, float length)
         {
             Canvas canvas = GetComponentInParent<Canvas>(true);
-            return new GenericWindowAnimation(canvas.transform as RectTransform, RectTransform, _activeAnchoredPosition, CanvasGroup, type, length);
-        }
+            return new UGUIGenericWindowAnimation(canvas.transform as RectTransform, RectTransform, _activeAnchoredPosition, CanvasGroup, type, length);
+        }        
 
         public bool SetWaiting(bool waiting)
         {

@@ -143,11 +143,11 @@ namespace UIFramework
                         }
                         else
                         {
-                            closeAnimationPlayable = _activeTabWindow.CreateDefaultAccessAnimation(animation.Length).CreatePlayable(animation.Length, AccessOperation.Close, 0.0F, animation.EasingMode, TimeMode.Scaled);
+                            closeAnimationPlayable = _activeTabWindow.CreateDefaultAccessAnimation(animation.Length).CreatePlayable(AccessOperation.Close, animation.EasingMode, TimeMode.Scaled);
                         }
                         _activeTabWindow.Close(in closeAnimationPlayable);
                         _activeTabWindow = targetWindow;
-                        _activeTabWindow.Open(animation.CreatePlayable(_activeTabWindow, AccessOperation.Open, 0.0F, TimeMode.Scaled));
+                        _activeTabWindow.Open(animation.CreatePlayable(_activeTabWindow, AccessOperation.Open));
                     }
                 }
             }
@@ -172,11 +172,11 @@ namespace UIFramework
                         }
                         else
                         {
-                            closeAnimationPlayable = _activeTabWindow.CreateDefaultAccessAnimation(animation.Length).CreatePlayable(animation.Length, AccessOperation.Close, 0.0F, animation.EasingMode, TimeMode.Scaled);
+                            closeAnimationPlayable = _activeTabWindow.CreateDefaultAccessAnimation(animation.Length).CreatePlayable(AccessOperation.Close, animation.EasingMode, TimeMode.Scaled);
                         }
                         _activeTabWindow.Close(in closeAnimationPlayable);
                         _activeTabWindow = targetWindow;
-                        _activeTabWindow.Open(animation.CreatePlayable(_activeTabWindow, AccessOperation.Open, 0.0F, TimeMode.Scaled));
+                        _activeTabWindow.Open(animation.CreatePlayable(_activeTabWindow, AccessOperation.Open));
                     }
                 }
             }
