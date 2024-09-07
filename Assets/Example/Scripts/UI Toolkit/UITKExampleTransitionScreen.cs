@@ -7,7 +7,6 @@ public class UITKExampleTransitionScreen : UIFramework.UIToolkit.Screen
     private float _transitionLength = 0.5F;
 
     private Button _fadeTransitionButton = null;
-    private Button _dissolveTransitionButton = null;
 
     private Button _slideFromLeftTransitionButton = null;
     private Button _slideFromRightTransitionButton = null;
@@ -36,9 +35,6 @@ public class UITKExampleTransitionScreen : UIFramework.UIToolkit.Screen
         _fadeTransitionButton = VisualElement.Q<Button>("fadeButton");
         _fadeTransitionButton.clicked += FadeTransition;
 
-        _dissolveTransitionButton = VisualElement.Q<Button>("dissolveButton");
-        _dissolveTransitionButton.clicked += DissolveTransition;
-
         _slideFromLeftTransitionButton = VisualElement.Q<Button>("slideFromLeftButton");
         _slideFromLeftTransitionButton.clicked += SlideFromLeftTransition;
         _slideFromRightTransitionButton = VisualElement.Q<Button>("slideFromRightButton");
@@ -66,12 +62,6 @@ public class UITKExampleTransitionScreen : UIFramework.UIToolkit.Screen
     private void FadeTransition()
     {
         TransitionAnimationParams transition = TransitionAnimationParams.Fade(_transitionLength, UnityEngine.Extension.EasingMode.EaseInOut);
-        Controller.OpenScreen<UITKExampleScreen>(in transition);
-    }
-
-    private void DissolveTransition()
-    {
-        TransitionAnimationParams transition = TransitionAnimationParams.Dissolve(_transitionLength, UnityEngine.Extension.EasingMode.EaseInOut);
         Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 

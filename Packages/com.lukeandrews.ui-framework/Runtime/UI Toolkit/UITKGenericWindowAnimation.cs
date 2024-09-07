@@ -21,11 +21,6 @@ namespace UIFramework.UIToolkit
             _visualElement.style.opacity = normalisedTime;
         }
 
-        protected override void Dissolve(float normalisedTime)
-        {
-            throw new System.NotImplementedException();
-        }
-
         protected override void SlideFromLeft(float normalisedTime)
         {
             float percent = (-1.0F + normalisedTime) * 100.0F;

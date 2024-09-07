@@ -6,13 +6,12 @@ namespace UIFramework
 {
     /// <summary>
     /// Type of animation. Some assumptions are made.
-    /// Fade, Dissolve, Flip, Expand: These are assumed to be from a inactive state to an active state.
+    /// Fade, Flip, Expand: These are assumed to be from a inactive state to an active state.
     /// E.g, animating from an alpha of 0 to 1 for Fade.
     /// </summary>
     public enum GenericWindowAnimationType
     {
         Fade,
-        Dissolve,
         SlideFromLeft,
         SlideFromRight,
         SlideFromBottom,
@@ -54,9 +53,6 @@ namespace UIFramework
                 case GenericWindowAnimationType.Fade:
                     Fade(normalisedTime);
                     break;
-                case GenericWindowAnimationType.Dissolve:
-                    Dissolve(normalisedTime);
-                    break;
                 case GenericWindowAnimationType.SlideFromLeft:
                     SlideFromLeft(normalisedTime);
                     break;
@@ -81,7 +77,6 @@ namespace UIFramework
         }
 
         protected abstract void Fade(float normalisedTime);
-        protected abstract void Dissolve(float normalisedTime);
         protected abstract void SlideFromLeft(float normalisedTime);
         protected abstract void SlideFromRight(float normalisedTime);
         protected abstract void SlideFromBottom(float normalisedTime);

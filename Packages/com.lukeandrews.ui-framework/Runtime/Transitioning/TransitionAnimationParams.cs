@@ -77,11 +77,6 @@ namespace UIFramework
             return new TransitionAnimationParams(length, easingMode, null, GenericWindowAnimationType.Fade, SortPriority.Auto);
         }
 
-        public static TransitionAnimationParams Dissolve(float length, EasingMode easingMode)
-        {
-            return new TransitionAnimationParams(length, easingMode, GenericWindowAnimationType.Dissolve, null, SortPriority.Auto);
-        }
-
         public static TransitionAnimationParams SlideFromLeft(float length, EasingMode easingMode)
         {
             return new TransitionAnimationParams(length, easingMode, GenericWindowAnimationType.SlideFromRight, GenericWindowAnimationType.SlideFromLeft, SortPriority.Auto);

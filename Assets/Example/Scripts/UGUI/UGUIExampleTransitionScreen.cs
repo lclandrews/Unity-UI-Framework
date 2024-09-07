@@ -11,7 +11,6 @@ public class UGUIExampleTransitionScreen : UIFramework.UGUI.Screen
     [SerializeField] private float _transitionLength = 0.5F;
 
     [SerializeField] private Button _fadeTransitionButton = null;
-    [SerializeField] private Button _dissolveTransitionButton = null;
 
     [SerializeField] private Button _slideFromLeftTransitionButton = null;
     [SerializeField] private Button _slideFromRightTransitionButton = null;
@@ -35,7 +34,6 @@ public class UGUIExampleTransitionScreen : UIFramework.UGUI.Screen
     {
         base.OnInit();
         _fadeTransitionButton?.onClick.AddListener(FadeTransition);
-        _dissolveTransitionButton?.onClick.AddListener(DissolveTransition);
         _slideFromLeftTransitionButton?.onClick.AddListener(SlideFromLeftTransition);
         _slideFromRightTransitionButton?.onClick?.AddListener(SlideFromRightTransition);
         _slideFromBottomTransitionButton?.onClick.AddListener(SlideFromBottomTransition);
@@ -52,12 +50,6 @@ public class UGUIExampleTransitionScreen : UIFramework.UGUI.Screen
     private void FadeTransition()
     {
         TransitionAnimationParams transition = TransitionAnimationParams.Fade(_transitionLength, EasingMode.EaseInOut);
-        Controller.OpenScreen(_targetScreen, GetTargetScreenData(), in transition);
-    }
-
-    private void DissolveTransition()
-    {
-        TransitionAnimationParams transition = TransitionAnimationParams.Dissolve(_transitionLength, EasingMode.EaseInOut);
         Controller.OpenScreen(_targetScreen, GetTargetScreenData(), in transition);
     }
 

@@ -68,11 +68,6 @@ namespace UIFramework.UGUI
             _canvasGroup.alpha = normalisedTime;
         }
 
-        protected override void Dissolve(float normalisedTime)
-        {
-            throw new System.NotImplementedException();
-        }
-
         protected override void SlideFromLeft(float normalisedTime)
         {
             _rectTransform.anchoredPosition = Vector2.LerpUnclamped(_offDisplayLeft, _activeAnchoredPosition, normalisedTime);
