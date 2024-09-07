@@ -24,7 +24,7 @@ public class ExampleManager : MonoBehaviour, IUpdatable
         {
             if (!exampleController.IsOpen)
             {
-                exampleController.OpenScreen<UGUIExampleTransitionScreen>(new WindowAccessPlayable(GenericWindowAnimationType.Fade, 0.5F, EasingMode.EaseInOut));
+                exampleController.OpenScreen<UGUIExampleTransitionScreen>(new AccessAnimationParams(GenericWindowAnimationType.Fade, 0.5F, EasingMode.EaseInOut));
             }
         }
     }

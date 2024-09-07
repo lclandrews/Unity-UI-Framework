@@ -65,73 +65,73 @@ public class UITKExampleTransitionScreen : UIFramework.UIToolkit.Screen
 
     private void FadeTransition()
     {
-        WindowTransitionPlayable transition = WindowTransitionPlayable.Fade(_transitionLength, UIFramework.EasingMode.EaseInOut);
+        TransitionAnimationParams transition = TransitionAnimationParams.Fade(_transitionLength, UnityEngine.Extension.EasingMode.EaseInOut);
         Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 
     private void DissolveTransition()
     {
-        WindowTransitionPlayable transition = WindowTransitionPlayable.Dissolve(_transitionLength, UIFramework.EasingMode.EaseInOut);
+        TransitionAnimationParams transition = TransitionAnimationParams.Dissolve(_transitionLength, UnityEngine.Extension.EasingMode.EaseInOut);
         Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 
     private void SlideFromLeftTransition()
     {
-        WindowTransitionPlayable transition = WindowTransitionPlayable.SlideFromLeft(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
+        TransitionAnimationParams transition = TransitionAnimationParams.SlideFromLeft(_transitionLength, UnityEngine.Extension.EasingMode.EaseOutBounce);
         Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 
     private void SlideFromRightTransition()
     {
-        WindowTransitionPlayable transition = WindowTransitionPlayable.SlideFromRight(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
+        TransitionAnimationParams transition = TransitionAnimationParams.SlideFromRight(_transitionLength, UnityEngine.Extension.EasingMode.EaseOutBounce);
         Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 
     private void SlideFromBottomTransition()
     {
-        WindowTransitionPlayable transition = WindowTransitionPlayable.SlideFromBottom(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
+        TransitionAnimationParams transition = TransitionAnimationParams.SlideFromBottom(_transitionLength, UnityEngine.Extension.EasingMode.EaseOutBounce);
         Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 
     private void SlideFromTopTransition()
     {
-        WindowTransitionPlayable transition = WindowTransitionPlayable.SlideFromTop(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
+        TransitionAnimationParams transition = TransitionAnimationParams.SlideFromTop(_transitionLength, UnityEngine.Extension.EasingMode.EaseOutBounce);
         Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 
     private void SlideOverLeftTransition()
     {
-        WindowTransitionPlayable transition = WindowTransitionPlayable.SlideOverFromLeft(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
+        TransitionAnimationParams transition = TransitionAnimationParams.SlideOverFromLeft(_transitionLength, UnityEngine.Extension.EasingMode.EaseOutBounce);
         Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 
     private void SlideOverRightTransition()
     {
-        WindowTransitionPlayable transition = WindowTransitionPlayable.SlideOverFromRight(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
+        TransitionAnimationParams transition = TransitionAnimationParams.SlideOverFromRight(_transitionLength, UnityEngine.Extension.EasingMode.EaseOutBounce);
         Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 
     private void SlideOverBottomTransition()
     {
-        WindowTransitionPlayable transition = WindowTransitionPlayable.SlideOverFromBottom(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
+        TransitionAnimationParams transition = TransitionAnimationParams.SlideOverFromBottom(_transitionLength, UnityEngine.Extension.EasingMode.EaseOutBounce);
         Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 
     private void SlideOverTopTransition()
     {
-        WindowTransitionPlayable transition = WindowTransitionPlayable.SlideOverFromTop(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
+        TransitionAnimationParams transition = TransitionAnimationParams.SlideOverFromTop(_transitionLength, UnityEngine.Extension.EasingMode.EaseOutBounce);
         Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 
     private void FlipTransition()
     {
-        WindowTransitionPlayable transition = WindowTransitionPlayable.Flip(_transitionLength, UIFramework.EasingMode.EaseOutBounce);
+        TransitionAnimationParams transition = TransitionAnimationParams.Flip(_transitionLength, UnityEngine.Extension.EasingMode.EaseOutBounce);
         Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 
     private void ExpandTransition()
     {
-        WindowTransitionPlayable transition = WindowTransitionPlayable.Expand(_transitionLength, UIFramework.EasingMode.EaseInOutBack);
+        TransitionAnimationParams transition = TransitionAnimationParams.Expand(_transitionLength, UnityEngine.Extension.EasingMode.EaseInOutBack);
         Controller.OpenScreen<UITKExampleScreen>(in transition);
     }
 }

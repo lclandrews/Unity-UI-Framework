@@ -71,22 +71,22 @@ namespace UIFramework
 
         public IWindow SetActive<WindowType>(GenericWindowAnimationType type = GenericWindowAnimationType.Fade, float length = 0.5F, EasingMode easingMode = EasingMode.EaseInOut) where WindowType : IWindow
         {
-            return SetActiveInternal<WindowType>(new WindowAccessPlayable(type, length, easingMode));
+            return SetActiveInternal<WindowType>(new AccessAnimationParams(type, length, easingMode));
         }
 
-        public IWindow SetActive<WindowType>(in WindowAccessPlayable accessPlayable) where WindowType : IWindow
+        public IWindow SetActive<WindowType>(in AccessAnimationParams accessPlayable) where WindowType : IWindow
         {
             return SetActiveInternal<WindowType>(in accessPlayable);
         }
 
         public IWindow SetActive<WindowType>(object data, GenericWindowAnimationType type = GenericWindowAnimationType.Fade, float length = 0.5F, EasingMode easingMode = EasingMode.EaseInOut) where WindowType : IWindow
         {
-            IWindow window = SetActiveInternal<WindowType>(new WindowAccessPlayable(type, length, easingMode));
+            IWindow window = SetActiveInternal<WindowType>(new AccessAnimationParams(type, length, easingMode));
             window.SetData(data);
             return window;
         }
 
-        public IWindow SetActive<WindowType>(object data, in WindowAccessPlayable accessPlayable) where WindowType : IWindow
+        public IWindow SetActive<WindowType>(object data, in AccessAnimationParams accessPlayable) where WindowType : IWindow
         {
             IWindow window = SetActiveInternal<WindowType>(in accessPlayable);
             window.SetData(data);
@@ -95,29 +95,29 @@ namespace UIFramework
 
         public IWindow SetActiveIndex(int index, GenericWindowAnimationType type = GenericWindowAnimationType.Fade, float length = 0.5F, EasingMode easingMode = EasingMode.EaseInOut)
         {
-            return SetActiveIndexInternal(index, new WindowAccessPlayable(type, length, easingMode));
+            return SetActiveIndexInternal(index, new AccessAnimationParams(type, length, easingMode));
         }
 
-        public IWindow SetActiveIndex(int index, in WindowAccessPlayable accessPlayable)
+        public IWindow SetActiveIndex(int index, in AccessAnimationParams accessPlayable)
         {
             return SetActiveIndexInternal(index, in accessPlayable);
         }
 
         public IWindow SetActiveIndex(int index, object data, GenericWindowAnimationType type = GenericWindowAnimationType.Fade, float length = 0.5F, EasingMode easingMode = EasingMode.EaseInOut)
         {
-            IWindow window = SetActiveIndexInternal(index, new WindowAccessPlayable(type, length, easingMode));
+            IWindow window = SetActiveIndexInternal(index, new AccessAnimationParams(type, length, easingMode));
             window.SetData(data);
             return window;
         }
 
-        public IWindow SetActiveIndex(int index, object data, in WindowAccessPlayable accessPlayable)
+        public IWindow SetActiveIndex(int index, object data, in AccessAnimationParams accessPlayable)
         {
             IWindow window = SetActiveIndexInternal(index, in accessPlayable);
             window.SetData(data);
             return window;
         }
 
-        private IWindow SetActiveInternal<WindowType>(in WindowAccessPlayable accessPlayable) where WindowType : IWindow
+        private IWindow SetActiveInternal<WindowType>(in AccessAnimationParams accessPlayable) where WindowType : IWindow
         {
             if (_activeTabWindow != null)
             {
@@ -136,7 +136,7 @@ namespace UIFramework
                             }
                         }
 
-                        AnimationPlayable closeAnimationPlayable;
+                        AccessAnimationPlayable closeAnimationPlayable;
                         if (_activeTabWindow.AccessAnimationPlayable.Animation != null)
                         {
                             closeAnimationPlayable = _activeTabWindow.AccessAnimationPlayable.CreateInverse();
@@ -154,7 +154,7 @@ namespace UIFramework
             return _activeTabWindow;
         }
 
-        private IWindow SetActiveIndexInternal(int index, in WindowAccessPlayable accessPlayable)
+        private IWindow SetActiveIndexInternal(int index, in AccessAnimationParams accessPlayable)
         {
             if (index != ActiveTabIndex)
             {
@@ -165,7 +165,7 @@ namespace UIFramework
                         _activeTabIndex = index;
                         IWindow targetWindow = _windows.Array[index];
 
-                        AnimationPlayable closeAnimationPlayable;
+                        AccessAnimationPlayable closeAnimationPlayable;
                         if (_activeTabWindow.AccessAnimationPlayable.Animation != null)
                         {
                             closeAnimationPlayable = _activeTabWindow.AccessAnimationPlayable.CreateInverse();

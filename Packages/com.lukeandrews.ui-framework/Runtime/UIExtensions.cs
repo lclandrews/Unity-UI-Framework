@@ -17,6 +17,11 @@ namespace UIFramework
         }
 
         // UI Toolkit
+        public static EasingMode ToUnityEasingMode(this UnityEngine.Extension.EasingMode mode)
+        {
+            return (EasingMode)mode;
+        }
+
         public static void IterateHierarchy(this VisualElement visualElement, Action<VisualElement> action)
         {
             Stack<VisualElement> stack = new Stack<VisualElement>();

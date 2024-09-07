@@ -2,6 +2,7 @@ using UIFramework;
 using UIFramework.UGUI;
 
 using UnityEngine;
+using UnityEngine.Extension;
 using UnityEngine.UI;
 
 public class ExampleController : Controller
@@ -36,7 +37,7 @@ public class ExampleController : Controller
 
     public override TimeMode TimeMode { get; protected set; } = TimeMode.Scaled;
 
-    protected override AnimationPlayable CreateAccessPlayable(AccessOperation accessOperation, float length)
+    protected override AccessAnimationPlayable CreateAccessPlayable(AccessOperation accessOperation, float length)
     {
         Canvas canvas = GetComponentInParent<Canvas>(true);
         UGUIGenericWindowAnimation animation =

@@ -1,3 +1,5 @@
+using UnityEngine.Extension;
+
 namespace UIFramework
 {
     public delegate void IAccessibleAction(IAccessible accessible);
@@ -22,9 +24,9 @@ namespace UIFramework
         AccessState AccessState { get; }
 
         AnimationPlayer.PlaybackData AccessAnimationPlaybackData { get; }
-        AnimationPlayable AccessAnimationPlayable { get; }
+        AccessAnimationPlayable AccessAnimationPlayable { get; }
 
-        WindowAccessAnimation GetDefaultAccessAnimation();
+        AccessAnimation GetDefaultAccessAnimation();
         void ResetAnimatedProperties();
 
         void Init();
@@ -32,7 +34,7 @@ namespace UIFramework
         /// <summary>
         /// Open the IAccessible with the provided animation
         /// /// </summary>
-        bool Open(in AnimationPlayable animationPlayable, IAccessibleAction onComplete = null);
+        bool Open(in AccessAnimationPlayable animationPlayable, IAccessibleAction onComplete = null);
         /// <summary>
         /// Open the IAccessible with immediately
         /// /// </summary>
@@ -43,7 +45,7 @@ namespace UIFramework
         /// </summary>
         /// <param name="animation"> The animation to play when closing the IAccessible. </param>
         /// <returns> True if the the IAccessible was closed. </returns>
-        bool Close(in AnimationPlayable animationPlayable, IAccessibleAction onComplete = null);
+        bool Close(in AccessAnimationPlayable animationPlayable, IAccessibleAction onComplete = null);
 
         /// <summary>
         /// Close the IAccessible immediately with no animation

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using UnityEngine;
+using UnityEngine.Extension;
 using UnityEngine.UIElements;
 
 namespace UIFramework.UIToolkit
@@ -19,7 +20,7 @@ namespace UIFramework.UIToolkit
         // IAccessible
         public AccessState AccessState { get; private set; } = AccessState.Unitialized;
         public AnimationPlayer.PlaybackData AccessAnimationPlaybackData { get; private set; } = default;
-        public AnimationPlayable AccessAnimationPlayable { get; private set; } = default;
+        public AccessAnimationPlayable AccessAnimationPlayable { get; private set; } = default;
 
         // IWindow
         public bool IsVisible { get { return AccessState != AccessState.Closed; } }
@@ -143,7 +144,7 @@ namespace UIFramework.UIToolkit
         }
 
         // IAccessible
-        public virtual WindowAccessAnimation GetDefaultAccessAnimation()
+        public virtual AccessAnimation GetDefaultAccessAnimation()
         {
             return GetAnimation(GenericWindowAnimationType.Fade);
         }
@@ -168,7 +169,7 @@ namespace UIFramework.UIToolkit
             OnInit();
         }        
 
-        public bool Open(in AnimationPlayable animationPlayable, IAccessibleAction onComplete = null)
+        public bool Open(in AccessAnimationPlayable playable, IAccessibleAction onComplete = null)
         {
             if (AccessState == AccessState.Closing || AccessState == AccessState.Closed)
             {
@@ -180,8 +181,8 @@ namespace UIFramework.UIToolkit
                 else
                 {
                     IsInteractable = false;
-                    AccessAnimationPlayable = animationPlayable;                    
-                    _animationPlayer = AnimationPlayer.PlayAnimation(in animationPlayable);
+                    AccessAnimationPlayable = playable;                    
+                    _animationPlayer = AnimationPlayer.PlayAnimation(playable.Animation, playable.StartTime, playable.PlaybackMode, playable.EasingMode, playable.TimeMode, playable.PlaybackSpeed);
                     _animationPlayer.OnComplete += OnAnimationComplete;
                     AccessAnimationPlaybackData = _animationPlayer.Data;
                 }
@@ -217,7 +218,7 @@ namespace UIFramework.UIToolkit
             return false;
         }        
 
-        public bool Close(in AnimationPlayable animationPlayable, IAccessibleAction onComplete = null)
+        public bool Close(in AccessAnimationPlayable playable, IAccessibleAction onComplete = null)
         {
             if (AccessState == AccessState.Opening || AccessState == AccessState.Open)
             {
@@ -229,8 +230,8 @@ namespace UIFramework.UIToolkit
                 else
                 {                    
                     IsInteractable = false;
-                    AccessAnimationPlayable = animationPlayable;
-                    _animationPlayer = AnimationPlayer.PlayAnimation(in animationPlayable);
+                    AccessAnimationPlayable = playable;
+                    _animationPlayer = AnimationPlayer.PlayAnimation(playable.Animation, playable.StartTime, playable.PlaybackMode, playable.EasingMode, playable.TimeMode, playable.PlaybackSpeed);
                     _animationPlayer.OnComplete += OnAnimationComplete;
                     AccessAnimationPlaybackData = _animationPlayer.Data;
                 }

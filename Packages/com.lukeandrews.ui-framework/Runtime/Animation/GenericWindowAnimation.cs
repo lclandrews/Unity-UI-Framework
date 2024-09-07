@@ -21,7 +21,7 @@ namespace UIFramework
         Expand
     }
 
-    public abstract class GenericWindowAnimation : WindowAccessAnimation
+    public abstract class GenericWindowAnimation : AccessAnimation
     {
         public GenericWindowAnimationType Type { get; private set; } = GenericWindowAnimationType.Fade;
 

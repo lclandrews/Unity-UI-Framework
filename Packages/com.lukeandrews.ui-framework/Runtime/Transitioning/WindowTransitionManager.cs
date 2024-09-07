@@ -1,18 +1,20 @@
 using System;
 using System.Collections.Generic;
 
+using UnityEngine.Extension;
+
 namespace UIFramework
 {
     public class WindowTransitionManager
     {
         private struct TransitionParams
         {
-            public WindowTransitionPlayable Transition { get; private set; }
+            public TransitionAnimationParams Transition { get; private set; }
             public IWindow SourceWidow { get; private set; }
             public IWindow TargetWindow { get; private set; }
             public TimeMode TimeMode { get; private set; }
 
-            public TransitionParams(in WindowTransitionPlayable transition, IWindow sourceWindow, IWindow targetWindow, TimeMode timeMode)
+            public TransitionParams(in TransitionAnimationParams transition, IWindow sourceWindow, IWindow targetWindow, TimeMode timeMode)
             {
                 this.Transition = transition;
                 this.SourceWidow = sourceWindow;
@@ -51,21 +53,21 @@ namespace UIFramework
                 TargetWindow = null;
             }
 
-            public AnimationPlayable CreateTargetWindowPlayable(float startOffset, bool reverse)
+            public AccessAnimationPlayable CreateTargetWindowPlayable(float startOffset, bool reverse)
             {
                 return CreateWindowPlayable(TargetWindow, Transition.EntryAnimation, startOffset, Transition.Length, Transition.EasingMode, AccessOperation.Open, reverse);
             }
 
-            public AnimationPlayable CreateSourceWindowPlayable(float startOffset, bool reverse)
+            public AccessAnimationPlayable CreateSourceWindowPlayable(float startOffset, bool reverse)
             {
                 return CreateWindowPlayable(SourceWidow, Transition.ExitAnimation, startOffset, Transition.Length, Transition.EasingMode.GetInverseEasingMode(), AccessOperation.Close, reverse);
             }
 
-            private AnimationPlayable CreateWindowPlayable(IWindow window, ImplicitWindowAnimation implicitAnimation, float startOffset, float length, EasingMode easingMode, AccessOperation accessOperation, bool reverse)
+            private AccessAnimationPlayable CreateWindowPlayable(IWindow window, ImplicitWindowAnimation implicitAnimation, float startOffset, float length, EasingMode easingMode, AccessOperation accessOperation, bool reverse)
             {
                 if (implicitAnimation != null)
                 {
-                    WindowAccessAnimation accessAnimation = implicitAnimation.GetWindowAnimation(window);
+                    AccessAnimation accessAnimation = implicitAnimation.GetWindowAnimation(window);
                     if (reverse)
                     {
                         return accessAnimation.CreatePlayable(accessOperation.InvertAccessOperation(), length, startOffset, easingMode.GetInverseEasingMode(), TimeMode);
@@ -127,10 +129,10 @@ namespace UIFramework
             {
                 switch (_activeTransitionParams.Transition.Target)
                 {
-                    case WindowTransitionPlayable.AnimationTarget.Both:
-                    case WindowTransitionPlayable.AnimationTarget.Target:
+                    case TransitionAnimationParams.AnimationTarget.Both:
+                    case TransitionAnimationParams.AnimationTarget.Target:
                         return _sourceWindowPlaybackData;
-                    case WindowTransitionPlayable.AnimationTarget.Source:
+                    case TransitionAnimationParams.AnimationTarget.Source:
                         return _targetWindowPlaybackData;
                 }
                 return default;
@@ -146,13 +148,13 @@ namespace UIFramework
             _timeMode = timeMode;
         }
 
-        public void Transition(in WindowTransitionPlayable transition, IWindow sourceWindow, IWindow targetWindow)
+        public void Transition(in TransitionAnimationParams transition, IWindow sourceWindow, IWindow targetWindow)
         {
             TransitionParams transitionParams = new TransitionParams(transition, sourceWindow, targetWindow, _timeMode);
             HandleNewTransition(in transitionParams, false);
         }
 
-        public void ReverseTransition(in WindowTransitionPlayable transition, IWindow sourceWindow, IWindow targetWindow)
+        public void ReverseTransition(in TransitionAnimationParams transition, IWindow sourceWindow, IWindow targetWindow)
         {
             TransitionParams transitionParams = new TransitionParams(transition, sourceWindow, targetWindow, _timeMode);
             HandleNewTransition(in transitionParams, true);
@@ -252,20 +254,20 @@ namespace UIFramework
             _isActiveReverse = reverse;
             _activeTransitionParams = transitionParams;
 
-            if (_activeTransitionParams.Transition.WindowSortPriority == WindowTransitionPlayable.SortPriority.Auto)
+            if (_activeTransitionParams.Transition.WindowSortPriority == TransitionAnimationParams.SortPriority.Auto)
             {
                 switch (_activeTransitionParams.Transition.Target)
                 {
                     default:
-                    case WindowTransitionPlayable.AnimationTarget.Both:
+                    case TransitionAnimationParams.AnimationTarget.Both:
                         _activeTransitionParams.SourceWidow.SortOrder = 0;
                         _activeTransitionParams.TargetWindow.SortOrder = 0;
                         break;
-                    case WindowTransitionPlayable.AnimationTarget.Target:
+                    case TransitionAnimationParams.AnimationTarget.Target:
                         _activeTransitionParams.SourceWidow.SortOrder = 0;
                         _activeTransitionParams.TargetWindow.SortOrder = 1;
                         break;
-                    case WindowTransitionPlayable.AnimationTarget.Source:
+                    case TransitionAnimationParams.AnimationTarget.Source:
                         _activeTransitionParams.SourceWidow.SortOrder = 1;
                         _activeTransitionParams.TargetWindow.SortOrder = 0;
                         break;
@@ -275,18 +277,18 @@ namespace UIFramework
             {
                 switch (_activeTransitionParams.Transition.WindowSortPriority)
                 {
-                    case WindowTransitionPlayable.SortPriority.Source:
+                    case TransitionAnimationParams.SortPriority.Source:
                         _activeTransitionParams.SourceWidow.SortOrder = 1;
                         _activeTransitionParams.TargetWindow.SortOrder = 0;
                         break;
-                    case WindowTransitionPlayable.SortPriority.Target:
+                    case TransitionAnimationParams.SortPriority.Target:
                         _activeTransitionParams.SourceWidow.SortOrder = 0;
                         _activeTransitionParams.TargetWindow.SortOrder = 1;
                         break;
                 }
             }
 
-            if (_activeTransitionParams.Transition.Target == WindowTransitionPlayable.AnimationTarget.None)
+            if (_activeTransitionParams.Transition.Target == TransitionAnimationParams.AnimationTarget.None)
             {
                 ExecuteNone(in _activeTransitionParams, reverse);
                 CompleteTransition();
@@ -299,7 +301,7 @@ namespace UIFramework
 
         private void InvertActiveTransition()
         {
-            if (_activeTransitionParams.Transition.Target == WindowTransitionPlayable.AnimationTarget.None)
+            if (_activeTransitionParams.Transition.Target == TransitionAnimationParams.AnimationTarget.None)
             {
                 throw new InvalidOperationException("Cannot invert transition with no animation targets.");
             }
@@ -315,13 +317,13 @@ namespace UIFramework
             float startOffset = transitionParams.Transition.Length * normalisedStartOffset;
             switch (_activeTransitionParams.Transition.Target)
             {
-                case WindowTransitionPlayable.AnimationTarget.Both:
+                case TransitionAnimationParams.AnimationTarget.Both:
                     ExecuteOnBoth(in transitionParams, reverse, startOffset);
                     break;
-                case WindowTransitionPlayable.AnimationTarget.Target:
+                case TransitionAnimationParams.AnimationTarget.Target:
                     ExecuteOnTarget(in transitionParams, reverse, startOffset);
                     break;
-                case WindowTransitionPlayable.AnimationTarget.Source:
+                case TransitionAnimationParams.AnimationTarget.Source:
                     ExecuteOnSource(in transitionParams, reverse, startOffset);
                     break;
             }
@@ -347,12 +349,12 @@ namespace UIFramework
             {
                 transitionParams.SourceWidow.Open();
 
-                AnimationPlayable targetWindowPlayable = transitionParams.CreateTargetWindowPlayable(startOffset, reverse);
+                AccessAnimationPlayable targetWindowPlayable = transitionParams.CreateTargetWindowPlayable(startOffset, reverse);
                 transitionParams.TargetWindow.Close(in targetWindowPlayable, OnAccessAnimationComplete);
             }
             else
             {
-                AnimationPlayable targetWindowPlayable = transitionParams.CreateTargetWindowPlayable(startOffset, reverse);
+                AccessAnimationPlayable targetWindowPlayable = transitionParams.CreateTargetWindowPlayable(startOffset, reverse);
                 transitionParams.TargetWindow.Open(in targetWindowPlayable, OnAccessAnimationComplete);
             }
             _targetWindowPlaybackData = transitionParams.TargetWindow.AccessAnimationPlaybackData;
@@ -362,14 +364,14 @@ namespace UIFramework
         {
             if (reverse)
             {
-                AnimationPlayable sourceWindowPlayable = transitionParams.CreateSourceWindowPlayable(startOffset, reverse);
+                AccessAnimationPlayable sourceWindowPlayable = transitionParams.CreateSourceWindowPlayable(startOffset, reverse);
                 transitionParams.SourceWidow.Open(in sourceWindowPlayable, OnAccessAnimationComplete);
             }
             else
             {
                 transitionParams.TargetWindow.Open();
 
-                AnimationPlayable sourceWindowPlayable = transitionParams.CreateSourceWindowPlayable(startOffset, reverse);
+                AccessAnimationPlayable sourceWindowPlayable = transitionParams.CreateSourceWindowPlayable(startOffset, reverse);
                 transitionParams.SourceWidow.Close(in sourceWindowPlayable, OnAccessAnimationComplete);
             }
             _sourceWindowPlaybackData = transitionParams.SourceWidow.AccessAnimationPlaybackData;
@@ -379,18 +381,18 @@ namespace UIFramework
         {
             if (reverse)
             {
-                AnimationPlayable sourceWindowPlayable = transitionParams.CreateSourceWindowPlayable(startOffset, reverse);
+                AccessAnimationPlayable sourceWindowPlayable = transitionParams.CreateSourceWindowPlayable(startOffset, reverse);
                 transitionParams.SourceWidow.Open(in sourceWindowPlayable, OnAccessAnimationComplete);
 
-                AnimationPlayable targetWindowPlayable = transitionParams.CreateTargetWindowPlayable(startOffset, reverse);
+                AccessAnimationPlayable targetWindowPlayable = transitionParams.CreateTargetWindowPlayable(startOffset, reverse);
                 transitionParams.TargetWindow.Close(in targetWindowPlayable, OnAccessAnimationComplete);
             }
             else
             {
-                AnimationPlayable sourceWindowPlayable = transitionParams.CreateSourceWindowPlayable(startOffset, reverse);
+                AccessAnimationPlayable sourceWindowPlayable = transitionParams.CreateSourceWindowPlayable(startOffset, reverse);
                 transitionParams.SourceWidow.Close(in sourceWindowPlayable, OnAccessAnimationComplete);
 
-                AnimationPlayable targetWindowPlayable = transitionParams.CreateTargetWindowPlayable(startOffset, reverse);
+                AccessAnimationPlayable targetWindowPlayable = transitionParams.CreateTargetWindowPlayable(startOffset, reverse);
                 transitionParams.TargetWindow.Open(in targetWindowPlayable, OnAccessAnimationComplete);
             }
             _targetWindowPlaybackData = transitionParams.TargetWindow.AccessAnimationPlaybackData;
@@ -449,18 +451,18 @@ namespace UIFramework
 
         private void CompleteTransition()
         {
-            if (_activeTransitionParams.Transition.Target != WindowTransitionPlayable.AnimationTarget.Both)
+            if (_activeTransitionParams.Transition.Target != TransitionAnimationParams.AnimationTarget.Both)
             {
                 if (_isActiveReverse)
                 {
-                    if (_activeTransitionParams.Transition.Target == WindowTransitionPlayable.AnimationTarget.Source)
+                    if (_activeTransitionParams.Transition.Target == TransitionAnimationParams.AnimationTarget.Source)
                     {
                         _activeTransitionParams.TargetWindow.Close();
                     }
                 }
                 else
                 {
-                    if (_activeTransitionParams.Transition.Target == WindowTransitionPlayable.AnimationTarget.Target)
+                    if (_activeTransitionParams.Transition.Target == TransitionAnimationParams.AnimationTarget.Target)
                     {
                         _activeTransitionParams.SourceWidow.Close();
                     }
@@ -519,21 +521,21 @@ namespace UIFramework
                 {
                     switch (_activeTransitionParams.Transition.Target)
                     {
-                        case WindowTransitionPlayable.AnimationTarget.Source:
+                        case TransitionAnimationParams.AnimationTarget.Source:
                             _activeTransitionParams.SourceWidow.SkipAccessAnimation();
                             if (_isActiveReverse)
                             {
                                 _activeTransitionParams.TargetWindow.Close();
                             }
                             break;
-                        case WindowTransitionPlayable.AnimationTarget.Target:
+                        case TransitionAnimationParams.AnimationTarget.Target:
                             _activeTransitionParams.TargetWindow.SkipAccessAnimation();
                             if (!_isActiveReverse)
                             {
                                 _activeTransitionParams.SourceWidow.Close();
                             }
                             break;
-                        case WindowTransitionPlayable.AnimationTarget.Both:
+                        case TransitionAnimationParams.AnimationTarget.Both:
                             _activeTransitionParams.SourceWidow.SkipAccessAnimation();
                             _activeTransitionParams.TargetWindow.SkipAccessAnimation();
                             break;

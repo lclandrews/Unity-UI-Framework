@@ -1,6 +1,7 @@
 using UIFramework;
 
 using UnityEngine;
+using UnityEngine.Extension;
 using UnityEngine.UI;
 
 public class UGUIExampleAlternateCanvasScreen : UIFramework.UGUI.Screen
@@ -26,19 +27,19 @@ public class UGUIExampleAlternateCanvasScreen : UIFramework.UGUI.Screen
 
     private void TravelToTransitionScreen()
     {
-        WindowTransitionPlayable transition = WindowTransitionPlayable.Custom(0.5F, EasingMode.EaseInOut, GenericWindowAnimationType.Flip, GenericWindowAnimationType.Fade, WindowTransitionPlayable.SortPriority.Source);
+        TransitionAnimationParams transition = TransitionAnimationParams.Custom(0.5F, EasingMode.EaseInOut, GenericWindowAnimationType.Flip, GenericWindowAnimationType.Fade, TransitionAnimationParams.SortPriority.Source);
         Controller.OpenScreen<UGUIExampleTransitionScreen>(in transition);
     }
 
     private void TravelToSharedCanvasScreen()
     {
-        WindowTransitionPlayable transition = WindowTransitionPlayable.Custom(0.5F, EasingMode.EaseInOut, GenericWindowAnimationType.Fade, GenericWindowAnimationType.Fade, WindowTransitionPlayable.SortPriority.Target);
+        TransitionAnimationParams transition = TransitionAnimationParams.Custom(0.5F, EasingMode.EaseInOut, GenericWindowAnimationType.Fade, GenericWindowAnimationType.Fade, TransitionAnimationParams.SortPriority.Target);
         Controller.OpenScreen<UGUIExampleSharedCanvasScreen>(in transition);
     }
 
     private void TravelToUITKTransitionScreen()
     {
-        WindowTransitionPlayable transition = WindowTransitionPlayable.Custom(0.5F, EasingMode.EaseInOut, GenericWindowAnimationType.Fade, GenericWindowAnimationType.Fade);
+        TransitionAnimationParams transition = TransitionAnimationParams.Custom(0.5F, EasingMode.EaseInOut, GenericWindowAnimationType.Fade, GenericWindowAnimationType.Fade);
         Controller.OpenScreen<UITKExampleTransitionScreen>(in transition);
     }
 }
