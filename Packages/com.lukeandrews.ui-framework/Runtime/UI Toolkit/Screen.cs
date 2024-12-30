@@ -51,6 +51,10 @@ namespace UIFramework.UIToolkit
                 UQueryBuilder<Button> backButtonQueryBuilder = VisualElement.Query<Button>(BackButtonName);
                 UQueryState<Button> backButtonQuery = backButtonQueryBuilder.Build();
                 BackButton = backButtonQuery.First();
+                if(BackButton != null)
+                {
+                    BackButton.RegisterCallback<ClickEvent>(BackButtonClicked);
+                }
             }
             Init();
         }
@@ -68,6 +72,11 @@ namespace UIFramework.UIToolkit
         public bool Equals(INavigableWindow other)
         {
             return other as Screen == this;
+        }
+
+        private void BackButtonClicked(ClickEvent clickEvent)
+        {
+            Controller.CloseScreen();
         }
     }
 }

@@ -34,7 +34,7 @@ namespace UIFramework
         {
             float playbackSpeed = Length / length;
             PlaybackMode playbackMode = accessOperation == AccessOperation ? PlaybackMode.Forward : PlaybackMode.Reverse;
-            float startTime = playbackMode == PlaybackMode.Forward ? startOffset : length - startOffset;
+            float startTime = (playbackMode == PlaybackMode.Forward ? startOffset : length - startOffset) * playbackSpeed;
             return new AccessAnimationPlayable(this, startTime, playbackMode, easingMode, timeMode, playbackSpeed);
         }
     }

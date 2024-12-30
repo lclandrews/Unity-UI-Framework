@@ -74,7 +74,7 @@ namespace UIFramework
                     }
                     else
                     {
-                        return accessAnimation.CreatePlayable(accessOperation, length, startOffset, easingMode.GetInverseEasingMode(), TimeMode);
+                        return accessAnimation.CreatePlayable(accessOperation, length, startOffset, easingMode, TimeMode);
                     }
                 }
                 return default;
