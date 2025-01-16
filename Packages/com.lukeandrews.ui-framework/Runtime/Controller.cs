@@ -166,9 +166,9 @@ namespace UIFramework
             _navigation.OnNavigationUpdate += OnNavigationUpdate;
 
             _transitionManager = new WindowTransitionManager(TimeMode);
-
-            SetBackButtonActive(false);
+            
             OnInit();
+            SetBackButtonActive(false);
 
             AccessState = AccessState.Closed;
         }
