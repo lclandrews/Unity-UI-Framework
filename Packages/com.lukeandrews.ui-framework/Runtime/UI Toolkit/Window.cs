@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using UnityEngine;
 using UnityEngine.Extension;
@@ -10,6 +11,8 @@ namespace UIFramework.UIToolkit
     [RequireComponent(typeof(UIDocument))]
     public abstract class Window : UIBehaviour, IWindow
     {
+        private const string _NonInteractiveClassName = ".non-interactive";
+
         // UI Toolkit Window
         public UIDocument UIDocument { get { return _uiDocument; } }
         private UIDocument _uiDocument = null;
@@ -330,11 +333,42 @@ namespace UIFramework.UIToolkit
 
         protected void SetInteractable(VisualElement visualElement, bool interactable)
         {
-            visualElement.pickingMode = interactable ? PickingMode.Position : PickingMode.Ignore;
-            visualElement.IterateHierarchy(delegate (VisualElement v)
+            PickingMode pickingMode = interactable ? PickingMode.Position : PickingMode.Ignore;
+            SetInteractablePickingMode(visualElement, pickingMode);
+            visualElement.IterateHierarchy(delegate (VisualElement child)
             {
-                v.pickingMode = interactable ? PickingMode.Position : PickingMode.Ignore;
+                SetInteractablePickingMode(child, pickingMode);
             });
+        }
+
+        private void SetInteractablePickingMode(VisualElement visualElement, PickingMode pickingMode)
+        {
+            if(pickingMode == PickingMode.Position)
+            {
+                bool isNonInteractive = false;
+                List<string> classList = visualElement.GetClasses() as List<string>;
+                if (classList != null)
+                {
+                    isNonInteractive = classList.Contains(_NonInteractiveClassName);
+                }
+                else
+                {
+                    // Linq as fallback incase class list type changes in the future
+                    isNonInteractive = visualElement.GetClasses().Contains(_NonInteractiveClassName);
+                    Debug.LogWarning("VisualElement.GetClasses() no longer returns a List<string>.");
+                }
+
+                if(isNonInteractive)
+                {
+                    visualElement.pickingMode = PickingMode.Position;
+                    visualElement.RemoveFromClassList(_NonInteractiveClassName);
+                }
+            }
+            else if(visualElement.pickingMode == PickingMode.Position)
+            {
+                visualElement.pickingMode = PickingMode.Ignore;
+                visualElement.AddToClassList(_NonInteractiveClassName);
+            }            
         }
 
         private void ClearAnimationReferences()
