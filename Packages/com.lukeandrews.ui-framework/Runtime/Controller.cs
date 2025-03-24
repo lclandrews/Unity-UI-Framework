@@ -183,6 +183,25 @@ namespace UIFramework
 
         public abstract void SetWaiting(bool waiting);
 
+        public IScreen FindScreen(string typeName)
+        {
+            return FindScreen(Type.GetType(typeName, true, false));
+        }        
+
+        public IScreen FindScreen<ScreenType>() where ScreenType : IScreen
+        {
+            return FindScreen(typeof(ScreenType));
+        }
+
+        public IScreen FindScreen(Type screenType)
+        {
+            if (_navigation.Windows.TryGetValue(screenType, out IScreen screen))
+            {
+                return screen;
+            }
+            return null;
+        }
+
         public ScreenType OpenScreen<ScreenType>(float animationLength = 0.0F, bool excludeCurrentFromHistory = false) where ScreenType : IScreen
         {
             WindowNavigationEvent navigationEvent = NavigateToScreen<ScreenType>(excludeCurrentFromHistory);

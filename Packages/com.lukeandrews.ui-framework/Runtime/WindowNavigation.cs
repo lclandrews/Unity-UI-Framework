@@ -27,6 +27,7 @@ namespace UIFramework
 
     public class WindowNavigation<Navigable> where Navigable : INavigableWindow
     {
+        public IReadOnlyDictionary<Type, Navigable> Windows { get { return _windows; } }
         private Dictionary<Type, Navigable> _windows = null;
 
         public Navigable ActiveWindow
