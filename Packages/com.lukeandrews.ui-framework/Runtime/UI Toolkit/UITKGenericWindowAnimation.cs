@@ -18,43 +18,60 @@ namespace UIFramework.UIToolkit
 
         protected override void Fade(float normalisedTime)
         {
-            _visualElement.style.opacity = normalisedTime;
+            if(_visualElement != null)
+                _visualElement.style.opacity = normalisedTime;
         }
 
         protected override void SlideFromLeft(float normalisedTime)
         {
-            float percent = (-1.0F + normalisedTime) * 100.0F;
-            _visualElement.style.translate = new Translate(UnityEngine.UIElements.Length.Percent(percent), UnityEngine.UIElements.Length.Percent(0.0F));
+            if (_visualElement != null)
+            {
+                float percent = (-1.0F + normalisedTime) * 100.0F;
+                _visualElement.style.translate = new Translate(UnityEngine.UIElements.Length.Percent(percent), UnityEngine.UIElements.Length.Percent(0.0F));
+            }
         }
 
         protected override void SlideFromRight(float normalisedTime)
         {
-            float percent = (1.0F - normalisedTime) * 100.0F;
-            _visualElement.style.translate = new Translate(UnityEngine.UIElements.Length.Percent(percent), UnityEngine.UIElements.Length.Percent(0.0F));
+            if (_visualElement != null)
+            {
+                float percent = (1.0F - normalisedTime) * 100.0F;
+                _visualElement.style.translate = new Translate(UnityEngine.UIElements.Length.Percent(percent), UnityEngine.UIElements.Length.Percent(0.0F));
+            }
         }
 
         protected override void SlideFromBottom(float normalisedTime)
         {
-            float percent = (1.0F - normalisedTime) * 100.0F;
-            _visualElement.style.translate = new Translate(UnityEngine.UIElements.Length.Percent(0.0F), UnityEngine.UIElements.Length.Percent(percent));
+            if (_visualElement != null)
+            {
+                float percent = (1.0F - normalisedTime) * 100.0F;
+                _visualElement.style.translate = new Translate(UnityEngine.UIElements.Length.Percent(0.0F), UnityEngine.UIElements.Length.Percent(percent));
+            }
         }
 
         protected override void SlideFromTop(float normalisedTime)
         {
-            float percent = (-1.0F + normalisedTime) * 100.0F;
-            _visualElement.style.translate = new Translate(UnityEngine.UIElements.Length.Percent(0.0F), UnityEngine.UIElements.Length.Percent(percent));
+            if (_visualElement != null)
+            {
+                float percent = (-1.0F + normalisedTime) * 100.0F;
+                _visualElement.style.translate = new Translate(UnityEngine.UIElements.Length.Percent(0.0F), UnityEngine.UIElements.Length.Percent(percent));
+            }
         }
 
         protected override void Flip(float normalisedTime)
         {
-            Fade(normalisedTime);
-            float degrees = (1.0F - normalisedTime) * 180.0F;
-            _visualElement.style.rotate = new Rotate(degrees);
+            if (_visualElement != null)
+            {
+                Fade(normalisedTime);
+                float degrees = (1.0F - normalisedTime) * 180.0F;
+                _visualElement.style.rotate = new Rotate(degrees);
+            }
         }
 
         protected override void Expand(float normalisedTime)
         {
-            _visualElement.style.scale = new Scale(new Vector2(normalisedTime, normalisedTime));
+            if (_visualElement != null)
+                _visualElement.style.scale = new Scale(new Vector2(normalisedTime, normalisedTime));
         }
 
         protected override bool IsSupportedType(GenericWindowAnimationType type)
