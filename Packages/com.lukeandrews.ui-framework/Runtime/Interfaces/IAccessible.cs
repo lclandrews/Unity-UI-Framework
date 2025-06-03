@@ -26,6 +26,11 @@ namespace UIFramework
         AnimationPlayer.PlaybackData AccessAnimationPlaybackData { get; }
         AccessAnimationPlayable AccessAnimationPlayable { get; }
 
+        event IAccessibleAction Opening;
+        event IAccessibleAction Opened;
+        event IAccessibleAction Closed;
+        event IAccessibleAction Closing;
+
         AccessAnimation GetDefaultAccessAnimation();
         void ResetAnimatedProperties();
 

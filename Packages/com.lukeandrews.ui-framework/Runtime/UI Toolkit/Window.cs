@@ -22,6 +22,12 @@ namespace UIFramework.UIToolkit
 
         // IAccessible
         public AccessState AccessState { get; private set; } = AccessState.Unitialized;
+
+        public event IAccessibleAction Opening = default;
+        public event IAccessibleAction Opened = default;
+        public event IAccessibleAction Closed = default;
+        public event IAccessibleAction Closing = default;
+
         public AnimationPlayer.PlaybackData AccessAnimationPlaybackData { get; private set; } = default;
         public AccessAnimationPlayable AccessAnimationPlayable { get; private set; } = default;
 
@@ -192,6 +198,7 @@ namespace UIFramework.UIToolkit
                 _onAccessAnimationComplete = onComplete;
                 AccessState = AccessState.Opening;
                 SetActive(true);
+                Opening?.Invoke(this);
                 OnOpen();
                 return true;
             }
@@ -214,7 +221,9 @@ namespace UIFramework.UIToolkit
                 }
                 AccessState = AccessState.Open;
                 SetActive(true);
+                Opening?.Invoke(this);
                 OnOpen();
+                Opened?.Invoke(this);
                 OnOpened();
                 return true;
             }
@@ -240,6 +249,7 @@ namespace UIFramework.UIToolkit
                 }
                 _onAccessAnimationComplete = onComplete;
                 AccessState = AccessState.Closing;
+                Closing?.Invoke(this);
                 OnClose();
                 return true;
             }
@@ -261,8 +271,10 @@ namespace UIFramework.UIToolkit
                     _onAccessAnimationComplete = null;
                 }
                 AccessState = AccessState.Closed;
+                Closing?.Invoke(this);
                 OnClose();
                 SetActive(false);
+                Closed?.Invoke(this);
                 OnClosed();
                 return true;
             }
@@ -308,6 +320,7 @@ namespace UIFramework.UIToolkit
             if (AccessState == AccessState.Opening)
             {
                 AccessState = AccessState.Open;
+                Opened?.Invoke(this);
                 OnOpened();
                 _onAccessAnimationComplete?.Invoke(this);
                 _onAccessAnimationComplete = null;
@@ -316,6 +329,7 @@ namespace UIFramework.UIToolkit
             {
                 AccessState = AccessState.Closed;
                 SetActive(false);
+                Closed?.Invoke(this);
                 OnClosed();
                 _onAccessAnimationComplete?.Invoke(this);
                 _onAccessAnimationComplete = null;
