@@ -140,7 +140,7 @@ namespace UIFramework
             {
                 throw new InvalidOperationException(string.Format("Unable to travel to: {0}, not found in navigation.", windowType.ToString()));
             }
-            return true;
+            return window.IsValid();
         }
 
         public WindowNavigationEvent<Navigable> Back()

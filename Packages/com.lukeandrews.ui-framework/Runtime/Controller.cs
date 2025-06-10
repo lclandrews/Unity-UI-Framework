@@ -236,7 +236,7 @@ namespace UIFramework
 
         public abstract void SetWaiting(bool waiting);
 
-        public WeakReference<IReadOnlyScreen> OpenScreen<ScreenType>(float animationLength = 0.0F, bool excludeCurrentFromHistory = false) where ScreenType : IScreen
+        public IReadOnlyScreen OpenScreen<ScreenType>(float animationLength = 0.0F, bool excludeCurrentFromHistory = false) where ScreenType : IScreen
         {
             WindowNavigationEvent<IScreen> navigationEvent = NavigateToScreen<ScreenType>(excludeCurrentFromHistory);
             if (navigationEvent.Success)
@@ -251,11 +251,11 @@ namespace UIFramework
             }
             else
             {
-                return new WeakReference<IReadOnlyScreen>(navigationEvent.ActiveWindow);
+                return navigationEvent.ActiveWindow;
             }
         }
 
-        public WeakReference<IReadOnlyScreen> OpenScreen<ScreenType>(object data, float animationLength = 0.0F, bool excludeCurrentFromHistory = false) where ScreenType : IScreen
+        public IReadOnlyScreen OpenScreen<ScreenType>(object data, float animationLength = 0.0F, bool excludeCurrentFromHistory = false) where ScreenType : IScreen
         {
             WindowNavigationEvent<IScreen> navigationEvent = NavigateToScreen<ScreenType>(excludeCurrentFromHistory);
             if (navigationEvent.Success)
@@ -271,11 +271,11 @@ namespace UIFramework
             else
             {
                 navigationEvent.ActiveWindow.SetData(data);
-                return new WeakReference<IReadOnlyScreen>(navigationEvent.ActiveWindow);
+                return navigationEvent.ActiveWindow;
             }
         }
 
-        public WeakReference<IReadOnlyScreen> OpenScreen<ScreenType>(in AccessAnimationParams accessPlayable, bool excludeCurrentFromHistory = false) where ScreenType : IScreen
+        public IReadOnlyScreen OpenScreen<ScreenType>(in AccessAnimationParams accessPlayable, bool excludeCurrentFromHistory = false) where ScreenType : IScreen
         {
             WindowNavigationEvent<IScreen> navigationEvent = NavigateToScreen<ScreenType>(excludeCurrentFromHistory);
             if (navigationEvent.Success)
@@ -289,11 +289,11 @@ namespace UIFramework
             }
             else
             {
-                return new WeakReference<IReadOnlyScreen>(navigationEvent.ActiveWindow);
+                return navigationEvent.ActiveWindow;
             }
         }
 
-        public WeakReference<IReadOnlyScreen> OpenScreen<ScreenType>(object data, in AccessAnimationParams accessPlayable, bool excludeCurrentFromHistory = false) where ScreenType : IScreen
+        public IReadOnlyScreen OpenScreen<ScreenType>(object data, in AccessAnimationParams accessPlayable, bool excludeCurrentFromHistory = false) where ScreenType : IScreen
         {
             WindowNavigationEvent<IScreen> navigationEvent = NavigateToScreen<ScreenType>(excludeCurrentFromHistory);
             if (navigationEvent.Success)
@@ -308,11 +308,11 @@ namespace UIFramework
             else
             {
                 navigationEvent.ActiveWindow.SetData(data);
-                return new WeakReference<IReadOnlyScreen>(navigationEvent.ActiveWindow);
+                return navigationEvent.ActiveWindow;
             }
         }
 
-        public WeakReference<IReadOnlyScreen> OpenScreen<ScreenType>(in TransitionAnimationParams transitionPlayable, bool excludeCurrentFromHistory = false) where ScreenType : IScreen
+        public IReadOnlyScreen OpenScreen<ScreenType>(in TransitionAnimationParams transitionPlayable, bool excludeCurrentFromHistory = false) where ScreenType : IScreen
         {
             WindowNavigationEvent<IScreen> navigationEvent = NavigateToScreen<ScreenType>(excludeCurrentFromHistory);
             if (navigationEvent.Success)
@@ -321,11 +321,11 @@ namespace UIFramework
             }
             else
             {
-                return new WeakReference<IReadOnlyScreen>(navigationEvent.ActiveWindow);
+                return navigationEvent.ActiveWindow;
             }
         }
 
-        public WeakReference<IReadOnlyScreen> OpenScreen<ScreenType>(object data, in TransitionAnimationParams transitionPlayable, bool excludeCurrentFromHistory = false) where ScreenType : IScreen
+        public IReadOnlyScreen OpenScreen<ScreenType>(object data, in TransitionAnimationParams transitionPlayable, bool excludeCurrentFromHistory = false) where ScreenType : IScreen
         {
             WindowNavigationEvent<IScreen> navigationEvent = NavigateToScreen<ScreenType>(excludeCurrentFromHistory);
             if (navigationEvent.Success)
@@ -335,20 +335,20 @@ namespace UIFramework
             else
             {
                 navigationEvent.ActiveWindow.SetData(data);
-                return new WeakReference<IReadOnlyScreen>(navigationEvent.ActiveWindow);
+                return navigationEvent.ActiveWindow;
             }
         }
 
-        private WeakReference<IReadOnlyScreen> OpenScreenInternal<ScreenType>(in TransitionAnimationParams transitionPlayable, IScreen targetScreen, IScreen sourceScreen, object data, bool excludeCurrentFromHistory) where ScreenType : IScreen
+        private IReadOnlyScreen OpenScreenInternal<ScreenType>(in TransitionAnimationParams transitionPlayable, IScreen targetScreen, IScreen sourceScreen, object data, bool excludeCurrentFromHistory) where ScreenType : IScreen
         {
             OpenScreenInternal(in transitionPlayable, targetScreen, sourceScreen, data, excludeCurrentFromHistory);
-            return new WeakReference<IReadOnlyScreen>(targetScreen);
+            return targetScreen;
         }
 
-        private WeakReference<IReadOnlyScreen> OpenScreenInternal<ScreenType>(in TransitionAnimationParams transitionPlayable, IScreen targetScreen, IScreen sourceScreen, bool excludeCurrentFromHistory) where ScreenType : IScreen
+        private IReadOnlyScreen OpenScreenInternal<ScreenType>(in TransitionAnimationParams transitionPlayable, IScreen targetScreen, IScreen sourceScreen, bool excludeCurrentFromHistory) where ScreenType : IScreen
         {
             OpenScreenInternal(in transitionPlayable, targetScreen, sourceScreen, excludeCurrentFromHistory);
-            return new WeakReference<IReadOnlyScreen>(targetScreen);
+            return targetScreen;
         }
 
         private void OpenScreenInternal(in TransitionAnimationParams transitionPlayable, IScreen targetScreen, IScreen sourceScreen, object data, bool excludeCurrentFromHistory)

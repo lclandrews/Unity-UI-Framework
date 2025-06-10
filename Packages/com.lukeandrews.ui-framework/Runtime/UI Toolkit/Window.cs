@@ -482,7 +482,7 @@ namespace UIFramework.UIToolkit
             }
         }
 
-        private void OnDocumentDisabled()
+        protected virtual void OnDocumentDisabled() 
         {
             Terminate();
         }
