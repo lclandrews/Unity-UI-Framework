@@ -43,8 +43,8 @@ namespace UIFramework
         public event Action Opened = default;
         public event Action Closed = default;
 
-        public event Action<string> ScreenOpened = default;
-        public event Action<string> ScreenClosed = default;
+        public event Action<IReadOnlyScreen> ScreenOpened = default;
+        public event Action<IReadOnlyScreen> ScreenClosed = default;
 
         private WindowNavigation<IScreen> _navigation = null;
         private WindowTransitionManager _transitionManager = null;
@@ -614,16 +614,12 @@ namespace UIFramework
 
         private void OnScreenOpen(IAccessible accessible)
         {
-            IWindow window = accessible as IWindow;
-            string identifier = window != null ? window.Identifier : null;
-            ScreenOpened?.Invoke(identifier);
+            ScreenOpened?.Invoke(accessible as IReadOnlyScreen);
         }
 
         private void OnScreenClose(IAccessible accessible)
         {
-            IWindow window = accessible as IWindow;
-            string identifier = window != null ? window.Identifier : null;
-            ScreenClosed?.Invoke(identifier);
+            ScreenClosed?.Invoke(accessible as IReadOnlyScreen);
         }
     }
 }
