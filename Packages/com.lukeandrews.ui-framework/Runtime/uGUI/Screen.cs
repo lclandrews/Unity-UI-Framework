@@ -33,25 +33,42 @@ namespace UIFramework.UGUI
             return Controller as ControllerType;
         }
 
-        public virtual void Init(Controller controller)
+        public virtual void Initialize(Controller controller)
         {
-            if(controller == null)
+            if (controller == null)
             {
                 throw new ArgumentNullException(nameof(controller));
             }
 
-            if (this.Controller != null)
+            if (State == BehaviourState.Initialized)
             {
                 throw new InvalidOperationException("Screen already initialized.");
             }
+            Controller = controller;
+            _canvas = GetComponentInParent<Canvas>(true);            
+            base.Initialize();
+        }
 
-            this.Controller = controller;
-            _canvas = GetComponentInParent<Canvas>(true);
+        // TODO: Find a more elegant solution for this.
+        new public void Initialize() { throw new InvalidOperationException("Screen cannot be initialized without a controller."); }
+
+        public sealed override void Terminate()
+        {
+            if (State != BehaviourState.Initialized)
+            {
+                throw new InvalidOperationException("Screen cannot be terminated.");
+            }
+            Controller = null;
+            base.Terminate();
+        }
+
+        protected override void OnInitialize()
+        {
+            base.OnInitialize();
             if (BackButton != null)
             {
-                BackButton.onClick.AddListener(delegate () { controller.CloseScreen(); });
+                BackButton.onClick.AddListener(delegate () { Controller.CloseScreen(); });
             }
-            Init();
         }
 
         public bool SetBackButtonActive(bool active)

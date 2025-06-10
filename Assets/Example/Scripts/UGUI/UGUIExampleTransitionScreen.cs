@@ -6,8 +6,6 @@ using UnityEngine.UI;
 
 public class UGUIExampleTransitionScreen : UIFramework.UGUI.Screen
 {
-    [SerializeField] private UIFramework.UGUI.Screen _targetScreen = null;
-
     [SerializeField] private float _transitionLength = 0.5F;
 
     [SerializeField] private Button _fadeTransitionButton = null;
@@ -30,9 +28,9 @@ public class UGUIExampleTransitionScreen : UIFramework.UGUI.Screen
         return false;
     }
 
-    protected override void OnInit()
+    protected override void OnInitialize()
     {
-        base.OnInit();
+        base.OnInitialize();
         _fadeTransitionButton?.onClick.AddListener(FadeTransition);
         _slideFromLeftTransitionButton?.onClick.AddListener(SlideFromLeftTransition);
         _slideFromRightTransitionButton?.onClick?.AddListener(SlideFromRightTransition);
@@ -46,75 +44,75 @@ public class UGUIExampleTransitionScreen : UIFramework.UGUI.Screen
         _expandTransitionButton?.onClick.AddListener(ExpandTransition);
     }
 
+    private object GetTargetScreenData()
+    {
+        return null;
+    }
+
     // UGUIExampleTransitionScreenBase
     private void FadeTransition()
     {
         TransitionAnimationParams transition = TransitionAnimationParams.Fade(_transitionLength, EasingMode.EaseInOut);
-        Controller.OpenScreen(_targetScreen, GetTargetScreenData(), in transition);
+        Controller.OpenScreen<UGUIExampleSharedCanvasScreen>(GetTargetScreenData(), in transition);
     }
 
     private void SlideFromLeftTransition()
     {
         TransitionAnimationParams transition = TransitionAnimationParams.SlideFromLeft(_transitionLength, EasingMode.EaseOutBounce);
-        Controller.OpenScreen(_targetScreen, GetTargetScreenData(), in transition);
+        Controller.OpenScreen<UGUIExampleSharedCanvasScreen>(GetTargetScreenData(), in transition);
     }
 
     private void SlideFromRightTransition()
     {
         TransitionAnimationParams transition = TransitionAnimationParams.SlideFromRight(_transitionLength, EasingMode.EaseOutBounce);
-        Controller.OpenScreen(_targetScreen, GetTargetScreenData(), in transition);
+        Controller.OpenScreen<UGUIExampleSharedCanvasScreen>(GetTargetScreenData(), in transition);
     }
 
     private void SlideFromBottomTransition()
     {
         TransitionAnimationParams transition = TransitionAnimationParams.SlideFromBottom(_transitionLength, EasingMode.EaseOutBounce);
-        Controller.OpenScreen(_targetScreen, GetTargetScreenData(), in transition);
+        Controller.OpenScreen<UGUIExampleSharedCanvasScreen>(GetTargetScreenData(), in transition);
     }
 
     private void SlideFromTopTransition()
     {
         TransitionAnimationParams transition = TransitionAnimationParams.SlideFromTop(_transitionLength, EasingMode.EaseOutBounce);
-        Controller.OpenScreen(_targetScreen, GetTargetScreenData(), in transition);
+        Controller.OpenScreen<UGUIExampleSharedCanvasScreen>(GetTargetScreenData(), in transition);
     }
 
     private void SlideOverLeftTransition()
     {
         TransitionAnimationParams transition = TransitionAnimationParams.SlideOverFromLeft(_transitionLength, EasingMode.EaseOutBounce);
-        Controller.OpenScreen(_targetScreen, GetTargetScreenData(), in transition);
+        Controller.OpenScreen<UGUIExampleSharedCanvasScreen>(GetTargetScreenData(), in transition);
     }
 
     private void SlideOverRightTransition()
     {
         TransitionAnimationParams transition = TransitionAnimationParams.SlideOverFromRight(_transitionLength, EasingMode.EaseOutBounce);
-        Controller.OpenScreen(_targetScreen, GetTargetScreenData(), in transition);
+        Controller.OpenScreen<UGUIExampleSharedCanvasScreen>(GetTargetScreenData(), in transition);
     }
 
     private void SlideOverBottomTransition()
     {
         TransitionAnimationParams transition = TransitionAnimationParams.SlideOverFromBottom(_transitionLength, EasingMode.EaseOutBounce);
-        Controller.OpenScreen(_targetScreen, GetTargetScreenData(), in transition);
+        Controller.OpenScreen<UGUIExampleSharedCanvasScreen>(GetTargetScreenData(), in transition);
     }
 
     private void SlideOverTopTransition()
     {
         TransitionAnimationParams transition = TransitionAnimationParams.SlideOverFromTop(_transitionLength, EasingMode.EaseOutBounce);
-        Controller.OpenScreen(_targetScreen, GetTargetScreenData(), in transition);
+        Controller.OpenScreen<UGUIExampleSharedCanvasScreen>(GetTargetScreenData(), in transition);
     }
 
     private void FlipTransition()
     {
         TransitionAnimationParams transition = TransitionAnimationParams.Flip(_transitionLength, EasingMode.EaseOutBounce);
-        Controller.OpenScreen(_targetScreen, GetTargetScreenData(), in transition);
+        Controller.OpenScreen<UGUIExampleSharedCanvasScreen>(GetTargetScreenData(), in transition);
     }
 
     private void ExpandTransition()
     {
         TransitionAnimationParams transition = TransitionAnimationParams.Expand(_transitionLength, EasingMode.EaseInOutBack);
-        Controller.OpenScreen(_targetScreen, GetTargetScreenData(),in transition);
-    }
-
-    protected object GetTargetScreenData()
-    {
-        return null;
-    }
+        Controller.OpenScreen<UGUIExampleSharedCanvasScreen>(GetTargetScreenData(),in transition);
+    }  
 }

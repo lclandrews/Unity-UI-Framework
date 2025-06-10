@@ -2,18 +2,23 @@
 
 namespace UIFramework.UIToolkit
 {
-    public abstract class UIBehaviour : IUIBehaviour, IDisposable
-    {        
+    public abstract class UIBehaviour : IUIBehaviour
+    {
+        public BehaviourState State { get; private set; } = BehaviourState.Uninitialized;
+
         // IUIBehaviour
-        public virtual void UpdateUI(float deltaTime)
+        public abstract bool IsValid();
+
+        public virtual void Initialize() 
         {
-            
+            State = BehaviourState.Initialized;
         }
 
-        // IDisposable
-        public virtual void Dispose()
-        {
+        public virtual void UpdateUI(float deltaTime) { }
 
+        public virtual void Terminate() 
+        {
+            State = BehaviourState.Terminated;
         }
     }
 }

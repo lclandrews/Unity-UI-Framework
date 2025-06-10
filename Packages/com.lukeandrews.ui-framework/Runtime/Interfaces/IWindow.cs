@@ -1,14 +1,22 @@
 namespace UIFramework
 {
+    public interface IReadOnlyWindow : IReadOnlyUIBehaviour, IReadOnlyAccessible
+    {
+        string Identifier { get; }
+        bool IsVisible { get; }
+        bool IsEnabled { get; }
+        bool IsInteractable { get; }
+        int SortOrder { get; }
+    }
+
     /// <summary>
     /// Interface <c>IWindow</c> defines expected contract for all <c>UIFramework</c> windows.
     /// </summary>
-    public interface IWindow : IAccessible, IDataRecipient, IUIBehaviour
+    public interface IWindow : IReadOnlyWindow, IAccessible, IDataRecipient, IUIBehaviour
     {
-        bool IsVisible { get; }
-        bool IsEnabled { get; set; }
-        bool IsInteractable { get; set; }
-        int SortOrder { get; set; }
+        new bool IsEnabled { get; set; }
+        new bool IsInteractable { get; set; }
+        new int SortOrder { get; set; }
         
         GenericWindowAnimation GetAnimation(GenericWindowAnimationType type);        
 

@@ -6,6 +6,8 @@ namespace UIFramework
 {
     public class TabController : IUIBehaviour
     {
+        public BehaviourState State { get; private set; } = BehaviourState.Uninitialized;
+
         private ObjectTypeMap<IWindow> _windows = null;
 
         public IWindow ActiveTabWindow { get { return _activeTabWindow; } }
@@ -21,6 +23,16 @@ namespace UIFramework
             Populate(windows, activeTabIndex);
         }
 
+        public bool IsValid()
+        {
+            return _windows != null;
+        }
+
+        public void Initialize() 
+        {
+            State = BehaviourState.Initialized;
+        }
+
         public void UpdateUI(float deltaTime)
         {
             for (int i = 0; i < _windows.Array.Length; i++)
@@ -30,6 +42,11 @@ namespace UIFramework
                     _windows.Array[i].UpdateUI(deltaTime);
                 }
             }
+        }
+
+        public void Terminate() 
+        {
+            State = BehaviourState.Terminated;
         }
 
         public void Clear()
@@ -53,7 +70,7 @@ namespace UIFramework
             _windows = new ObjectTypeMap<IWindow>(windows);
             for (int i = 0; i < _windows.Array.Length; i++)
             {
-                _windows.Array[i].Init();
+                _windows.Array[i].Initialize();
                 if (i == activeTabIndex)
                 {
                     _windows.Array[i].Open();

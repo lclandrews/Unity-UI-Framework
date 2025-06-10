@@ -6,11 +6,23 @@ namespace UIFramework.UGUI
 {
     public abstract class UIBehaviour : MonoBehaviour, IUIBehaviour
     {
+        public BehaviourState State { get; private set; } = BehaviourState.Uninitialized;
+
         public UIBehaviour Parent { get; private set; } = null;
-        private HashSet<UIBehaviour> _children { get; set; } = new HashSet<UIBehaviour>();
+        private HashSet<UIBehaviour> _children { get; set; } = new HashSet<UIBehaviour>();        
 
 
         // IUIBehaviour
+        public bool IsValid()
+        {
+            return true;
+        }
+
+        public virtual void Initialize()
+        {
+            State = BehaviourState.Initialized;
+        }
+
         public virtual void UpdateUI(float deltaTime)
         {
             foreach (UIBehaviour child in _children)
@@ -20,6 +32,11 @@ namespace UIFramework.UGUI
                     child.UpdateUI(deltaTime);
                 }
             }
+        }
+
+        public virtual void Terminate()
+        {
+            State = BehaviourState.Terminated;
         }
 
         // Unity Messages
@@ -75,6 +92,6 @@ namespace UIFramework.UGUI
             {
                 _children.Remove(child);
             }
-        }
+        }                
     }
 }

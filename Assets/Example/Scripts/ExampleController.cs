@@ -1,3 +1,5 @@
+using System;
+
 using UIFramework;
 using UIFramework.UGUI;
 
@@ -45,11 +47,17 @@ public class ExampleController : Controller
         return animation.CreatePlayable(accessOperation, EasingMode.EaseInOut, TimeMode);
     }
 
-    protected override void OnInit()
+    protected override void OnInitialize()
     {
-        base.OnInit();
+        base.OnInitialize();
         gameObject.SetActive(false);
-        backButton.onClick.AddListener(delegate () { CloseScreen(); });
+        backButton.onClick.AddListener(CloseScreenAction);
+    }
+
+    protected override void OnTerminate()
+    {
+        backButton.onClick.RemoveListener(CloseScreenAction);
+        base.OnTerminate();        
     }
 
     protected override void OnUpdate(float deltaTime)
@@ -67,7 +75,7 @@ public class ExampleController : Controller
 
     public override void SetWaiting(bool waiting)
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 
     protected override void SetBackButtonActive(bool active)
@@ -92,5 +100,10 @@ public class ExampleController : Controller
     {
         base.OnClosed();
         gameObject.SetActive(false);
+    }
+
+    private void CloseScreenAction()
+    {
+        CloseScreen();
     }
 }

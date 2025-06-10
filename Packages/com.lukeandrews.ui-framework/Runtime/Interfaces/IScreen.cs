@@ -1,13 +1,16 @@
 namespace UIFramework
 {
-    public interface IScreen : INavigableWindow
+    public interface IReadOnlyScreen : IReadOnlyNavigableWindow
+    {
+        
+    }
+
+    public interface IScreen : IReadOnlyScreen, INavigableWindow
     {
         Controller Controller { get; }
 
         ControllerType GetController<ControllerType>() where ControllerType : Controller;
-
-        void Init(Controller controller);
-
+        void Initialize(Controller controller);
         bool SetBackButtonActive(bool active);
     }
 }

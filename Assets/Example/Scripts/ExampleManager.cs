@@ -8,9 +8,23 @@ public class ExampleManager : MonoBehaviour, IUpdatable
     [SerializeField] private ExampleController exampleController = null;
 
     private void Awake()
-    {
-        exampleController.Init();
+    {        
         UpdateManager.AddUpdatable(this);
+    }
+
+    private void OnEnable()
+    {
+        BehaviourState controllerState = exampleController.State;
+        exampleController.Initialize();
+        if(controllerState == BehaviourState.Terminated)
+        {
+            exampleController.OpenScreen<UGUIExampleTransitionScreen>();
+        }
+    }
+
+    private void OnDisable()
+    {
+        exampleController.Terminate();
     }
 
     private void Start()

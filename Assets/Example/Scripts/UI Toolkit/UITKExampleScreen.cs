@@ -1,5 +1,7 @@
 using UIFramework;
+using UIFramework.UIToolkit;
 
+using UnityEngine;
 using UnityEngine.UIElements;
 
 public class UITKExampleScreen : UIFramework.UIToolkit.Screen
@@ -10,29 +12,29 @@ public class UITKExampleScreen : UIFramework.UIToolkit.Screen
     private Button _travelToUGUISharedCanvasScreenButton = null;
     private Button _travelToUGUIAltCanvasScreenButton = null;
 
-    public UITKExampleScreen(UIDocument uiDocument, VisualElement visualElement) : base(uiDocument, visualElement) { }
+    public UITKExampleScreen(UIBehaviourDocument uIBehaviourDocument, string identifier) : base(uIBehaviourDocument, identifier) { }
 
     public override bool IsValidData(object data)
     {
         return false;
     }
 
-    protected override void OnInit()
+    protected override void OnInitialize(VisualElement visualElement)
     {
-        base.OnInit();
-        _returnButton = VisualElement.Q<Button>("returnButton");
+        base.OnInitialize(visualElement);
+        _returnButton = visualElement.Q<Button>("returnButton");
         _returnButton.clicked += delegate() { Controller.CloseScreen(); };
 
-        _travelToUGUITransitionScreenButton = VisualElement.Q<Button>("uguiTransitionButton");
+        _travelToUGUITransitionScreenButton = visualElement.Q<Button>("uguiTransitionButton");
         _travelToUGUITransitionScreenButton.clicked += TravelToUGUITransitionScreen;
 
-        _tavelToUITKTransitionScreenButton = VisualElement.Q<Button>("uitkTransitionButton");
+        _tavelToUITKTransitionScreenButton = visualElement.Q<Button>("uitkTransitionButton");
         _tavelToUITKTransitionScreenButton.clicked += TravelToUITKTransitionScreen;
 
-        _travelToUGUISharedCanvasScreenButton = VisualElement.Q<Button>("uguiSharedCanvasButton");
+        _travelToUGUISharedCanvasScreenButton = visualElement.Q<Button>("uguiSharedCanvasButton");
         _travelToUGUISharedCanvasScreenButton.clicked += TravelToUGUISharedCanvasScreen;
 
-        _travelToUGUIAltCanvasScreenButton = VisualElement.Q<Button>("uguiAltCanvasButton");
+        _travelToUGUIAltCanvasScreenButton = visualElement.Q<Button>("uguiAltCanvasButton");
         _travelToUGUIAltCanvasScreenButton.clicked += TravelToUGUIAltCanvasScreen;
     }
 
@@ -58,5 +60,11 @@ public class UITKExampleScreen : UIFramework.UIToolkit.Screen
     {
         TransitionAnimationParams transition = TransitionAnimationParams.Custom(0.5F, UnityEngine.Extension.EasingMode.EaseInOut, GenericWindowAnimationType.Fade, GenericWindowAnimationType.Expand, TransitionAnimationParams.SortPriority.Target);
         Controller.OpenScreen<UGUIExampleAlternateCanvasScreen>(in transition);
-    }    
+    }
+    
+    public override void UpdateUI(float deltaTime)
+    {
+        base.UpdateUI(deltaTime);
+        Debug.Log($"IsValid: {IsValid()}");
+    }
 }

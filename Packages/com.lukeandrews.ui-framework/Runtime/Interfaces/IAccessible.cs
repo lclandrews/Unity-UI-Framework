@@ -12,17 +12,20 @@ namespace UIFramework
 
     public enum AccessState
     {
-        Unitialized,
+        None,        
         Open,
         Opening,
         Closed,
-        Closing
-    }    
+        Closing,
+    }
 
-    public interface IAccessible
+    public interface IReadOnlyAccessible
     {
         AccessState AccessState { get; }
+    }
 
+    public interface IAccessible : IReadOnlyAccessible
+    {
         AnimationPlayer.PlaybackData AccessAnimationPlaybackData { get; }
         AccessAnimationPlayable AccessAnimationPlayable { get; }
 
@@ -32,9 +35,7 @@ namespace UIFramework
         event IAccessibleAction Closing;
 
         AccessAnimation GetDefaultAccessAnimation();
-        void ResetAnimatedProperties();
-
-        void Init();
+        void ResetAnimatedProperties();        
 
         /// <summary>
         /// Open the IAccessible with the provided animation

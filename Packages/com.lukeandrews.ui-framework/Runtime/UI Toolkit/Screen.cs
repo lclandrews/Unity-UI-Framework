@@ -25,7 +25,7 @@ namespace UIFramework.UIToolkit
             }
         }
 
-        public Screen(UIDocument uiDocument, VisualElement visualElement) : base(uiDocument, visualElement) { }
+        public Screen(UIBehaviourDocument uIBehaviourDocument, string identifier) : base(uIBehaviourDocument, identifier) { }
 
         // IScreen
         public ControllerType GetController<ControllerType>() where ControllerType : Controller
@@ -33,30 +33,42 @@ namespace UIFramework.UIToolkit
             return Controller as ControllerType;
         }
 
-        public virtual void Init(Controller controller)
+        public void Initialize(Controller controller)
         {
             if (controller == null)
             {
                 throw new ArgumentNullException(nameof(controller));
             }
 
-            if (this.Controller != null)
+            if (State == BehaviourState.Initialized)
             {
                 throw new InvalidOperationException("Screen already initialized.");
             }
+            Controller = controller;            
+            base.Initialize();
+        }
 
-            this.Controller = controller;
+        // TODO: Find a more elegant solution for this.
+        new public void Initialize() { throw new InvalidOperationException("Screen cannot be initialized without a controller."); }
+
+        public sealed override void Terminate()
+        {
+            if (State != BehaviourState.Initialized)
+            {
+                throw new InvalidOperationException("Screen cannot be terminated.");
+            }
+            Controller = null;
+            base.Terminate();            
+        }
+
+        protected override void OnInitialize(VisualElement visualElement)
+        {
+            base.OnInitialize(visualElement);
             if (!string.IsNullOrWhiteSpace(BackButtonName))
             {
-                UQueryBuilder<Button> backButtonQueryBuilder = VisualElement.Query<Button>(BackButtonName);
-                UQueryState<Button> backButtonQuery = backButtonQueryBuilder.Build();
-                BackButton = backButtonQuery.First();
-                if(BackButton != null)
-                {
-                    BackButton.RegisterCallback<ClickEvent>(BackButtonClicked);
-                }
+                BackButton = visualElement.Q<Button>(BackButtonName);
+                BackButton.RegisterCallback<ClickEvent>(BackButtonClicked);
             }
-            Init();
         }
 
         public bool SetBackButtonActive(bool active)
