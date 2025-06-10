@@ -67,7 +67,10 @@ namespace UIFramework.UIToolkit
             if (!string.IsNullOrWhiteSpace(BackButtonName))
             {
                 BackButton = visualElement.Q<Button>(BackButtonName);
-                BackButton.RegisterCallback<ClickEvent>(BackButtonClicked);
+                if(BackButton != null)
+                {
+                    BackButton.RegisterCallback<ClickEvent>(BackButtonClicked);
+                }                
             }
         }
 
