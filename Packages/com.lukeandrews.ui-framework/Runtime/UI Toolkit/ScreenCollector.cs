@@ -5,15 +5,20 @@ using UnityEngine.Serialization;
 
 namespace UIFramework.UIToolkit
 {
+    [RequireComponent(typeof(UIBehaviourDocument))]
     public class ScreenCollector : ScreenCollectorComponent
     {
         [SerializeField, FormerlySerializedAs("_collectableDefinitions")] private CollectableBehaviour<Screen>[] _definitions = new CollectableBehaviour<Screen>[0];
         private UIBehaviourDocument _uiBehaviourDocument = null;
         private IScreen[] _cachedScreens = null;
 
-        private void Awake()
+        private UIBehaviourDocument GetUIBehaviourDocument()
         {
-            _uiBehaviourDocument = GetComponent<UIBehaviourDocument>();
+            if (_uiBehaviourDocument == null)
+            {
+                _uiBehaviourDocument = GetComponent<UIBehaviourDocument>();
+            }
+            return _uiBehaviourDocument;
         }
 
         public override IScreen[] Collect()
@@ -23,7 +28,8 @@ namespace UIFramework.UIToolkit
                 return _cachedScreens;
             }
 
-            if (_uiBehaviourDocument == null)
+            UIBehaviourDocument behaviourDocument = GetUIBehaviourDocument();
+            if (behaviourDocument == null)
             {
                 throw new InvalidOperationException("UIBehaviourDocument is null.");
             }
@@ -36,7 +42,7 @@ namespace UIFramework.UIToolkit
             _cachedScreens = new IScreen[_definitions.Length];
             for (int i = 0; i < _definitions.Length; i++)
             {
-                IScreen screen = _definitions[i].Type.CreateInstance(_uiBehaviourDocument, _definitions[i].Identifier);
+                IScreen screen = _definitions[i].Type.CreateInstance(behaviourDocument, _definitions[i].Identifier);
                 _cachedScreens[i] = screen;
             }
             return _cachedScreens;
