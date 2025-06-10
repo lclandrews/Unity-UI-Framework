@@ -16,6 +16,9 @@ namespace UIFramework.UIToolkit
         protected UIDocument UIDocument { get { return _uiBehaviourDocument.Document; } }
         private UIBehaviourDocument _uiBehaviourDocument = null;
 
+        protected VisualElement VisualElement { get { return _visualElement; } }
+        private VisualElement _visualElement = null;
+
         // IAccessible
         public AccessState AccessState { get; private set; } = AccessState.None;
 
@@ -99,8 +102,7 @@ namespace UIFramework.UIToolkit
         }
         private int _sortOrder = 0;
 
-        // UI Toolkit Window
-        private VisualElement _visualElement = null;
+        // UI Toolkit Window        
         private bool _isActive = true;
         private bool _isWaiting = false;
         private AnimationPlayer _animationPlayer = null;
