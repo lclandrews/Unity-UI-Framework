@@ -372,8 +372,9 @@ namespace UIFramework.UGUI
                 AccessState = AccessState.Open;
                 Opened?.Invoke(this);
                 OnOpened();
-                _onAccessAnimationComplete?.Invoke(this);
+                IAccessibleAction action = _onAccessAnimationComplete;
                 _onAccessAnimationComplete = null;
+                action?.Invoke(this);
             }
             else if (AccessState == AccessState.Closing)
             {
@@ -381,8 +382,9 @@ namespace UIFramework.UGUI
                 gameObject.SetActive(false);
                 Closed?.Invoke(this);
                 OnClosed();
-                _onAccessAnimationComplete?.Invoke(this);
+                IAccessibleAction action = _onAccessAnimationComplete;
                 _onAccessAnimationComplete = null;
+                action?.Invoke(this);
             }
             else
             {
