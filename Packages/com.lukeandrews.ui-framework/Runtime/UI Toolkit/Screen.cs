@@ -49,7 +49,7 @@ namespace UIFramework.UIToolkit
         }
 
         // TODO: Find a more elegant solution for this.
-        new public void Initialize() { throw new InvalidOperationException("Screen cannot be initialized without a controller."); }
+        public new void Initialize() { throw new InvalidOperationException("Screen cannot be initialized without a controller."); }
 
         public sealed override void Terminate()
         {
@@ -74,6 +74,15 @@ namespace UIFramework.UIToolkit
             }
         }
 
+        protected override void OnTerminate()
+        {
+            base.OnTerminate();
+            if(BackButton != null)
+            {
+                BackButton.UnregisterCallback<ClickEvent>(BackButtonClicked);
+            }              
+        }
+
         public bool SetBackButtonActive(bool active)
         {
             if(BackButton != null)
@@ -91,7 +100,7 @@ namespace UIFramework.UIToolkit
 
         private void BackButtonClicked(ClickEvent clickEvent)
         {
-            Controller.CloseScreen();
+            Controller.TryCloseScreen();
         }
     }
 }

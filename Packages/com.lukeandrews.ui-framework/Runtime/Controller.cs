@@ -221,6 +221,9 @@ namespace UIFramework
                 }
             }
             _screens = null;
+            
+            OnTerminate();
+            
             AccessState = AccessState.None;
             State = BehaviourState.Terminated;
         }
@@ -452,7 +455,12 @@ namespace UIFramework
         protected virtual void OnOpen() { }
         protected virtual void OnOpened() { }
 
-        public bool CloseScreen()
+        public void CloseScreen()
+        {
+            _ = TryCloseScreen();
+        }
+        
+        public bool TryCloseScreen()
         {
             WindowNavigationEvent<IScreen> navigationEvent = _navigation.Back();
             if (navigationEvent.Success)

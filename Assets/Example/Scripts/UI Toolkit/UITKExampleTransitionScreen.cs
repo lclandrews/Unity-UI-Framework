@@ -60,6 +60,22 @@ public class UITKExampleTransitionScreen : UIFramework.UIToolkit.Screen
         _expandTransitionButton.clicked += ExpandTransition;
     }
 
+    protected override void OnTerminate()
+    {
+        base.OnTerminate();
+        _fadeTransitionButton.clicked -= FadeTransition;
+        _slideFromLeftTransitionButton.clicked -= SlideFromLeftTransition;
+        _slideFromRightTransitionButton.clicked -= SlideFromRightTransition;
+        _slideFromBottomTransitionButton.clicked -= SlideFromBottomTransition;
+        _slideFromTopTransitionButton.clicked -= SlideFromTopTransition;
+        _slideOverLeftTransitionButton.clicked -= SlideOverLeftTransition;
+        _slideOverRightTransitionButton.clicked -= SlideOverRightTransition;
+        _slideOverBottomTransitionButton.clicked -= SlideOverBottomTransition;
+        _slideOverTopTransitionButton.clicked -= SlideOverTopTransition;
+        _flipTransitionButton.clicked -= FlipTransition;
+        _expandTransitionButton.clicked -= ExpandTransition;
+    }
+
     private void FadeTransition()
     {
         TransitionAnimationParams transition = TransitionAnimationParams.Fade(_transitionLength, UnityEngine.Extension.EasingMode.EaseInOut);

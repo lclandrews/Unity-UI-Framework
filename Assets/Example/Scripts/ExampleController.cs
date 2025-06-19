@@ -56,8 +56,8 @@ public class ExampleController : Controller
 
     protected override void OnTerminate()
     {
+        base.OnTerminate();
         backButton.onClick.RemoveListener(CloseScreenAction);
-        base.OnTerminate();        
     }
 
     protected override void OnUpdate(float deltaTime)
@@ -66,7 +66,7 @@ public class ExampleController : Controller
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (!CloseScreen())
+            if (!TryCloseScreen())
             {
                 CloseAll(0.5F);
             }
@@ -104,6 +104,6 @@ public class ExampleController : Controller
 
     private void CloseScreenAction()
     {
-        CloseScreen();
+        TryCloseScreen();
     }
 }

@@ -19,12 +19,21 @@ public class UGUIExampleAlternateCanvasScreen : UIFramework.UGUI.Screen
     protected override void OnInitialize()
     {
         base.OnInitialize();
-        returnButton?.onClick.AddListener(delegate() { Controller.CloseScreen(); });
+        returnButton?.onClick.AddListener(Controller.CloseScreen);
         travelToTransitionScreenButton?.onClick.AddListener(TravelToTransitionScreen);
         travelToSharedCanvasScreenButton?.onClick.AddListener(TravelToSharedCanvasScreen);
         travelToUITKTransitionScreenButton?.onClick.AddListener(TravelToUITKTransitionScreen);
     }
 
+    protected override void OnTerminate()
+    {
+        base.OnTerminate();
+        returnButton?.onClick.RemoveListener(Controller.CloseScreen);
+        travelToTransitionScreenButton?.onClick.RemoveListener(TravelToTransitionScreen);
+        travelToSharedCanvasScreenButton?.onClick.RemoveListener(TravelToSharedCanvasScreen);
+        travelToUITKTransitionScreenButton?.onClick.RemoveListener(TravelToUITKTransitionScreen);
+    }
+    
     private void TravelToTransitionScreen()
     {
         TransitionAnimationParams transition = TransitionAnimationParams.Custom(0.5F, EasingMode.EaseInOut, GenericWindowAnimationType.Flip, GenericWindowAnimationType.Fade, TransitionAnimationParams.SortPriority.Source);

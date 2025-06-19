@@ -8,23 +8,29 @@ namespace UIFramework.UIToolkit
     [RequireComponent(typeof(UIDocument))]
     public class UIBehaviourDocument : MonoBehaviour
     {
-        public UIDocument Document { get; private set; } = null;
-
-        public event Action Enabled = default;
-        public event Action Disabled = default;
-        public event Action Destroyed = default;
-
-        private void Awake()
+        public UIDocument Document
         {
-            Document = GetComponent<UIDocument>();
+            get
+            {
+                if (_document == null)
+                {
+                    _document = GetComponent<UIDocument>();        
+                }
+                return _document;
+            }
         }
+        private UIDocument _document;
 
-        private void OnEnabled()
+        public event Action Enabled;
+        public event Action Disabled;
+        public event Action Destroyed;
+
+        private void OnEnable()
         {
             Enabled?.Invoke();
         }
 
-        private void OnDisabled()
+        private void OnDisable()
         {
             Disabled?.Invoke();
         }

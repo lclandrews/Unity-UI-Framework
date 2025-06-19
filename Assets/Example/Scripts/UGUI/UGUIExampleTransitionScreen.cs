@@ -44,6 +44,22 @@ public class UGUIExampleTransitionScreen : UIFramework.UGUI.Screen
         _expandTransitionButton?.onClick.AddListener(ExpandTransition);
     }
 
+    protected override void OnTerminate()
+    {
+        base.OnTerminate();
+        _fadeTransitionButton?.onClick.RemoveListener(FadeTransition);
+        _slideFromLeftTransitionButton?.onClick.RemoveListener(SlideFromLeftTransition);
+        _slideFromRightTransitionButton?.onClick?.RemoveListener(SlideFromRightTransition);
+        _slideFromBottomTransitionButton?.onClick.RemoveListener(SlideFromBottomTransition);
+        _slideFromTopTransitionButton?.onClick.RemoveListener(SlideFromTopTransition);
+        _slideOverLeftTransitionButton?.onClick.RemoveListener(SlideOverLeftTransition);
+        _slideOverRightTransitionButton?.onClick?.RemoveListener(SlideOverRightTransition);
+        _slideOverBottomTransitionButton?.onClick.RemoveListener(SlideOverBottomTransition);
+        _slideOverTopTransitionButton?.onClick.RemoveListener(SlideOverTopTransition);
+        _flipTransitionButton?.onClick.RemoveListener(FlipTransition);
+        _expandTransitionButton?.onClick.RemoveListener(ExpandTransition);
+    }
+
     private object GetTargetScreenData()
     {
         return null;

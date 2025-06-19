@@ -23,7 +23,7 @@ public class UITKExampleScreen : UIFramework.UIToolkit.Screen
     {
         base.OnInitialize(visualElement);
         _returnButton = visualElement.Q<Button>("returnButton");
-        _returnButton.clicked += delegate() { Controller.CloseScreen(); };
+        _returnButton.clicked += Controller.CloseScreen;
 
         _travelToUGUITransitionScreenButton = visualElement.Q<Button>("uguiTransitionButton");
         _travelToUGUITransitionScreenButton.clicked += TravelToUGUITransitionScreen;
@@ -36,6 +36,16 @@ public class UITKExampleScreen : UIFramework.UIToolkit.Screen
 
         _travelToUGUIAltCanvasScreenButton = visualElement.Q<Button>("uguiAltCanvasButton");
         _travelToUGUIAltCanvasScreenButton.clicked += TravelToUGUIAltCanvasScreen;
+    }
+
+    protected override void OnTerminate()
+    {
+        base.OnTerminate();
+        _returnButton.clicked -= Controller.CloseScreen;
+        _travelToUGUITransitionScreenButton.clicked -= TravelToUGUITransitionScreen;
+        _tavelToUITKTransitionScreenButton.clicked -= TravelToUITKTransitionScreen;
+        _travelToUGUISharedCanvasScreenButton.clicked -= TravelToUGUISharedCanvasScreen;
+        _travelToUGUIAltCanvasScreenButton.clicked -= TravelToUGUIAltCanvasScreen;
     }
 
     private void TravelToUGUITransitionScreen()
