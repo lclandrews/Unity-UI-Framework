@@ -7,6 +7,8 @@ public class ExampleManager : MonoBehaviour, IUpdatable
 {
     [SerializeField] private ExampleController exampleController = null;
 
+    public bool Active => gameObject.activeInHierarchy;
+    
     private void Awake()
     {        
         UpdateManager.AddUpdatable(this);

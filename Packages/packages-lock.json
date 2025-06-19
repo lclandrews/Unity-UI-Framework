@@ -15,8 +15,10 @@
       "version": "https://github.com/lclandrews/Unity-Extensions.git?path=Packages/com.lukeandrews.unity-extension",
       "depth": 0,
       "source": "git",
-      "dependencies": {},
-      "hash": "6497c24eb346ac37bcd2cf4be2ee6da37351cf8a"
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.2.1"
+      },
+      "hash": "8ef465852b570a5378cc99935835a6e62feca170"
     },
     "com.unity.collab-proxy": {
       "version": "2.8.2",
@@ -76,6 +78,13 @@
       "dependencies": {
         "com.unity.modules.uielements": "1.0.0"
       }
+    },
+    "com.unity.nuget.newtonsoft-json": {
+      "version": "3.2.1",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
     },
     "com.unity.performance.profile-analyzer": {
       "version": "1.2.3",

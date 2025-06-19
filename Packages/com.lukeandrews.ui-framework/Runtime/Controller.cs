@@ -8,6 +8,8 @@ namespace UIFramework
 {
     public abstract class Controller : MonoBehaviour, IUpdatable
     {
+        public bool Active => gameObject.activeInHierarchy;
+
         public BehaviourState State { get; private set; } = BehaviourState.Uninitialized;
         public AccessState AccessState { get; private set; } = AccessState.None;
 
