@@ -137,8 +137,13 @@ namespace UIFramework.UIToolkit
 
             if(!_uiBehaviourDocument.gameObject.activeSelf)
             {
-                Debug.Log("UI Document enabled by Window Initialization.");
-                _uiBehaviourDocument.gameObject.SetActive(true);
+                Debug.Log("UI Document and all parents enabled by Window Initialization.", _uiBehaviourDocument);
+                Transform target = _uiBehaviourDocument.gameObject.transform;
+                while (target != null)
+                {
+                    target.gameObject.SetActive(true);
+                    target = target.parent;
+                }
             }
 
             if(!_uiBehaviourDocument.Document.gameObject.activeInHierarchy)

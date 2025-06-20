@@ -1,6 +1,6 @@
 {
   "name": "com.lukeandrews.ui-framework",
-  "version": "1.0.23",
+  "version": "1.0.24",
   "displayName": "UI Framework",
   "description": "A code library that outlines a generic framework for creating UI systems in within Unity.",
   "unity": "6000.0",
