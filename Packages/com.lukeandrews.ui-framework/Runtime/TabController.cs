@@ -15,12 +15,13 @@ namespace UIFramework
 
         public int ActiveTabIndex { get { return _activeTabIndex; } }
         private int _activeTabIndex = 0;
-
+        
         private TabController() { }
 
         public TabController(IWindow[] windows, int activeTabIndex = 0)
         {
             Populate(windows, activeTabIndex);
+            Initialize();
         }
 
         public bool IsValid()
@@ -46,6 +47,10 @@ namespace UIFramework
 
         public void Terminate() 
         {
+            for (int i = 0; i < _windows.Array.Length; i++)
+            {
+                _windows.Array[i].Terminate();
+            }
             State = BehaviourState.Terminated;
         }
 
@@ -66,7 +71,6 @@ namespace UIFramework
             {
                 Clear();
             }
-
             _windows = new ObjectTypeMap<IWindow>(windows);
             for (int i = 0; i < _windows.Array.Length; i++)
             {
