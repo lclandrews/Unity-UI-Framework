@@ -100,7 +100,10 @@ namespace UIFramework.UIToolkit
 
         private void BackButtonClicked(ClickEvent clickEvent)
         {
-            Controller.TryCloseScreen();
+            if(AccessState == AccessState.Open || AccessState == AccessState.Opening)
+            {
+                Controller.TryCloseScreen();
+            }            
         }
     }
 }

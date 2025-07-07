@@ -67,7 +67,7 @@ namespace UIFramework.UGUI
             base.OnInitialize();
             if (BackButton != null)
             {
-                BackButton.onClick.AddListener(Controller.CloseScreen);
+                BackButton.onClick.AddListener(BackButtonClicked);
             }
         }
 
@@ -76,7 +76,7 @@ namespace UIFramework.UGUI
             base.OnTerminate();
             if (BackButton != null)
             {
-                BackButton.onClick.RemoveListener(Controller.CloseScreen);
+                BackButton.onClick.RemoveListener(BackButtonClicked);
             }
         }
 
@@ -93,6 +93,14 @@ namespace UIFramework.UGUI
         public bool Equals(INavigableWindow other)
         {
             return other as Screen == this;
+        }
+
+        private void BackButtonClicked()
+        {
+            if (AccessState == AccessState.Open || AccessState == AccessState.Opening)
+            {
+                Controller.TryCloseScreen();
+            }
         }
     }
 }
