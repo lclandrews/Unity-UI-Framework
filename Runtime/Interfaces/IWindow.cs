@@ -1,11 +1,18 @@
+using System;
+
+using UnityEngine.Extension;
+
 namespace UIFramework
 {
     public interface IReadOnlyWindow : IReadOnlyUIBehaviour, IReadOnlyAccessible
     {
         string Identifier { get; }
+        
         bool IsVisible { get; }
-        bool IsEnabled { get; }
-        bool IsInteractable { get; }
+        IReadOnlyScalarFlag IsHidden { get; }
+        IReadOnlyScalarFlag IsEnabled { get; }
+        IReadOnlyScalarFlag IsInteractable { get; }
+        
         int SortOrder { get; }
     }
 
@@ -14,8 +21,10 @@ namespace UIFramework
     /// </summary>
     public interface IWindow : IReadOnlyWindow, IAccessible, IDataRecipient, IUIBehaviour
     {
-        new bool IsEnabled { get; set; }
-        new bool IsInteractable { get; set; }
+        new IScalarFlag IsHidden { get; }
+        new IScalarFlag IsEnabled { get; }
+        new IScalarFlag IsInteractable { get; }
+        
         new int SortOrder { get; set; }
         
         GenericWindowAnimation GetAnimation(GenericWindowAnimationType type);        

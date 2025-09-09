@@ -15,27 +15,15 @@ namespace UIFramework
 
         public bool IsOpen { get { return AccessState == AccessState.Open || AccessState == AccessState.Opening; } }
         public bool IsVisible { get { return AccessState != AccessState.Closed; } }
-
-        public bool IsEnabled
-        {
-            get { return _isEnabled; }
-            set
-            {
-                if (_isEnabled != value)
-                {
-                    _isEnabled = value;
-                    if (_isEnabled)
-                    {
-                        Enabled();
-                    }
-                    else
-                    {
-                        Disabled();
-                    }
-                }
-            }
-        }
-        private bool _isEnabled = false;
+        
+        public IScalarFlag IsEnabled => _isEnabled;
+        private readonly ScalarFlag _isEnabled = new ScalarFlag(true);
+        
+        public IScalarFlag IsInteractable => _isInteractable;
+        private readonly ScalarFlag _isInteractable = new ScalarFlag(true);
+        
+        public IScalarFlag IsHidden => _isHidden;
+        private readonly ScalarFlag _isHidden = new ScalarFlag(false);
 
         public virtual TimeMode TimeMode { get { return _timeMode; } protected set { _timeMode = value; } }
         [SerializeField] private TimeMode _timeMode = TimeMode.Scaled;
@@ -236,8 +224,13 @@ namespace UIFramework
 
         protected abstract void SetBackButtonActive(bool active);
 
-        protected virtual void Enabled() { }
-        protected virtual void Disabled() { }
+        protected virtual void OnEnabled() { }
+        protected virtual void OnDisabled() { }
+
+        protected virtual void OnIsInteractable(bool value) { }
+
+        protected virtual void OnHide() { }
+        protected virtual void OnShow() { }
 
         public abstract void SetWaiting(bool waiting);
 
@@ -630,6 +623,47 @@ namespace UIFramework
         private void OnScreenClose(IAccessible accessible)
         {
             ScreenClosed?.Invoke(accessible as IReadOnlyScreen);
+        }
+        
+        private void OnIsEnabledUpdated(bool value)
+        {
+            for (int i = 0; i < _screens.Length; i++)
+            {
+                _screens[i].IsEnabled.Value = value;
+            }
+            if (value)
+            {
+                OnEnabled();
+            }
+            else
+            {
+                OnDisabled();
+            }
+        }
+        
+        private void OnIsInteractableUpdated(bool value)
+        {
+            for (int i = 0; i < _screens.Length; i++)
+            {
+                _screens[i].IsInteractable.Value = value;
+            }
+            OnIsInteractable(value);
+        }
+        
+        private void OnIsHiddenUpdated(bool value)
+        {
+            for (int i = 0; i < _screens.Length; i++)
+            {
+                _screens[i].IsHidden.Value = value;
+            }
+            if (value)
+            {
+                OnHide();
+            }
+            else
+            {
+                OnShow();
+            }
         }
     }
 }
