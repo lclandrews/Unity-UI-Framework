@@ -34,59 +34,17 @@ namespace UIFramework.UIToolkit
         public string Identifier { get; } = string.Empty;
         public bool IsVisible { get { return AccessState != AccessState.Closed; } }
 
-        public virtual bool IsEnabled
-        {
-            get { return _isEnabledCounter > 0; }
-            set
-            {
-                if (value)
-                {
-                    _isEnabledCounter = Mathf.Min(_isInteractableCounter + 1, 1);
-                }
-                else
-                {
-                    _isEnabledCounter--;
-                }
+        IReadOnlyScalarFlag IReadOnlyWindow.IsEnabled => IsEnabled;
+        public IScalarFlag IsEnabled => _isEnabled;
+        private readonly ScalarFlag _isEnabled = new ScalarFlag(true);
+        
+        IReadOnlyScalarFlag IReadOnlyWindow.IsInteractable => IsInteractable;
+        public IScalarFlag IsInteractable => _isInteractable;
+        private readonly ScalarFlag _isInteractable = new ScalarFlag(true);
 
-                if (_isEnabledCounter > 0)
-                {
-                    IsInteractable = true;
-                    _visualElement.SetEnabled(true);
-                }
-                else
-                {
-                    IsInteractable = false;
-                    _visualElement.SetEnabled(false);
-                }
-            }
-        }
-        private int _isEnabledCounter = 1;
-
-        public bool IsInteractable
-        {
-            get { return _isInteractableCounter > 0; }
-            set
-            {
-                if (value)
-                {
-                    _isInteractableCounter = Mathf.Min(_isInteractableCounter + 1, 1);
-                }
-                else
-                {
-                    _isInteractableCounter--;
-                }
-
-                if (_isInteractableCounter > 0)
-                {
-                    SetInteractable(_visualElement, true);
-                }
-                else
-                {
-                    SetInteractable(_visualElement, false);
-                }
-            }
-        }
-        private int _isInteractableCounter = 1;
+        IReadOnlyScalarFlag IReadOnlyWindow.IsHidden => IsHidden;
+        public IScalarFlag IsHidden => _isHidden;
+        private readonly ScalarFlag _isHidden = new ScalarFlag(false);
 
         public virtual int SortOrder
         {
@@ -160,6 +118,9 @@ namespace UIFramework.UIToolkit
             _uiBehaviourDocument.Destroyed += OnDocumentDestroyed;
 
             base.Initialize();
+            _isEnabled.OnUpdate += OnIsEnabledUpdated;
+            _isInteractable.OnUpdate += OnIsInteractableUpdated;
+            _isHidden.OnUpdate += OnIsHiddenUpdated;
             AccessState = AccessState.Closed;
 
             SetActive(false);
@@ -183,8 +144,12 @@ namespace UIFramework.UIToolkit
             ResetAnimatedProperties();
             ClearAnimationReferences();            
             _visualElement = null;
-            _isEnabledCounter = 1;
-            _isInteractableCounter = 1;
+            _isEnabled.Reset(true);
+            _isEnabled.OnUpdate -= OnIsEnabledUpdated;
+            _isInteractable.Reset(true);
+            _isInteractable.OnUpdate -= OnIsInteractableUpdated;
+            _isHidden.Reset(false);
+            _isHidden.OnUpdate -= OnIsHiddenUpdated;
             _sortOrder = 0;
             _genericAnimations.Clear();
             OnTerminate();
@@ -209,7 +174,7 @@ namespace UIFramework.UIToolkit
                 if (waiting != _isWaiting)
                 {
                     _isWaiting = waiting;
-                    IsEnabled = !waiting;
+                    _isEnabled.SetOverrideValue(!waiting);
                 }
                 return true;
             }
@@ -244,7 +209,7 @@ namespace UIFramework.UIToolkit
                 }
                 else
                 {
-                    IsInteractable = false;
+                    _isInteractable.SetOverrideValue(false);
                     AccessAnimationPlayable = playable;
                     _animationPlayer = AnimationPlayer.PlayAnimation(playable.Animation, playable.StartTime, playable.PlaybackMode, playable.EasingMode, playable.TimeMode, playable.PlaybackSpeed);
                     _animationPlayer.OnComplete += OnAnimationComplete;
@@ -268,7 +233,7 @@ namespace UIFramework.UIToolkit
                 {
                     Debug.Log("Open was called on a Window without an animation while already playing a state animation, " +
                         "this may cause unexpected behviour of the UI.");
-                    IsInteractable = true;
+                    _isInteractable.SetOverrideValue(true);
 
                     float time = 0.0F;
                     if (AccessState == AccessState.Closing) time = 0.0F;
@@ -305,7 +270,7 @@ namespace UIFramework.UIToolkit
                 }
                 else
                 {
-                    IsInteractable = false;
+                    _isInteractable.SetOverrideValue(false);
                     AccessAnimationPlayable = playable;
                     _animationPlayer = AnimationPlayer.PlayAnimation(playable.Animation, playable.StartTime, playable.PlaybackMode, playable.EasingMode, playable.TimeMode, playable.PlaybackSpeed);
                     _animationPlayer.OnComplete += OnAnimationComplete;
@@ -328,7 +293,7 @@ namespace UIFramework.UIToolkit
                 {
                     Debug.Log("Close was called on a Window without an animation while already playing a state animation, " +
                         "this may cause unexpected behviour of the UI.");
-                    IsInteractable = true;
+                    _isInteractable.SetOverrideValue(true);
 
                     float time = 0.0F;
                     if (AccessState == AccessState.Opening) time = 0.0F;
@@ -385,7 +350,7 @@ namespace UIFramework.UIToolkit
         {
             ResetAnimatedProperties();
             ClearAnimationReferences();
-            IsInteractable = true;
+            _isInteractable.SetOverrideValue(true);
             if (AccessState == AccessState.Opening)
             {
                 AccessState = AccessState.Open;
@@ -439,8 +404,8 @@ namespace UIFramework.UIToolkit
             {
                 _visualElement.PlaceInFront(parentHierarchy.ElementAt(newIndexInHierarchy));
             }
-
             UIDocument.sortingOrder = _sortOrder;
+            UIDocument.panelSettings.sortingOrder = _sortOrder;
         }
 
         private void SetInteractablePickingMode(VisualElement visualElement, PickingMode pickingMode)
@@ -499,6 +464,37 @@ namespace UIFramework.UIToolkit
         private void OnDocumentDestroyed()
         {
             Terminate();
+        }
+        
+        private void OnIsEnabledUpdated(bool value)
+        {
+            if (value)
+            {
+                _isInteractable.SetOverrideValue(true);
+                _visualElement.SetEnabled(true);
+            }
+            else
+            {
+                _isInteractable.SetOverrideValue(false);
+                _visualElement.SetEnabled(false);
+            }
+        }
+        
+        private void OnIsInteractableUpdated(bool value)
+        {
+            if (value)
+            {
+                SetInteractable(_visualElement, true);
+            }
+            else
+            {
+                SetInteractable(_visualElement, false);
+            }
+        }
+        
+        private void OnIsHiddenUpdated(bool value)
+        {
+            _visualElement.style.display = value ? DisplayStyle.None : DisplayStyle.Flex;
         }
     }
 }

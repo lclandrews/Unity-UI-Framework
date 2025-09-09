@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 
 using UnityEngine;
 using UnityEngine.Extension;
@@ -54,66 +55,21 @@ namespace UIFramework.UGUI
 
         public bool IsVisible { get { return AccessState != AccessState.Closed; } }
 
-        public virtual bool IsEnabled
-        {
-            get { return _isEnabledCounter > 0; }
-            set
-            {
-                if (value)
-                {
-                    _isEnabledCounter = Mathf.Min(_isInteractableCounter + 1, 1);
-                }
-                else
-                {
-                    _isEnabledCounter--;
-                }
+        IReadOnlyScalarFlag IReadOnlyWindow.IsEnabled => IsEnabled;
+        public IScalarFlag IsEnabled => _isEnabled;
+        private readonly ScalarFlag _isEnabled = new ScalarFlag(true);
+        
+        IReadOnlyScalarFlag IReadOnlyWindow.IsInteractable => IsInteractable;
+        public IScalarFlag IsInteractable => _isInteractable;
+        private readonly ScalarFlag _isInteractable = new ScalarFlag(true);
 
-                if (_isEnabledCounter > 0)
-                {
-                    IsInteractable = true;
-                    CanvasGroup.interactable = true;
-                }
-                else
-                {
-                    IsInteractable = false;
-                    CanvasGroup.interactable = false;
-                }
-            }
-        }
-        private int _isEnabledCounter = 1;
-
-        public bool IsInteractable
-        {
-            get { return _isInteractableCounter > 0; }
-            set
-            {
-                if (value)
-                {
-                    _isInteractableCounter = Mathf.Min(_isInteractableCounter + 1, 1);
-                }
-                else
-                {
-                    _isInteractableCounter--;
-                }
-
-                if (_isInteractableCounter > 0)
-                {
-                    CanvasGroup.blocksRaycasts = true;
-                }
-                else
-                {
-                    CanvasGroup.blocksRaycasts = false;
-                }
-            }
-        }
-        private int _isInteractableCounter = 1;
-
+        IReadOnlyScalarFlag IReadOnlyWindow.IsHidden => IsHidden;
+        public IScalarFlag IsHidden => _isHidden;
+        private readonly ScalarFlag _isHidden = new ScalarFlag(false);
+        
         public virtual int SortOrder
         {
-            get
-            {
-                return _sortOrder;
-            }
+            get => _sortOrder;
             set
             {
                 _sortOrder = value;
@@ -138,8 +94,10 @@ namespace UIFramework.UGUI
             }
 
             base.Initialize();
+            _isEnabled.OnUpdate += OnIsEnabledUpdated;
+            _isInteractable.OnUpdate += OnIsInteractableUpdated;
+            _isHidden.OnUpdate += OnIsHiddenUpdated;
             AccessState = AccessState.Closed;
-
             _activeAnchoredPosition = RectTransform.anchoredPosition;
             AccessState = AccessState.Closed;
             gameObject.SetActive(false);
@@ -158,8 +116,12 @@ namespace UIFramework.UGUI
             AccessState = AccessState.None;
             ResetAnimatedProperties();
             ClearAnimationReferences();
-            _isEnabledCounter = 1;
-            _isInteractableCounter = 1;
+            _isEnabled.Reset(true);
+            _isEnabled.OnUpdate -= OnIsEnabledUpdated;
+            _isInteractable.Reset(true);
+            _isInteractable.OnUpdate -= OnIsInteractableUpdated;
+            _isHidden.Reset(false);
+            _isHidden.OnUpdate -= OnIsHiddenUpdated;
             _sortOrder = 0;
             _genericAnimations.Clear();
             OnTerminate();
@@ -185,7 +147,7 @@ namespace UIFramework.UGUI
                 if (waiting != _isWaiting)
                 {
                     _isWaiting = waiting;
-                    IsEnabled = !waiting;
+                    _isEnabled.SetOverrideValue(!waiting);
                 }
                 return true;
             }
@@ -223,7 +185,7 @@ namespace UIFramework.UGUI
                 }
                 else
                 {
-                    IsInteractable = false;
+                    _isInteractable.SetOverrideValue(false);
                     AccessAnimationPlayable = playable;
                     _animationPlayer = AnimationPlayer.PlayAnimation(playable.Animation, playable.StartTime, playable.PlaybackMode, playable.EasingMode, playable.TimeMode, playable.PlaybackSpeed);
                     _animationPlayer.OnComplete += OnAnimationComplete;
@@ -247,7 +209,7 @@ namespace UIFramework.UGUI
                 {
                     Debug.Log("Open was called on a Window without an animation while already playing a state animation, " +
                         "this may cause unexpected behviour of the UI.");
-                    IsInteractable = true;
+                    _isInteractable.SetOverrideValue(true);
 
                     float time = 0.0F;
                     if (AccessState == AccessState.Closing) time = 0.0F;
@@ -284,7 +246,7 @@ namespace UIFramework.UGUI
                 }
                 else
                 {
-                    IsInteractable = false;
+                    _isInteractable.SetOverrideValue(false);
                     AccessAnimationPlayable = playable;
                     _animationPlayer = AnimationPlayer.PlayAnimation(playable.Animation, playable.StartTime, playable.PlaybackMode, playable.EasingMode, playable.TimeMode, playable.PlaybackSpeed);
                     _animationPlayer.OnComplete += OnAnimationComplete;
@@ -307,7 +269,7 @@ namespace UIFramework.UGUI
                 {
                     Debug.Log("Close was called on a Window without an animation while already playing a state animation, " +
                         "this may cause unexpected behviour of the UI.");
-                    IsInteractable = true;
+                    _isInteractable.SetOverrideValue(true);
 
                     float time = 0.0F;
                     if (AccessState == AccessState.Opening) time = 0.0F;
@@ -366,7 +328,7 @@ namespace UIFramework.UGUI
         {
             ResetAnimatedProperties();
             ClearAnimationReferences();
-            IsInteractable = true;
+            _isInteractable.SetOverrideValue(true);
             if (AccessState == AccessState.Opening)
             {
                 AccessState = AccessState.Open;
@@ -405,6 +367,37 @@ namespace UIFramework.UGUI
                 _animationPlayer = null;                
             }
             AccessAnimationPlaybackData.ReleaseReferences();
+        }
+
+        private void OnIsEnabledUpdated(bool value)
+        {
+            if (value)
+            {
+                _isInteractable.SetOverrideValue(true);
+                CanvasGroup.interactable = true;
+            }
+            else
+            {
+                _isInteractable.SetOverrideValue(false);
+                CanvasGroup.interactable = false;
+            }
+        }
+        
+        private void OnIsInteractableUpdated(bool value)
+        {
+            if (value)
+            {
+                CanvasGroup.blocksRaycasts = true;
+            }
+            else
+            {
+                CanvasGroup.blocksRaycasts = false;
+            }
+        }
+        
+        private void OnIsHiddenUpdated(bool value)
+        {
+            gameObject.SetActive(value);
         }
     }
 }
