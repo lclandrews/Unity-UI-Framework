@@ -220,6 +220,7 @@ namespace UIFramework.UGUI
                     ClearAnimationReferences();
                     _onAccessAnimationComplete = null;
                 }
+                AccessAnimationPlayable = default;
                 AccessState previousState = AccessState;
                 AccessState = AccessState.Open;
                 if (previousState != AccessState.Opening)
@@ -280,6 +281,7 @@ namespace UIFramework.UGUI
                     ClearAnimationReferences();
                     _onAccessAnimationComplete = null;
                 }
+                AccessAnimationPlayable = default;
                 AccessState previousState = AccessState;
                 AccessState = AccessState.Closed;
                 if (previousState != AccessState.Closing)

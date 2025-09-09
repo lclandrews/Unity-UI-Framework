@@ -244,6 +244,7 @@ namespace UIFramework.UIToolkit
                     ClearAnimationReferences();
                     _onAccessAnimationComplete = null;
                 }
+                AccessAnimationPlayable = default;
                 AccessState previousState = AccessState;
                 AccessState = AccessState.Open;
                 if (previousState != AccessState.Opening)
@@ -304,6 +305,7 @@ namespace UIFramework.UIToolkit
                     ClearAnimationReferences();
                     _onAccessAnimationComplete = null;
                 }
+                AccessAnimationPlayable = default;
                 AccessState previousState = AccessState;
                 AccessState = AccessState.Closed;                
                 if(previousState != AccessState.Closing)
